@@ -12,6 +12,8 @@ The provided source codes were tested in Windows 10 using the following librarie
 - glm 0.9.9.8;
 - rapidjson;
 
+To run the application, you need to pass the `config.json` file path as an argument to it (_e.g._ `main.exe config.json`).
+ 
 ## Compilation/Building for Windows 
 
 To compile the source code and build the application for Windows, you may need to:
@@ -30,8 +32,7 @@ Then, you can create a new, empty Visual Studio project, add the source codes, a
  - `Configuration Properties -> General -> C++ Language Standard:` to `ISO C++17 Standard (/std:c++17)`;
  - `Configuration Properties -> C/C++ -> General -> Additional Include Directories:` to `<AMBIENT_OCCLUSION_PATH>\include;%(AdditionalIncludeDirectories)`;
  - `Configuration Properties -> Linker -> General ->  Additional Library Directories:` to `<VULKAN_SDK_PATH>\Lib;%(AdditionalLibraryDirectories)`;
- - `Configuration Properties -> Linker -> Input -> Additional Dependencies:` add `vulkan-1.lib`;
- 
-Where:
+ - `Configuration Properties -> Linker -> Input -> Additional Dependencies:` add `vulkan-1.lib`,
+where:
 - `<AMBIENT_OCCLUSION_PATH>` is the path where the repository is stored;
 - `<VULKAN_SDK_PATH>` is the path where the Vulkan SDK is installed;
