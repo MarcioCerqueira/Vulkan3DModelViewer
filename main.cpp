@@ -1,37 +1,35 @@
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
-
 #include <vulkan/vulkan.hpp>
 
 #include <iostream>
+#include <stdexcept>
+#include <cstdlib>
 
-int main() {
-    glfwInit();
+#include "ArgumentParser.h"
+#include "JSONConfigurationFileParser.h"
+#include "AmbientOcclusionApplication.h"
 
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Vulkan window", nullptr, nullptr);
+int main(int argc, const char* argv[]) 
+{
+	
+	try 
+	{
+		ArgumentParser argumentParser{ argc, argv };
+		JSONConfigurationFileParser JSONConfigurationFileParser{ argumentParser.getConfigurationFile().c_str() };
+		ConfigurationFileModel configurationFileModel = JSONConfigurationFileParser.getConfigurationFileModel();
 
-    uint32_t extensionCount = 0;
-    vk::enumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+		AmbientOcclusionApplication app{ configurationFileModel.window.width, configurationFileModel.window.height };
+		app.run();
+	}
+	catch (const std::exception& exception) 
+	{
+		std::cerr << exception.what() << std::endl;
+		return EXIT_FAILURE;
+	}
 
-    std::cout << extensionCount << " extensions supported\n";
+	return EXIT_SUCCESS;
 
-    glm::mat4 matrix;
-    glm::vec4 vec;
-    auto test = matrix * vec;
-
-    while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
-    }
-
-    glfwDestroyWindow(window);
-
-    glfwTerminate();
-
-    return 0;
 }

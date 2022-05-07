@@ -10,6 +10,7 @@ The provided source codes were tested in Windows 10 using the following librarie
 - Vulkan SDK 1.3.211.0;
 - glfw3 3.3.7;
 - glm 0.9.9.8;
+- rapidjson;
 
 ## Compilation/Building for Windows 
 
@@ -22,9 +23,15 @@ To compile the source code and build the application for Windows, you may need t
    - vcpkg install vulkan-headers;
    - vcpkg install glfw3;
    - vcpkg install glm;
+   - vcpkg install rapidjson;
    - vcpkg integrate install;
    
 Then, you can create a new, empty Visual Studio project, add the source codes, and you may need to change the following properties of the project:
  - `Configuration Properties -> General -> C++ Language Standard:` to `ISO C++17 Standard (/std:c++17)`;
+ - `Configuration Properties -> C/C++ -> General -> Additional Include Directories:` to `<AMBIENT_OCCLUSION_PATH>\include;%(AdditionalIncludeDirectories)`;
  - `Configuration Properties -> Linker -> General ->  Additional Library Directories:` to `<VULKAN_SDK_PATH>\Lib;%(AdditionalLibraryDirectories)`;
  - `Configuration Properties -> Linker -> Input -> Additional Dependencies:` add `vulkan-1.lib`;
+ 
+Where:
+- `<AMBIENT_OCCLUSION_PATH>` is the path where the repository is stored;
+- `<VULKAN_SDK_PATH>` is the path where the Vulkan SDK is installed;
