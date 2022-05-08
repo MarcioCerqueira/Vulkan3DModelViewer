@@ -1,6 +1,6 @@
 #include "Window.h"
 
-Window::Window(int width, int height) : width(width), height(height)
+Window::Window(int width, int height, const std::string& title) : width(width), height(height), title(title)
 {
 	glfwInit();
 	setGlfwWindowHints();
@@ -21,7 +21,7 @@ void Window::setGlfwWindowHints() const
 
 void Window::createGlfwWindow()
 {
-	glfwWindow = glfwCreateWindow(width, height, "Ambient Occlusion Application", nullptr, nullptr);
+	glfwWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 }
 
 void Window::open()

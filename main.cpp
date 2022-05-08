@@ -19,7 +19,7 @@ int main(int argc, const char* argv[])
 	{
 		ArgumentParser argumentParser{ argc, argv };
 		JSONConfigurationFileParser JSONConfigurationFileParser{ argumentParser.getConfigurationFile().c_str() };
-		ConfigurationFileModel configurationFileModel = JSONConfigurationFileParser.getConfigurationFileModel();
+		ConfigurationFileModel configurationFileModel{ JSONConfigurationFileParser.getConfigurationFileModel() };
 
 		AmbientOcclusionApplication app{ configurationFileModel.window.width, configurationFileModel.window.height };
 		app.run();

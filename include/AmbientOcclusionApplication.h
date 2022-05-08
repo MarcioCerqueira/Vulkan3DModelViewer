@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "Window.h"
+#include "GraphicInstance.h"
 
 class AmbientOcclusionApplication
 {
@@ -13,5 +14,5 @@ public:
 
 private:
 	std::unique_ptr<Window> window;
-
+	std::unique_ptr<GraphicInstance> graphicInstance;
 };
