@@ -33,6 +33,7 @@ Then, you can create a new, empty Visual Studio project, add the source codes, a
  - `Configuration Properties -> C/C++ -> General -> Additional Include Directories:` to `<AMBIENT_OCCLUSION_PATH>\include;%(AdditionalIncludeDirectories)`;
  - `Configuration Properties -> Linker -> General ->  Additional Library Directories:` to `<VULKAN_SDK_PATH>\Lib;%(AdditionalLibraryDirectories)`;
  - `Configuration Properties -> Linker -> Input -> Additional Dependencies:` add `vulkan-1.lib`,
+
 where:
 - `<AMBIENT_OCCLUSION_PATH>` is the path where the repository is stored;
 - `<VULKAN_SDK_PATH>` is the path where the Vulkan SDK is installed;
