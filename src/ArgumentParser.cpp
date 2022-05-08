@@ -21,14 +21,19 @@ void ArgumentParser::validateNumberOfArguments(int argc) const
 
 void ArgumentParser::loadConfigurationFile(const char* configurationFilePath)
 {
+	std::ifstream file = openFile(configurationFilePath);
+	std::stringstream buffer;
+	buffer << file.rdbuf();
+	configurationFile = buffer.str();
+}
+
+std::ifstream ArgumentParser::openFile(const char* configurationFilePath) const
+{
 	std::ifstream file(configurationFilePath);
 	if (!file.is_open())
 	{
 		std::string errorMessage = "Error opening file located at " + std::string(configurationFilePath);
 		throw std::runtime_error(errorMessage);
 	}
-
-	std::stringstream buffer;
-	buffer << file.rdbuf();
-	configurationFile = buffer.str();
+	return file;
 }

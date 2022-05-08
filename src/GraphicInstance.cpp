@@ -7,6 +7,7 @@ GraphicInstance::GraphicInstance(const std::string& applicationName)
 		throw std::runtime_error("Validation layers requested, but not available!");
 	}
 	createVulkanInstance(applicationName);
+	physicalDevice.pick(vulkanInstance.enumeratePhysicalDevices());
 }
 
 GraphicInstance::~GraphicInstance()
@@ -14,13 +15,13 @@ GraphicInstance::~GraphicInstance()
 	vulkanInstance.destroy();
 }
 
-bool GraphicInstance::checkValidationLayerSupport()
+bool GraphicInstance::checkValidationLayerSupport() const
 {
 	const std::vector<vk::LayerProperties> availableLayers = vk::enumerateInstanceLayerProperties();
 	return checkValidationLayerAvailability(validationLayers, availableLayers);
 }
 
-bool GraphicInstance::checkValidationLayerAvailability(const std::vector<const char*>& validationLayers, const std::vector<vk::LayerProperties>& availableLayers)
+bool GraphicInstance::checkValidationLayerAvailability(const std::vector<const char*>& validationLayers, const std::vector<vk::LayerProperties>& availableLayers) const noexcept
 {
 	for (const char* layerName : validationLayers)
 	{
@@ -43,16 +44,16 @@ bool GraphicInstance::checkValidationLayerAvailability(const std::vector<const c
 
 void GraphicInstance::createVulkanInstance(const std::string& applicationName)
 {
-
-	const vk::ApplicationInfo applicationInfo{ applicationName.c_str(), 1, "No Engine", 1, VK_API_VERSION_1_0 };
-	
 	uint32_t glfwExtensionCount = 0;
 	const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 	
 	uint32_t enabledLayerCount = (enableValidationLayers) ? static_cast<uint32_t>(validationLayers.size()) : 0;
 	const char* const* enabledLayerNames = (enableValidationLayers) ? validationLayers.data() : nullptr;
 	
+	const vk::ApplicationInfo applicationInfo{ applicationName.c_str(), 1, "No Engine", 1, VK_API_VERSION_1_0 };
 	const vk::InstanceCreateInfo createInfo{ {}, &applicationInfo, enabledLayerCount, enabledLayerNames, glfwExtensionCount, glfwExtensions };
-	vulkanInstance = vk::createInstance(createInfo);
 
+	vulkanInstance = vk::createInstance(createInfo);
 }
+
+

@@ -5,6 +5,8 @@
 #include <vulkan/vulkan.hpp>
 #include <stdexcept>
 
+#include "PhysicalDevice.h"
+
 class GraphicInstance
 {
 public:
@@ -12,10 +14,10 @@ public:
 	~GraphicInstance();
 
 private:
-	bool checkValidationLayerSupport();
-	bool checkValidationLayerAvailability(const std::vector<const char*>& validationLayers, const std::vector<vk::LayerProperties>& availableLayers);
+	bool checkValidationLayerSupport() const;
+	bool checkValidationLayerAvailability(const std::vector<const char*>& validationLayers, const std::vector<vk::LayerProperties>& availableLayers) const noexcept;
 	void createVulkanInstance(const std::string& applicationName);
-
+	
 	const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
 #ifdef NDEBUG
 	const bool enableValidationLayers = false;
@@ -23,5 +25,5 @@ private:
 	const bool enableValidationLayers = true;
 #endif
 	vk::Instance vulkanInstance;
-
+	PhysicalDevice physicalDevice;
 };

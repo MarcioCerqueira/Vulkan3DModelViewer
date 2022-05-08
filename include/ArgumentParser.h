@@ -13,5 +13,6 @@ public:
 private:
 	void validateNumberOfArguments(int argc) const;
 	void loadConfigurationFile(const char* configurationFilePath);
+	std::ifstream openFile(const char* configurationFilePath) const;
 	std::string configurationFile;
 };
