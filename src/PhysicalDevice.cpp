@@ -1,15 +1,19 @@
 #include "PhysicalDevice.h"
 
-void PhysicalDevice::pick(std::vector<vk::PhysicalDevice> physicalDevices)
+void PhysicalDevice::pick(const std::vector<vk::PhysicalDevice>& physicalDevices)
+{
+	checkVulkanSupport(physicalDevices);
+	std::multimap<int, vk::PhysicalDevice> mostSuitableDevices = rateMostSuitablePhysicalDevices(physicalDevices);
+	vulkanPhysicalDevice = selectMostSuitablePhysicalDevice(mostSuitableDevices);
+	std::cout << "Selected physical device: " << vulkanPhysicalDevice.getProperties().deviceName << std::endl;
+}
+
+void PhysicalDevice::checkVulkanSupport(const std::vector<vk::PhysicalDevice>& physicalDevices) const
 {
 	if (physicalDevices.size() == 0)
 	{
 		throw std::runtime_error("Failed to find GPUs with Vulkan support!");
 	}
-
-	std::multimap<int, vk::PhysicalDevice> mostSuitableDevices = rateMostSuitablePhysicalDevices(physicalDevices);
-	vulkanPhysicalDevice = selectMostSuitablePhysicalDevice(mostSuitableDevices);
-	std::cout << "Selected physical device: " << vulkanPhysicalDevice.getProperties().deviceName << std::endl;
 }
 
 std::multimap<int, vk::PhysicalDevice> PhysicalDevice::rateMostSuitablePhysicalDevices(const std::vector<vk::PhysicalDevice>& physicalDevices) const noexcept

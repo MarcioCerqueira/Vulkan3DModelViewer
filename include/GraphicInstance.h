@@ -14,7 +14,7 @@ public:
 	~GraphicInstance();
 
 private:
-	bool checkValidationLayerSupport() const;
+	void checkValidationLayerSupport() const;
 	bool checkValidationLayerAvailability(const std::vector<const char*>& validationLayers, const std::vector<vk::LayerProperties>& availableLayers) const noexcept;
 	void createVulkanInstance(const std::string& applicationName);
 	

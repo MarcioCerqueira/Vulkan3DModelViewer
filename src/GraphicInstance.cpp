@@ -2,10 +2,7 @@
 
 GraphicInstance::GraphicInstance(const std::string& applicationName)
 {
-	if (enableValidationLayers && !checkValidationLayerSupport())
-	{
-		throw std::runtime_error("Validation layers requested, but not available!");
-	}
+	checkValidationLayerSupport();
 	createVulkanInstance(applicationName);
 	physicalDevice.pick(vulkanInstance.enumeratePhysicalDevices());
 }
@@ -15,10 +12,13 @@ GraphicInstance::~GraphicInstance()
 	vulkanInstance.destroy();
 }
 
-bool GraphicInstance::checkValidationLayerSupport() const
+void GraphicInstance::checkValidationLayerSupport() const
 {
 	const std::vector<vk::LayerProperties> availableLayers = vk::enumerateInstanceLayerProperties();
-	return checkValidationLayerAvailability(validationLayers, availableLayers);
+	if (enableValidationLayers && !checkValidationLayerAvailability(validationLayers, availableLayers))
+	{
+		throw std::runtime_error("Validation layers requested, but not available!");
+	}
 }
 
 bool GraphicInstance::checkValidationLayerAvailability(const std::vector<const char*>& validationLayers, const std::vector<vk::LayerProperties>& availableLayers) const noexcept
