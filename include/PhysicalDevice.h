@@ -13,6 +13,8 @@ private:
 	void checkVulkanSupport(const std::vector<vk::PhysicalDevice>& physicalDevices) const;
 	std::multimap<int, vk::PhysicalDevice> rateMostSuitablePhysicalDevices(const std::vector<vk::PhysicalDevice>& physicalDevices) const noexcept;
 	int rateSuitability(const vk::PhysicalDevice& vulkanPhysicalDevice) const noexcept;
+	int rateSuitabilityByPhysicalDeviceType(const vk::PhysicalDevice& vulkanPhysicalDevice) const noexcept;
+	int rateSuitabilityByQueueFamilyProperties(const vk::PhysicalDevice& vulkanPhysicalDevice) const noexcept;
 	vk::PhysicalDevice selectMostSuitablePhysicalDevice(const std::multimap<int, vk::PhysicalDevice>& mostSuitablePhysicalDevices) const;
 
 	vk::PhysicalDevice vulkanPhysicalDevice;

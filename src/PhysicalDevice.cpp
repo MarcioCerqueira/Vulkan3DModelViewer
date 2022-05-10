@@ -30,6 +30,14 @@ std::multimap<int, vk::PhysicalDevice> PhysicalDevice::rateMostSuitablePhysicalD
 int PhysicalDevice::rateSuitability(const vk::PhysicalDevice& vulkanPhysicalDevice) const noexcept
 {
 	int score = 0;
+	score += rateSuitabilityByPhysicalDeviceType(vulkanPhysicalDevice);
+	score += rateSuitabilityByQueueFamilyProperties(vulkanPhysicalDevice);
+	return score;
+}
+
+int PhysicalDevice::rateSuitabilityByPhysicalDeviceType(const vk::PhysicalDevice& vulkanPhysicalDevice) const noexcept
+{
+	int score = 0;
 	switch (vulkanPhysicalDevice.getProperties().deviceType)
 	{
 	case vk::PhysicalDeviceType::eDiscreteGpu:
@@ -44,6 +52,21 @@ int PhysicalDevice::rateSuitability(const vk::PhysicalDevice& vulkanPhysicalDevi
 	default:
 		score = 0;
 		break;
+	}
+	return score;
+}
+
+int PhysicalDevice::rateSuitabilityByQueueFamilyProperties(const vk::PhysicalDevice& vulkanPhysicalDevice) const noexcept
+{
+	int score = 0;
+	const std::vector<vk::QueueFamilyProperties> queueFamilies = vulkanPhysicalDevice.getQueueFamilyProperties();
+	for(const auto& queueFamily : queueFamilies)
+	{
+		if (queueFamily.queueFlags & vk::QueueFlagBits::eGraphics)
+		{
+			score = 1000;
+			break;
+		}
 	}
 	return score;
 }
