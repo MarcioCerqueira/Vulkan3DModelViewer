@@ -9,7 +9,7 @@ class AmbientOcclusionApplication
 {
 
 public:
-	AmbientOcclusionApplication(int windowWidth, int windowHeight);
+	AmbientOcclusionApplication(const int windowWidth, const int windowHeight);
 	void run() const noexcept;
 
 private:

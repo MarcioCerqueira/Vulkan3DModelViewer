@@ -12,7 +12,7 @@
 #include "JSONConfigurationFileParser.h"
 #include "AmbientOcclusionApplication.h"
 
-int main(int argc, const char* argv[]) 
+int main(const int argc, const char* argv[]) 
 {
 	
 	try 

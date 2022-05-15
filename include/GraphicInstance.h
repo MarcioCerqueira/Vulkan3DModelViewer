@@ -18,14 +18,14 @@ private:
 	void checkValidationLayerSupport() const;
 	bool checkValidationLayerAvailability(const std::vector<const char*>& validationLayers, const std::vector<vk::LayerProperties>& availableLayers) const noexcept;
 	void createVulkanInstance(const std::string& applicationName);
-	uint32_t getEnabledLayerCount() const;
+	const uint32_t getEnabledLayerCount() const;
 	const char* const* getEnabledLayerNames() const;
 
 	const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
 #ifdef NDEBUG
-	const bool enableValidationLayers = false;
+	const bool enableValidationLayers{ false };
 #else
-	const bool enableValidationLayers = true;
+	const bool enableValidationLayers{ true };
 #endif
 	vk::Instance vulkanInstance;
 	PhysicalDevice physicalDevice;

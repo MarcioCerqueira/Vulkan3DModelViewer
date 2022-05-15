@@ -1,8 +1,8 @@
 #include "AmbientOcclusionApplication.h"
 
-AmbientOcclusionApplication::AmbientOcclusionApplication(int windowWidth, int windowHeight)
+AmbientOcclusionApplication::AmbientOcclusionApplication(const int windowWidth, const int windowHeight)
 {
-	std::string applicationName = "Ambient Occlusion Application";
+	const std::string applicationName{ "Ambient Occlusion Application" };
 	window = std::make_unique<Window>(windowWidth, windowHeight, applicationName);
 	graphicInstance = std::make_unique<GraphicInstance>(applicationName);
 }

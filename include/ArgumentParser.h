@@ -7,11 +7,11 @@
 class ArgumentParser
 {
 public:
-	ArgumentParser(int argc, const char* argv[]);
+	ArgumentParser(const int argc, const char* argv[]);
 	std::string getConfigurationFile() const noexcept;
 
 private:
-	void validateNumberOfArguments(int argc) const;
+	void validateNumberOfArguments(const int argc) const;
 	void loadConfigurationFile(const char* configurationFilePath);
 	std::ifstream openFile(const char* configurationFilePath) const;
 	std::string configurationFile;

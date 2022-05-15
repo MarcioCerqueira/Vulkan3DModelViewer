@@ -11,7 +11,7 @@ class PhysicalDevice
 {
 public:
 	void pick(const std::vector<vk::PhysicalDevice>& physicalDevices);
-	void createLogicalDevice(uint32_t enabledLayerCount, const char* const* enabledLayerNames);
+	void createLogicalDevice(const uint32_t enabledLayerCount, const char* const* enabledLayerNames);
 
 private:
 	void checkVulkanSupport(const std::vector<vk::PhysicalDevice>& physicalDevices) const;
