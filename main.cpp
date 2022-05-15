@@ -24,12 +24,21 @@ int main(int argc, const char* argv[])
 		AmbientOcclusionApplication app{ configurationFileModel.window.width, configurationFileModel.window.height };
 		app.run();
 	}
-	catch (const std::exception& exception) 
+	catch (const vk::SystemError& error)
 	{
-		std::cerr << exception.what() << std::endl;
+		std::cerr << "vk::SystemError: " << error.what() << std::endl;
 		return EXIT_FAILURE;
 	}
-
+	catch (const std::exception& exception)
+	{
+		std::cerr << "std::exception: " << exception.what() << std::endl;
+		return EXIT_FAILURE;
+	}
+	catch (...)
+	{
+		std::cerr << "Unknown error" << std::endl;
+		return EXIT_FAILURE;
+	}
 	return EXIT_SUCCESS;
 
 }

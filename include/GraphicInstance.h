@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include "PhysicalDevice.h"
+#include "LogicalDevice.h"
 
 class GraphicInstance
 {
@@ -17,7 +18,9 @@ private:
 	void checkValidationLayerSupport() const;
 	bool checkValidationLayerAvailability(const std::vector<const char*>& validationLayers, const std::vector<vk::LayerProperties>& availableLayers) const noexcept;
 	void createVulkanInstance(const std::string& applicationName);
-	
+	uint32_t getEnabledLayerCount() const;
+	const char* const* getEnabledLayerNames() const;
+
 	const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
 #ifdef NDEBUG
 	const bool enableValidationLayers = false;

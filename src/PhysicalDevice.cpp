@@ -16,7 +16,7 @@ void PhysicalDevice::checkVulkanSupport(const std::vector<vk::PhysicalDevice>& p
 	}
 }
 
-std::multimap<int, vk::PhysicalDevice> PhysicalDevice::rateMostSuitablePhysicalDevices(const std::vector<vk::PhysicalDevice>& physicalDevices) const noexcept
+std::multimap<int, vk::PhysicalDevice> PhysicalDevice::rateMostSuitablePhysicalDevices(const std::vector<vk::PhysicalDevice>& physicalDevices) const
 {
 	std::multimap<int, vk::PhysicalDevice> mostSuitablePhysicalDevices;
 	for (const auto& device : physicalDevices)
@@ -27,7 +27,7 @@ std::multimap<int, vk::PhysicalDevice> PhysicalDevice::rateMostSuitablePhysicalD
 	return mostSuitablePhysicalDevices;
 }
 
-int PhysicalDevice::rateSuitability(const vk::PhysicalDevice& vulkanPhysicalDevice) const noexcept
+int PhysicalDevice::rateSuitability(const vk::PhysicalDevice& vulkanPhysicalDevice) const
 {
 	int score = 0;
 	score += rateSuitabilityByPhysicalDeviceType(vulkanPhysicalDevice);
@@ -35,7 +35,7 @@ int PhysicalDevice::rateSuitability(const vk::PhysicalDevice& vulkanPhysicalDevi
 	return score;
 }
 
-int PhysicalDevice::rateSuitabilityByPhysicalDeviceType(const vk::PhysicalDevice& vulkanPhysicalDevice) const noexcept
+int PhysicalDevice::rateSuitabilityByPhysicalDeviceType(const vk::PhysicalDevice& vulkanPhysicalDevice) const
 {
 	int score = 0;
 	switch (vulkanPhysicalDevice.getProperties().deviceType)
@@ -56,19 +56,31 @@ int PhysicalDevice::rateSuitabilityByPhysicalDeviceType(const vk::PhysicalDevice
 	return score;
 }
 
-int PhysicalDevice::rateSuitabilityByQueueFamilyProperties(const vk::PhysicalDevice& vulkanPhysicalDevice) const noexcept
+int PhysicalDevice::rateSuitabilityByQueueFamilyProperties(const vk::PhysicalDevice& vulkanPhysicalDevice) const
 {
 	int score = 0;
+	if (retrieveValidGraphicsFamilyIndex(vulkanPhysicalDevice).has_value())
+	{
+		score = 1000;
+	}
+	return score;
+}
+
+std::optional<uint32_t> PhysicalDevice::retrieveValidGraphicsFamilyIndex(const vk::PhysicalDevice& vulkanPhysicalDevice) const
+{
+	int queueFamilyIndex = 0;
+	std::optional<uint32_t> graphicsFamilyIndex;
 	const std::vector<vk::QueueFamilyProperties> queueFamilies = vulkanPhysicalDevice.getQueueFamilyProperties();
-	for(const auto& queueFamily : queueFamilies)
+	for (const auto& queueFamily : queueFamilies)
 	{
 		if (queueFamily.queueFlags & vk::QueueFlagBits::eGraphics)
 		{
-			score = 1000;
+			graphicsFamilyIndex = queueFamilyIndex;
 			break;
 		}
+		queueFamilyIndex++;
 	}
-	return score;
+	return graphicsFamilyIndex;
 }
 
 vk::PhysicalDevice PhysicalDevice::selectMostSuitablePhysicalDevice(const std::multimap<int, vk::PhysicalDevice>& mostSuitablePhysicalDevices) const
@@ -81,4 +93,10 @@ vk::PhysicalDevice PhysicalDevice::selectMostSuitablePhysicalDevice(const std::m
 	{
 		throw std::runtime_error("Failed to find a suitable GPU!");
 	}
+}
+
+void PhysicalDevice::createLogicalDevice(uint32_t enabledLayerCount, const char* const* enabledLayerNames)
+{
+	std::optional<uint32_t> validGraphicsFamilyIndex = retrieveValidGraphicsFamilyIndex(vulkanPhysicalDevice);
+	logicalDevice = make_unique<LogicalDevice>(vulkanPhysicalDevice, validGraphicsFamilyIndex, enabledLayerCount, enabledLayerNames);
 }
