@@ -4,6 +4,7 @@
 
 #include "Window.h"
 #include "GraphicInstance.h"
+#include "WindowSurface.h"
 
 class AmbientOcclusionApplication
 {
@@ -15,4 +16,5 @@ public:
 private:
 	std::unique_ptr<Window> window;
 	std::unique_ptr<GraphicInstance> graphicInstance;
+	std::unique_ptr<WindowSurface> windowSurface;
 };

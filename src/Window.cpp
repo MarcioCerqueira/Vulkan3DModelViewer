@@ -24,6 +24,11 @@ void Window::createGlfwWindow()
 	glfwWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 }
 
+GLFWwindow* Window::getGLFWWindow() const noexcept
+{
+	return glfwWindow;
+}
+
 void Window::open()
 {
 	while(!glfwWindowShouldClose(glfwWindow)) 

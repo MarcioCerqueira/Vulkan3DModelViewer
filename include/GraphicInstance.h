@@ -14,6 +14,10 @@ public:
 	explicit GraphicInstance(const std::string& applicationName);
 	~GraphicInstance();
 
+	vk::Instance getVulkanInstance() const noexcept;
+	void selectPhysicalDevice(const vk::SurfaceKHR& vulkanWindowSurface);
+	void createLogicalDevice(const vk::SurfaceKHR& vulkanWindowSurface);
+
 private:
 	void checkValidationLayerSupport() const;
 	bool checkValidationLayerAvailability(const std::vector<const char*>& validationLayers, const std::vector<vk::LayerProperties>& availableLayers) const noexcept;
@@ -29,4 +33,5 @@ private:
 #endif
 	vk::Instance vulkanInstance;
 	PhysicalDevice physicalDevice;
+	std::unique_ptr<LogicalDevice> logicalDevice;
 };

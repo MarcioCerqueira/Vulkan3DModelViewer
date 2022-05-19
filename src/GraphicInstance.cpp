@@ -4,13 +4,6 @@ GraphicInstance::GraphicInstance(const std::string& applicationName)
 {
 	checkValidationLayerSupport();
 	createVulkanInstance(applicationName);
-
-	const std::vector<vk::PhysicalDevice> vulkanPhysicalDevices = vulkanInstance.enumeratePhysicalDevices();
-	physicalDevice.pick(vulkanPhysicalDevices);
-	
-	const uint32_t enabledLayerCount = getEnabledLayerCount();
-	const char* const* enabledLayerNames = getEnabledLayerNames();
-	physicalDevice.createLogicalDevice(enabledLayerCount, enabledLayerNames);
 }
 
 GraphicInstance::~GraphicInstance()
@@ -69,4 +62,22 @@ const uint32_t GraphicInstance::getEnabledLayerCount() const
 const char* const* GraphicInstance::getEnabledLayerNames() const
 {
 	return (enableValidationLayers) ? validationLayers.data() : nullptr;
+}
+
+vk::Instance GraphicInstance::getVulkanInstance() const noexcept
+{
+	return vulkanInstance;
+}
+
+void GraphicInstance::selectPhysicalDevice(const vk::SurfaceKHR& vulkanWindowSurface)
+{
+	const std::vector<vk::PhysicalDevice> vulkanPhysicalDevices = vulkanInstance.enumeratePhysicalDevices();
+	physicalDevice.pick(vulkanPhysicalDevices, vulkanWindowSurface);
+}
+
+void GraphicInstance::createLogicalDevice(const vk::SurfaceKHR& vulkanWindowSurface)
+{
+	const uint32_t enabledLayerCount{ getEnabledLayerCount() };
+	const char* const* enabledLayerNames{ getEnabledLayerNames() };
+	logicalDevice = physicalDevice.createLogicalDevice(enabledLayerCount, enabledLayerNames, vulkanWindowSurface);
 }

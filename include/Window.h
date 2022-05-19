@@ -9,6 +9,7 @@ public:
 	Window(const int width, const int height, const std::string& title);
 	~Window();
 	
+	GLFWwindow* getGLFWWindow() const noexcept;
 	void open();
 
 private:
