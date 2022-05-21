@@ -32,6 +32,7 @@ int PhysicalDevice::rateSuitability(const vk::PhysicalDevice& vulkanPhysicalDevi
 	int score{ 0 };
 	score += rateSuitabilityByPhysicalDeviceType(vulkanPhysicalDevice);
 	score += rateSuitabilityByQueueFamilyProperties(vulkanPhysicalDevice, vulkanWindowSurface);
+	score *= rateSuitabilityByDeviceExtensionSupport(vulkanPhysicalDevice);
 	return score;
 }
 
@@ -59,15 +60,29 @@ int PhysicalDevice::rateSuitabilityByPhysicalDeviceType(const vk::PhysicalDevice
 int PhysicalDevice::rateSuitabilityByQueueFamilyProperties(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface) const
 {
 	int score{ 0 };
-	if (retrieveValidGraphicsFamilyIndex(vulkanPhysicalDevice).has_value())
-	{
-		score += 1000;
-	}
-	if (retrieveValidPresentFamilyIndex(vulkanPhysicalDevice, vulkanWindowSurface).has_value())
-	{
-		score += 1000;
-	}
+	QueueFamilyIndicesModel queueFamilyIndices = computeQueueFamilyIndices(vulkanPhysicalDevice, vulkanWindowSurface);
+	score += 1000 * static_cast<int>(queueFamilyIndices.graphicsFamilyIndex.has_value());
+	score += 1000 * static_cast<int>(queueFamilyIndices.presentFamilyIndex.has_value());
 	return score;
+}
+
+QueueFamilyIndicesModel PhysicalDevice::computeQueueFamilyIndices(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface) const
+{
+	QueueFamilyIndicesModel queueFamilyIndices;
+	queueFamilyIndices.graphicsFamilyIndex = retrieveValidGraphicsFamilyIndex(vulkanPhysicalDevice);
+	queueFamilyIndices.presentFamilyIndex = retrieveValidPresentFamilyIndex(vulkanPhysicalDevice, vulkanWindowSurface);
+	return queueFamilyIndices;
+}
+
+int PhysicalDevice::rateSuitabilityByDeviceExtensionSupport(const vk::PhysicalDevice& vulkanPhysicalDevice) const
+{
+	const std::vector<vk::ExtensionProperties> availableExtensions = vulkanPhysicalDevice.enumerateDeviceExtensionProperties();
+	std::set<std::string> requiredExtensions(vulkanDeviceExtensions.begin(), vulkanDeviceExtensions.end());
+	for (const auto& extension : availableExtensions)
+	{
+		requiredExtensions.erase(extension.extensionName);
+	}
+	return static_cast<int>(requiredExtensions.empty());
 }
 
 std::optional<uint32_t> PhysicalDevice::retrieveValidGraphicsFamilyIndex(const vk::PhysicalDevice& vulkanPhysicalDevice) const
@@ -114,11 +129,15 @@ vk::PhysicalDevice PhysicalDevice::selectMostSuitablePhysicalDevice(const std::m
 	}
 }
 
-std::unique_ptr<LogicalDevice> PhysicalDevice::createLogicalDevice(const uint32_t enabledLayerCount, const char* const* enabledLayerNames, const vk::SurfaceKHR& vulkanWindowSurface)
+std::unique_ptr<LogicalDevice> PhysicalDevice::createLogicalDevice(uint32_t enabledLayerCount, 
+	char* const* enabledLayerNames, const vk::SurfaceKHR& vulkanWindowSurface)
 {
-	std::optional<uint32_t> validGraphicsFamilyIndex{ retrieveValidGraphicsFamilyIndex(vulkanPhysicalDevice) };
-	std::optional<uint32_t> validPresentFamilyIndex{ retrieveValidPresentFamilyIndex(vulkanPhysicalDevice, vulkanWindowSurface) };
-	std::unique_ptr<LogicalDevice> logicalDevice{ make_unique<LogicalDevice>(validGraphicsFamilyIndex, validPresentFamilyIndex) };
-	logicalDevice->create(vulkanPhysicalDevice, enabledLayerCount, enabledLayerNames);
-	return logicalDevice;
+	const LogicalDeviceInfoModel logicalDeviceInfoModel{
+		.queueFamilyIndices = computeQueueFamilyIndices(vulkanPhysicalDevice, vulkanWindowSurface),
+		.vulkanPhysicalDevice = vulkanPhysicalDevice,
+		.vulkanDeviceExtensions = vulkanDeviceExtensions,
+		.enabledLayerCount = enabledLayerCount,
+		.enabledLayerNames = enabledLayerNames
+	};
+	return std::make_unique<LogicalDevice>(logicalDeviceInfoModel);
 }

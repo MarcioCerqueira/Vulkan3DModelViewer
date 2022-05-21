@@ -54,14 +54,14 @@ void GraphicInstance::createVulkanInstance(const std::string& applicationName)
 	vulkanInstance = vk::createInstance(createInfo);
 }
 
-const uint32_t GraphicInstance::getEnabledLayerCount() const
+uint32_t GraphicInstance::getEnabledLayerCount() const
 {
 	return (enableValidationLayers) ? static_cast<uint32_t>(validationLayers.size()) : 0;
 }
 
-const char* const* GraphicInstance::getEnabledLayerNames() const
+char* const* GraphicInstance::getEnabledLayerNames() const
 {
-	return (enableValidationLayers) ? validationLayers.data() : nullptr;
+	return (enableValidationLayers) ? const_cast<char* const*>(validationLayers.data()) : nullptr;
 }
 
 vk::Instance GraphicInstance::getVulkanInstance() const noexcept
@@ -77,7 +77,7 @@ void GraphicInstance::selectPhysicalDevice(const vk::SurfaceKHR& vulkanWindowSur
 
 void GraphicInstance::createLogicalDevice(const vk::SurfaceKHR& vulkanWindowSurface)
 {
-	const uint32_t enabledLayerCount{ getEnabledLayerCount() };
-	const char* const* enabledLayerNames{ getEnabledLayerNames() };
+	uint32_t enabledLayerCount{ getEnabledLayerCount() };
+	char* const* enabledLayerNames{ getEnabledLayerNames() };
 	logicalDevice = physicalDevice.createLogicalDevice(enabledLayerCount, enabledLayerNames, vulkanWindowSurface);
 }

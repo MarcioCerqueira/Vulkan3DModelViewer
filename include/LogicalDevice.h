@@ -6,14 +6,13 @@
 #include <iostream>
 #include <set>
 
+#include "LogicalDeviceInfoModel.h"
+
 class LogicalDevice
 {
 public:
-	LogicalDevice(const std::optional<uint32_t>& graphicsFamilyIndex, const std::optional<uint32_t>& presentFamilyIndex);
-	void create(const vk::PhysicalDevice& vulkanPhysicalDevice, const uint32_t enabledLayerCount, const char* const* enabledLayerNames);
+	LogicalDevice(const LogicalDeviceInfoModel& logicalDeviceInfo);
 
 private:
 	vk::Device vulkanLogicalDevice; 
-	const std::optional<uint32_t> graphicsFamilyIndex; 
-	const std::optional<uint32_t> presentFamilyIndex;
 };
