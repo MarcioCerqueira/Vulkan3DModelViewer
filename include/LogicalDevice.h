@@ -6,12 +6,12 @@
 #include <iostream>
 #include <set>
 
-#include "LogicalDeviceInfoModel.h"
+#include "LogicalDeviceInfo.h"
 
 class LogicalDevice
 {
 public:
-	LogicalDevice(const LogicalDeviceInfoModel& logicalDeviceInfo);
+	LogicalDevice(const LogicalDeviceInfo& logicalDeviceInfo);
 
 private:
 	vk::Device vulkanLogicalDevice; 

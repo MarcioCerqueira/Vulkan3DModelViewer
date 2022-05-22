@@ -29,6 +29,13 @@ GLFWwindow* Window::getGLFWWindow() const noexcept
 	return glfwWindow;
 }
 
+WindowSize Window::getFramebufferSize() const
+{
+	WindowSize framebufferSize;
+	glfwGetFramebufferSize(glfwWindow, &framebufferSize.width, &framebufferSize.height);
+	return framebufferSize;
+}
+
 void Window::open()
 {
 	while(!glfwWindowShouldClose(glfwWindow)) 

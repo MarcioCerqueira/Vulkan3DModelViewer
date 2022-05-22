@@ -3,6 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <string>
 
+#include "WindowSize.h"
+
 class Window
 {
 public:
@@ -10,6 +12,7 @@ public:
 	~Window();
 	
 	GLFWwindow* getGLFWWindow() const noexcept;
+	WindowSize getFramebufferSize() const;
 	void open();
 
 private:

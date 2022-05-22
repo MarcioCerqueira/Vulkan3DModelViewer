@@ -4,11 +4,11 @@
 #include <vulkan/vulkan.hpp>
 #include <optional>
 
-#include "QueueFamilyIndicesModel.h"
+#include "QueueFamilyIndices.h"
 
-struct LogicalDeviceInfoModel
+struct LogicalDeviceInfo
 {
-	QueueFamilyIndicesModel queueFamilyIndices;
+	QueueFamilyIndices queueFamilyIndices;
 	vk::PhysicalDevice vulkanPhysicalDevice;
 	std::vector<const char*> vulkanDeviceExtensions;
 	uint32_t enabledLayerCount;

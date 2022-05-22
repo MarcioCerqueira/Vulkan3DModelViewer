@@ -1,0 +1,19 @@
+#pragma once
+
+#include <vulkan/vulkan.hpp>
+#include <optional>
+
+class QueueFamilyIndices
+{
+public:
+	QueueFamilyIndices(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface);
+	std::optional<uint32_t> getGraphicsFamilyIndex() const noexcept;
+	std::optional<uint32_t> getPresentFamilyIndex() const noexcept;
+
+private:
+	void computeValidGraphicsFamilyIndex(const vk::PhysicalDevice& vulkanPhysicalDevice);
+	void computeValidPresentFamilyIndex(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface);
+
+	std::optional<uint32_t> graphicsFamilyIndex;
+	std::optional<uint32_t> presentFamilyIndex;
+};

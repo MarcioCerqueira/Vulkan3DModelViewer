@@ -1,11 +1,11 @@
 #include "LogicalDevice.h"
 
-LogicalDevice::LogicalDevice(const LogicalDeviceInfoModel& logicalDeviceInfo)
+LogicalDevice::LogicalDevice(const LogicalDeviceInfo& logicalDeviceInfo)
 {
 	const float queuePriority{ 1.0f };
 	std::set<uint32_t> uniqueQueueFamilies = { 
-		logicalDeviceInfo.queueFamilyIndices.graphicsFamilyIndex.value(),
-		logicalDeviceInfo.queueFamilyIndices.presentFamilyIndex.value()
+		logicalDeviceInfo.queueFamilyIndices.getGraphicsFamilyIndex().value(),
+		logicalDeviceInfo.queueFamilyIndices.getPresentFamilyIndex().value()
 	};
 	std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
 	for (uint32_t queueFamily : uniqueQueueFamilies)

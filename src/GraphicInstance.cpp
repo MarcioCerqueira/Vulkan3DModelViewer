@@ -69,10 +69,10 @@ vk::Instance GraphicInstance::getVulkanInstance() const noexcept
 	return vulkanInstance;
 }
 
-void GraphicInstance::selectPhysicalDevice(const vk::SurfaceKHR& vulkanWindowSurface)
+void GraphicInstance::selectPhysicalDevice(const vk::SurfaceKHR& vulkanWindowSurface, const WindowSize& framebufferSize)
 {
 	const std::vector<vk::PhysicalDevice> vulkanPhysicalDevices = vulkanInstance.enumeratePhysicalDevices();
-	physicalDevice.pick(vulkanPhysicalDevices, vulkanWindowSurface);
+	physicalDevice.pick(vulkanPhysicalDevices, vulkanWindowSurface, framebufferSize);
 }
 
 void GraphicInstance::createLogicalDevice(const vk::SurfaceKHR& vulkanWindowSurface)
