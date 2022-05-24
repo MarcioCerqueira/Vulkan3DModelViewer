@@ -2,9 +2,9 @@
 
 SwapChain::SwapChain(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface, const WindowSize& framebufferSize)
 {
-	vk::SurfaceCapabilitiesKHR capabilities = vulkanPhysicalDevice.getSurfaceCapabilitiesKHR(vulkanWindowSurface);
-	const std::vector<vk::SurfaceFormatKHR> availableFormats = vulkanPhysicalDevice.getSurfaceFormatsKHR(vulkanWindowSurface);
-	std::vector<vk::PresentModeKHR> availablePresentModes = vulkanPhysicalDevice.getSurfacePresentModesKHR(vulkanWindowSurface);
+    vk::SurfaceCapabilitiesKHR capabilities{ vulkanPhysicalDevice.getSurfaceCapabilitiesKHR(vulkanWindowSurface) };
+    const std::vector<vk::SurfaceFormatKHR> availableFormats{ vulkanPhysicalDevice.getSurfaceFormatsKHR(vulkanWindowSurface) };
+    std::vector<vk::PresentModeKHR> availablePresentModes{ vulkanPhysicalDevice.getSurfacePresentModesKHR(vulkanWindowSurface) };
 
     checkSwapChainValidity(availableFormats, availablePresentModes);
     chooseSwapSurfaceFormat(availableFormats);

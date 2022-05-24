@@ -39,15 +39,14 @@ vk::PhysicalDevice PhysicalDevice::selectMostSuitablePhysicalDevice(const std::m
 	}
 }
 
-std::unique_ptr<LogicalDevice> PhysicalDevice::createLogicalDevice(uint32_t enabledLayerCount, 
-	char* const* enabledLayerNames, const vk::SurfaceKHR& vulkanWindowSurface)
+std::unique_ptr<LogicalDevice> PhysicalDevice::createLogicalDevice(const ValidationLayer& validationLayer, const vk::SurfaceKHR& vulkanWindowSurface)
 {
 	const LogicalDeviceInfo logicalDeviceInfo{
 		.queueFamilyIndices = QueueFamilyIndices(vulkanPhysicalDevice, vulkanWindowSurface),
 		.vulkanPhysicalDevice = vulkanPhysicalDevice,
 		.vulkanDeviceExtensions = vulkanDeviceExtensions,
-		.enabledLayerCount = enabledLayerCount,
-		.enabledLayerNames = enabledLayerNames
+		.enabledLayerCount = validationLayer.getEnabledLayerCount(),
+		.enabledLayerNames = validationLayer.getEnabledLayerNames()
 	};
 	return std::make_unique<LogicalDevice>(logicalDeviceInfo);
 }

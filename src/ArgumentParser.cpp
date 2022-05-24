@@ -27,12 +27,12 @@ void ArgumentParser::loadConfigurationFile(const char* configurationFilePath)
 	configurationFile = buffer.str();
 }
 
-std::ifstream ArgumentParser::openFile(const char* configurationFilePath) const
+std::ifstream ArgumentParser::openFile(const char* filePath) const
 {
-	std::ifstream file(configurationFilePath);
+	std::ifstream file(filePath);
 	if (!file.is_open())
 	{
-		std::string errorMessage = "Error opening file located at " + std::string(configurationFilePath);
+		std::string errorMessage = "Error opening file located at " + std::string(filePath);
 		throw std::runtime_error(errorMessage);
 	}
 	return file;

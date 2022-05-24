@@ -2,11 +2,13 @@
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+#define VULKAN_HPP_NO_CONSTRUCTORS
 #include <vulkan/vulkan.hpp>
 #include <stdexcept>
 
 #include "PhysicalDevice.h"
 #include "LogicalDevice.h"
+#include "ValidationLayer.h"
 
 class GraphicInstance
 {
@@ -19,19 +21,10 @@ public:
 	void createLogicalDevice(const vk::SurfaceKHR& vulkanWindowSurface);
 
 private:
-	void checkValidationLayerSupport() const;
-	bool checkValidationLayerAvailability(const std::vector<const char*>& validationLayers, const std::vector<vk::LayerProperties>& availableLayers) const noexcept;
 	void createVulkanInstance(const std::string& applicationName);
-	uint32_t getEnabledLayerCount() const;
-	char* const* getEnabledLayerNames() const;
-
-	const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
-#ifdef NDEBUG
-	const bool enableValidationLayers{ false };
-#else
-	const bool enableValidationLayers{ true };
-#endif
+	
 	vk::Instance vulkanInstance;
 	PhysicalDevice physicalDevice;
 	std::unique_ptr<LogicalDevice> logicalDevice;
+	const ValidationLayer validationLayer;
 };

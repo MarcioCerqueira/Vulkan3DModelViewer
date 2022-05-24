@@ -19,5 +19,4 @@ private:
 	int rateByDeviceExtensionSupport(const vk::PhysicalDevice& vulkanPhysicalDevice, const std::vector<const char*> vulkanDeviceExtensions) const;
 	int rateBySwapChainProperties(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface, const WindowSize& framebufferSize) const;
 
-
 };
