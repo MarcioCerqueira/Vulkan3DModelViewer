@@ -19,9 +19,11 @@ private:
 	void chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats);
 	void chooseSwapPresentMode(const std::vector<vk::PresentModeKHR>& availablePresentModes);
 	void chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities, const WindowSize& framebufferSize);
+	void setImageCount(const vk::SurfaceCapabilitiesKHR& capabilities);
 
 	vk::SurfaceFormatKHR format;
 	vk::PresentModeKHR presentMode;
 	vk::Extent2D extent;
+	uint32_t imageCount;
 	bool valid;
 };

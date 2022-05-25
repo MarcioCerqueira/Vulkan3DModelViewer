@@ -11,8 +11,10 @@
 class LogicalDevice
 {
 public:
-	LogicalDevice(const LogicalDeviceInfo& logicalDeviceInfo);
+	explicit LogicalDevice(const LogicalDeviceInfo& logicalDeviceInfo);
 
 private:
+	std::vector<vk::DeviceQueueCreateInfo> buildDeviceQueueCreateInfos(const std::set<uint32_t>& uniqueQueueFamilies) const;
+	vk::DeviceCreateInfo buildVulkanLogicalDeviceCreateInfo(const std::vector<vk::DeviceQueueCreateInfo>& deviceQueueCreateInfos, const LogicalDeviceInfo& logicalDeviceInfo) const;
 	vk::Device vulkanLogicalDevice; 
 };

@@ -10,6 +10,7 @@ SwapChain::SwapChain(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::S
     chooseSwapSurfaceFormat(availableFormats);
     chooseSwapPresentMode(availablePresentModes);
     chooseSwapExtent(capabilities, framebufferSize);
+    setImageCount(capabilities);
 }
 
 void SwapChain::checkSwapChainValidity(const std::vector<vk::SurfaceFormatKHR>& availableFormats, const std::vector<vk::PresentModeKHR>& availablePresentModes)
@@ -54,6 +55,15 @@ void SwapChain::chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities,
         extent = vk::Extent2D{ static_cast<uint32_t>(framebufferSize.width), static_cast<uint32_t>(framebufferSize.height) };
         extent.width = std::clamp(extent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
         extent.height = std::clamp(extent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+    }
+}
+
+void SwapChain::setImageCount(const vk::SurfaceCapabilitiesKHR& capabilities)
+{
+    imageCount = capabilities.minImageCount + 1;
+    if (capabilities.maxImageCount > 0 && imageCount > capabilities.maxImageCount) 
+    {
+        imageCount = capabilities.maxImageCount;
     }
 }
 

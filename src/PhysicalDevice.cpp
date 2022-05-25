@@ -21,7 +21,13 @@ std::multimap<int, vk::PhysicalDevice> PhysicalDevice::rateMostSuitablePhysicalD
 	std::multimap<int, vk::PhysicalDevice> mostSuitablePhysicalDevices;
 	for (const auto& vulkanPhysicalDevice : vulkanPhysicalDevices)
 	{
-		int score{ physicalDeviceSuitabilityRater.rate(vulkanPhysicalDevice, vulkanWindowSurface, vulkanDeviceExtensions, framebufferSize) };
+		PhysicalDeviceSuitabilityRaterInfo physicalDeviceSuitabilityRaterInfo{
+			.vulkanPhysicalDevice = vulkanPhysicalDevice,
+			.vulkanWindowSurface = vulkanWindowSurface,
+			.vulkanDeviceExtensions = vulkanDeviceExtensions,
+			.framebufferSize = framebufferSize
+		};
+		int score{ physicalDeviceSuitabilityRater.rate(physicalDeviceSuitabilityRaterInfo) };
 		mostSuitablePhysicalDevices.insert(std::make_pair(score, vulkanPhysicalDevice));
 	}
 	return mostSuitablePhysicalDevices;

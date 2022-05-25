@@ -5,18 +5,18 @@
 #include <set>
 #include <string>
 
+#include "PhysicalDeviceSuitabilityRaterInfo.h"
 #include "QueueFamilyIndices.h"
 #include "SwapChain.h"
 
 class PhysicalDeviceSuitabilityRater
 {
 public:
-	int rate(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface, const std::vector<const char*> vulkanDeviceExtensions, const WindowSize& framebufferSize) const;
+	int rate(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const;
 
 private:
-	int rateByPhysicalDeviceType(const vk::PhysicalDevice& vulkanPhysicalDevice) const;
-	int rateByQueueFamilyProperties(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface) const;
-	int rateByDeviceExtensionSupport(const vk::PhysicalDevice& vulkanPhysicalDevice, const std::vector<const char*> vulkanDeviceExtensions) const;
-	int rateBySwapChainProperties(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface, const WindowSize& framebufferSize) const;
-
+	int rateByPhysicalDeviceType(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const;
+	int rateByQueueFamilyProperties(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const;
+	int rateByDeviceExtensionSupport(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const;
+	int rateBySwapChainProperties(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const;
 };
