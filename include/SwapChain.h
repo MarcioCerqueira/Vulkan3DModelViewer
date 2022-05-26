@@ -1,17 +1,18 @@
 #pragma once
 
+#define VULKAN_HPP_NO_CONSTRUCTORS
 #include <vulkan/vulkan.hpp>
 #include <vector>
 #include <cstdint>
 #include <limits>
 #include <algorithm>
 
-#include "WindowSize.h"
+#include "SwapChainInfo.h"
 
 class SwapChain
 {
 public:
-	SwapChain(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface, const WindowSize& framebufferSize);
+	explicit SwapChain(const SwapChainInfo& swapChainInfo);
 	bool isValid() const noexcept;
 
 private:
@@ -20,8 +21,11 @@ private:
 	void chooseSwapPresentMode(const std::vector<vk::PresentModeKHR>& availablePresentModes);
 	void chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities, const WindowSize& framebufferSize);
 	void setImageCount(const vk::SurfaceCapabilitiesKHR& capabilities);
+	void createVulkanSwapChainInfo(const SwapChainInfo& swapChainInfo, const vk::SurfaceCapabilitiesKHR& capabilities);
 
-	vk::SurfaceFormatKHR format;
+	vk::SwapchainKHR vulkanSwapChain; 
+	std::vector<vk::Image> swapChainImages;
+	vk::SurfaceFormatKHR surfaceFormat;
 	vk::PresentModeKHR presentMode;
 	vk::Extent2D extent;
 	uint32_t imageCount;

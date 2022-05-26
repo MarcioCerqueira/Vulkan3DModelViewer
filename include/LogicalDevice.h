@@ -7,14 +7,16 @@
 #include <set>
 
 #include "LogicalDeviceInfo.h"
+#include "SwapChain.h"
 
 class LogicalDevice
 {
 public:
 	explicit LogicalDevice(const LogicalDeviceInfo& logicalDeviceInfo);
+	SwapChain createSwapChain(SwapChainInfo& swapChainInfo) const;
 
 private:
 	std::vector<vk::DeviceQueueCreateInfo> buildDeviceQueueCreateInfos(const std::set<uint32_t>& uniqueQueueFamilies) const;
-	vk::DeviceCreateInfo buildVulkanLogicalDeviceCreateInfo(const std::vector<vk::DeviceQueueCreateInfo>& deviceQueueCreateInfos, const LogicalDeviceInfo& logicalDeviceInfo) const;
+
 	vk::Device vulkanLogicalDevice; 
 };

@@ -6,8 +6,20 @@ LogicalDevice::LogicalDevice(const LogicalDeviceInfo& logicalDeviceInfo)
 		logicalDeviceInfo.queueFamilyIndices.getGraphicsFamilyIndex().value(),
 		logicalDeviceInfo.queueFamilyIndices.getPresentFamilyIndex().value()
 	};
+	const float queuePriority{ 1.0f };
 	const std::vector<vk::DeviceQueueCreateInfo> deviceQueueCreateInfos = buildDeviceQueueCreateInfos(uniqueQueueFamilies);
-	const vk::DeviceCreateInfo vulkanLogicalDeviceCreateInfo = buildVulkanLogicalDeviceCreateInfo(deviceQueueCreateInfos, logicalDeviceInfo);
+	
+	vk::PhysicalDeviceFeatures physicalDeviceFeatures{};
+	const vk::DeviceCreateInfo vulkanLogicalDeviceCreateInfo{
+		.sType = vk::StructureType::eDeviceCreateInfo,
+		.queueCreateInfoCount = static_cast<uint32_t>(deviceQueueCreateInfos.size()),
+		.pQueueCreateInfos = deviceQueueCreateInfos.data(),
+		.enabledLayerCount = logicalDeviceInfo.enabledLayerCount,
+		.ppEnabledLayerNames = logicalDeviceInfo.enabledLayerNames,
+		.enabledExtensionCount = static_cast<uint32_t>(logicalDeviceInfo.vulkanDeviceExtensions.size()),
+		.ppEnabledExtensionNames = logicalDeviceInfo.vulkanDeviceExtensions.data(),
+		.pEnabledFeatures = &physicalDeviceFeatures
+	};
 	vulkanLogicalDevice = logicalDeviceInfo.vulkanPhysicalDevice.createDevice(vulkanLogicalDeviceCreateInfo);
 }
 
@@ -28,18 +40,8 @@ std::vector<vk::DeviceQueueCreateInfo> LogicalDevice::buildDeviceQueueCreateInfo
 	return queueCreateInfos;
 }
 
-vk::DeviceCreateInfo LogicalDevice::buildVulkanLogicalDeviceCreateInfo(const std::vector<vk::DeviceQueueCreateInfo>& deviceQueueCreateInfos, const LogicalDeviceInfo& logicalDeviceInfo) const
+SwapChain LogicalDevice::createSwapChain(SwapChainInfo& swapChainInfo) const
 {
-	vk::PhysicalDeviceFeatures physicalDeviceFeatures{};
-	const vk::DeviceCreateInfo vulkanLogicalDeviceCreateInfo{
-		.sType = vk::StructureType::eDeviceCreateInfo,
-		.queueCreateInfoCount = static_cast<uint32_t>(deviceQueueCreateInfos.size()),
-		.pQueueCreateInfos = deviceQueueCreateInfos.data(),
-		.enabledLayerCount = logicalDeviceInfo.enabledLayerCount,
-		.ppEnabledLayerNames = logicalDeviceInfo.enabledLayerNames,
-		.enabledExtensionCount = static_cast<uint32_t>(logicalDeviceInfo.vulkanDeviceExtensions.size()),
-		.ppEnabledExtensionNames = logicalDeviceInfo.vulkanDeviceExtensions.data(),
-		.pEnabledFeatures = &physicalDeviceFeatures
-	};
-	return vulkanLogicalDeviceCreateInfo;
+	swapChainInfo.vulkanLogicalDevice = vulkanLogicalDevice;
+	return SwapChain(swapChainInfo);
 }

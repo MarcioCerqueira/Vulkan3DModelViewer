@@ -56,6 +56,20 @@ int PhysicalDeviceSuitabilityRater::rateByDeviceExtensionSupport(const PhysicalD
 
 int PhysicalDeviceSuitabilityRater::rateBySwapChainProperties(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
 {
-	SwapChain swapChain(physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice, physicalDeviceSuitabilityRaterInfo.vulkanWindowSurface, physicalDeviceSuitabilityRaterInfo.framebufferSize);
-	return static_cast<int>(swapChain.isValid());
+	ValidationLayer validationLayer;
+	LogicalDeviceInfo logicalDeviceInfo{
+		.queueFamilyIndices = physicalDeviceSuitabilityRaterInfo.queueFamilyIndices,
+		.vulkanPhysicalDevice = physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice,
+		.vulkanDeviceExtensions = physicalDeviceSuitabilityRaterInfo.vulkanDeviceExtensions,
+		.enabledLayerCount = validationLayer.getEnabledLayerCount(),
+		.enabledLayerNames = validationLayer.getEnabledLayerNames()
+	};
+	LogicalDevice logicalDevice(logicalDeviceInfo);
+	SwapChainInfo swapChainInfo{
+		.vulkanPhysicalDevice = physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice,
+		.vulkanWindowSurface = physicalDeviceSuitabilityRaterInfo.vulkanWindowSurface,
+		.framebufferSize = physicalDeviceSuitabilityRaterInfo.framebufferSize,
+		.queueFamilyIndices = physicalDeviceSuitabilityRaterInfo.queueFamilyIndices
+	};
+	return static_cast<int>(logicalDevice.createSwapChain(swapChainInfo).isValid());
 }

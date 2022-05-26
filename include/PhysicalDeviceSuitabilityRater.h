@@ -8,6 +8,8 @@
 #include "PhysicalDeviceSuitabilityRaterInfo.h"
 #include "QueueFamilyIndices.h"
 #include "SwapChain.h"
+#include "LogicalDevice.h"
+#include "ValidationLayer.h"
 
 class PhysicalDeviceSuitabilityRater
 {

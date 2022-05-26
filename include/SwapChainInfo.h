@@ -7,11 +7,11 @@
 #include "WindowSize.h"
 #include "QueueFamilyIndices.h"
 
-struct PhysicalDeviceSuitabilityRaterInfo
+struct SwapChainInfo
 {
-	vk::PhysicalDevice vulkanPhysicalDevice;
+	vk::PhysicalDevice vulkanPhysicalDevice; 
 	vk::SurfaceKHR vulkanWindowSurface;
-	std::vector<const char*> vulkanDeviceExtensions;
 	WindowSize framebufferSize;
 	QueueFamilyIndices queueFamilyIndices;
+	vk::Device vulkanLogicalDevice;
 };

@@ -1,16 +1,17 @@
 #include "SwapChain.h"
 
-SwapChain::SwapChain(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface, const WindowSize& framebufferSize)
+SwapChain::SwapChain(const SwapChainInfo& swapChainInfo)
 {
-    vk::SurfaceCapabilitiesKHR capabilities{ vulkanPhysicalDevice.getSurfaceCapabilitiesKHR(vulkanWindowSurface) };
-    const std::vector<vk::SurfaceFormatKHR> availableFormats{ vulkanPhysicalDevice.getSurfaceFormatsKHR(vulkanWindowSurface) };
-    std::vector<vk::PresentModeKHR> availablePresentModes{ vulkanPhysicalDevice.getSurfacePresentModesKHR(vulkanWindowSurface) };
+    vk::SurfaceCapabilitiesKHR capabilities{ swapChainInfo.vulkanPhysicalDevice.getSurfaceCapabilitiesKHR(swapChainInfo.vulkanWindowSurface) };
+    const std::vector<vk::SurfaceFormatKHR> availableFormats{ swapChainInfo.vulkanPhysicalDevice.getSurfaceFormatsKHR(swapChainInfo.vulkanWindowSurface) };
+    std::vector<vk::PresentModeKHR> availablePresentModes{ swapChainInfo.vulkanPhysicalDevice.getSurfacePresentModesKHR(swapChainInfo.vulkanWindowSurface) };
 
     checkSwapChainValidity(availableFormats, availablePresentModes);
     chooseSwapSurfaceFormat(availableFormats);
     chooseSwapPresentMode(availablePresentModes);
-    chooseSwapExtent(capabilities, framebufferSize);
+    chooseSwapExtent(capabilities, swapChainInfo.framebufferSize);
     setImageCount(capabilities);
+    createVulkanSwapChainInfo(swapChainInfo, capabilities);
 }
 
 void SwapChain::checkSwapChainValidity(const std::vector<vk::SurfaceFormatKHR>& availableFormats, const std::vector<vk::PresentModeKHR>& availablePresentModes)
@@ -20,12 +21,12 @@ void SwapChain::checkSwapChainValidity(const std::vector<vk::SurfaceFormatKHR>& 
 
 void SwapChain::chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats)
 {
-    format = availableFormats[0];
+    surfaceFormat = availableFormats[0];
     for (const auto& availableFormat : availableFormats) 
     {
         if (availableFormat.format == vk::Format::eB8G8R8A8Srgb && availableFormat.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear) 
         {
-            format = availableFormat;
+            surfaceFormat = availableFormat;
             return;
         }
     }
@@ -70,4 +71,29 @@ void SwapChain::setImageCount(const vk::SurfaceCapabilitiesKHR& capabilities)
 bool SwapChain::isValid() const noexcept
 {
     return valid;
+}
+
+void SwapChain::createVulkanSwapChainInfo(const SwapChainInfo& swapChainInfo, const vk::SurfaceCapabilitiesKHR& capabilities)
+{
+    std::optional<uint32_t> graphicsFamilyIndex{ swapChainInfo.queueFamilyIndices.getGraphicsFamilyIndex() };
+    std::optional<uint32_t> presentFamilyIndex{ swapChainInfo.queueFamilyIndices.getPresentFamilyIndex() };
+    uint32_t queueFamilyIndices[] = { graphicsFamilyIndex.value(), presentFamilyIndex.value() };
+    vk::SwapchainCreateInfoKHR swapChainCreateInfoKHR{
+        .flags = {},
+        .surface = swapChainInfo.vulkanWindowSurface,
+        .minImageCount = imageCount,
+        .imageFormat = surfaceFormat.format,
+        .imageColorSpace = surfaceFormat.colorSpace,
+        .imageExtent = extent,
+        .imageArrayLayers = 1,
+        .imageUsage = vk::ImageUsageFlagBits::eColorAttachment,
+        .imageSharingMode = (graphicsFamilyIndex != presentFamilyIndex) ? vk::SharingMode::eConcurrent : vk::SharingMode::eExclusive,
+        .queueFamilyIndexCount = (graphicsFamilyIndex != presentFamilyIndex) ? static_cast<uint32_t>(2) : static_cast<uint32_t>(0),
+        .pQueueFamilyIndices = (graphicsFamilyIndex != presentFamilyIndex) ? queueFamilyIndices : nullptr,
+        .preTransform = capabilities.currentTransform,
+        .compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque,
+        .presentMode = presentMode
+    };
+    vulkanSwapChain = swapChainInfo.vulkanLogicalDevice.createSwapchainKHR(swapChainCreateInfoKHR);
+    swapChainImages = swapChainInfo.vulkanLogicalDevice.getSwapchainImagesKHR(vulkanSwapChain);
 }
