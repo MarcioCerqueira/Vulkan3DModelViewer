@@ -102,20 +102,29 @@ void SwapChain::buildSwapChainImageViews(const SwapChainCreateInfo& swapChainCre
     imageViews.resize(images.size());
     for (size_t imageIndex = 0; imageIndex < images.size(); imageIndex++)
     {
-        vk::ImageViewCreateInfo imageViewCreateInfo{
-            .sType = vk::StructureType::eImageViewCreateInfo,
-            .image = images[imageIndex],
-            .viewType = vk::ImageViewType::e2D,
-            .format = surfaceFormat.format,
-            .components = vk::ComponentSwizzle::eIdentity,
-            .subresourceRange = vk::ImageSubresourceRange{
-                .aspectMask = vk::ImageAspectFlagBits::eColor,
-                .baseMipLevel = 0,
-                .levelCount = 1,
-                .baseArrayLayer = 0,
-                .layerCount = 1
-            }
-        };
+        vk::ImageViewCreateInfo imageViewCreateInfo{ buildImageViewCreateInfo(imageIndex) };
         imageViews[imageIndex] = swapChainCreateInfo.vulkanLogicalDevice.createImageView(imageViewCreateInfo);
     }
+}
+
+vk::ImageViewCreateInfo SwapChain::buildImageViewCreateInfo(const int imageIndex) const
+{
+    return vk::ImageViewCreateInfo{
+        .sType = vk::StructureType::eImageViewCreateInfo,
+        .image = images[imageIndex],
+        .viewType = vk::ImageViewType::e2D,
+        .format = surfaceFormat.format,
+        .components = vk::ComponentSwizzle::eIdentity,
+        .subresourceRange = createImageSubresourceRange()
+    };
+}
+vk::ImageSubresourceRange SwapChain::createImageSubresourceRange() const
+{
+    return vk::ImageSubresourceRange{
+        .aspectMask = vk::ImageAspectFlagBits::eColor,
+        .baseMipLevel = 0,
+        .levelCount = 1,
+        .baseArrayLayer = 0,
+        .layerCount = 1
+    };
 }

@@ -22,6 +22,8 @@ private:
 	void setImageCount(const vk::SurfaceCapabilitiesKHR& capabilities);
 	void buildVulkanSwapChain(const SwapChainCreateInfo& swapChainCreateInfo, const vk::SurfaceCapabilitiesKHR& capabilities);
 	void buildSwapChainImageViews(const SwapChainCreateInfo& swapChainCreateInfo);
+	vk::ImageViewCreateInfo buildImageViewCreateInfo(const int imageIndex) const;
+	vk::ImageSubresourceRange createImageSubresourceRange() const;
 
 	const SwapChainCreateInfo swapChainCreateInfo;
 	vk::SwapchainKHR vulkanSwapChain; 
