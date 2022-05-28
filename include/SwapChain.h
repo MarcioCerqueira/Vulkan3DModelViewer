@@ -7,21 +7,20 @@
 #include <limits>
 #include <algorithm>
 
-#include "SwapChainInfo.h"
+#include "SwapChainCreateInfo.h"
 
 class SwapChain
 {
 public:
-	explicit SwapChain(const SwapChainInfo& swapChainInfo);
-	bool isValid() const noexcept;
+	explicit SwapChain(const SwapChainCreateInfo& swapChainCreateInfo);
+	static bool isValid(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface);
 
 private:
-	void checkSwapChainValidity(const std::vector<vk::SurfaceFormatKHR>& availableFormats, const std::vector<vk::PresentModeKHR>& availablePresentModes);
 	void chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats);
 	void chooseSwapPresentMode(const std::vector<vk::PresentModeKHR>& availablePresentModes);
 	void chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities, const WindowSize& framebufferSize);
 	void setImageCount(const vk::SurfaceCapabilitiesKHR& capabilities);
-	void createVulkanSwapChainInfo(const SwapChainInfo& swapChainInfo, const vk::SurfaceCapabilitiesKHR& capabilities);
+	void buildVulkanSwapChainCreateInfo(const SwapChainCreateInfo& swapChainCreateInfo, const vk::SurfaceCapabilitiesKHR& capabilities);
 
 	vk::SwapchainKHR vulkanSwapChain; 
 	std::vector<vk::Image> swapChainImages;
@@ -29,5 +28,4 @@ private:
 	vk::PresentModeKHR presentMode;
 	vk::Extent2D extent;
 	uint32_t imageCount;
-	bool valid;
 };

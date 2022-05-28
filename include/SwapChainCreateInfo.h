@@ -7,7 +7,7 @@
 #include "WindowSize.h"
 #include "QueueFamilyIndices.h"
 
-struct SwapChainInfo
+struct SwapChainCreateInfo
 {
 	vk::PhysicalDevice vulkanPhysicalDevice; 
 	vk::SurfaceKHR vulkanWindowSurface;

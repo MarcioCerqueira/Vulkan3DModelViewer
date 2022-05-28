@@ -7,11 +7,6 @@ JSONConfigurationFileParser::JSONConfigurationFileParser(const char* configurati
 	convertJSONDocumentToConfigurationFileModel();
 }
 
-ConfigurationFileModel JSONConfigurationFileParser::getConfigurationFileModel() const noexcept
-{
-	return configurationFileModel;
-}
-
 void JSONConfigurationFileParser::validateJSONConfigurationFile() const
 {
 	assert(JSONDocument.IsObject());
@@ -26,4 +21,9 @@ void JSONConfigurationFileParser::convertJSONDocumentToConfigurationFileModel() 
 {
 	configurationFileModel.window.width = JSONDocument["window"].GetObject()["width"].GetInt();
 	configurationFileModel.window.height = JSONDocument["window"].GetObject()["height"].GetInt();
+}
+
+ConfigurationFileModel JSONConfigurationFileParser::getConfigurationFileModel() const noexcept
+{
+	return configurationFileModel;
 }

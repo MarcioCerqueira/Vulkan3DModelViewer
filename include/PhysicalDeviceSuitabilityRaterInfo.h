@@ -4,14 +4,9 @@
 #include <vulkan/vulkan.hpp>
 #include <vector>
 
-#include "WindowSize.h"
-#include "QueueFamilyIndices.h"
-
 struct PhysicalDeviceSuitabilityRaterInfo
 {
 	vk::PhysicalDevice vulkanPhysicalDevice;
 	vk::SurfaceKHR vulkanWindowSurface;
 	std::vector<const char*> vulkanDeviceExtensions;
-	WindowSize framebufferSize;
-	QueueFamilyIndices queueFamilyIndices;
 };

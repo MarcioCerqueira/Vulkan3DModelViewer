@@ -1,9 +1,9 @@
 #include "PhysicalDevice.h"
 
-void PhysicalDevice::pick(const std::vector<vk::PhysicalDevice>& vulkanPhysicalDevices, const vk::SurfaceKHR& vulkanWindowSurface, const WindowSize& framebufferSize)
+void PhysicalDevice::pick(const std::vector<vk::PhysicalDevice>& vulkanPhysicalDevices, const vk::SurfaceKHR& vulkanWindowSurface)
 {
 	checkVulkanSupport(vulkanPhysicalDevices);
-	std::multimap<int, vk::PhysicalDevice> mostSuitableDevices{ rateMostSuitablePhysicalDevices(vulkanPhysicalDevices, vulkanWindowSurface, framebufferSize) };
+	std::multimap<int, vk::PhysicalDevice> mostSuitableDevices{ rateMostSuitablePhysicalDevices(vulkanPhysicalDevices, vulkanWindowSurface) };
 	vulkanPhysicalDevice = selectMostSuitablePhysicalDevice(mostSuitableDevices);
 	std::cout << "Selected physical device: " << vulkanPhysicalDevice.getProperties().deviceName << std::endl;
 }
@@ -16,7 +16,7 @@ void PhysicalDevice::checkVulkanSupport(const std::vector<vk::PhysicalDevice>& v
 	}
 }
 
-std::multimap<int, vk::PhysicalDevice> PhysicalDevice::rateMostSuitablePhysicalDevices(const std::vector<vk::PhysicalDevice>& vulkanPhysicalDevices, const vk::SurfaceKHR& vulkanWindowSurface, const WindowSize& framebufferSize) const
+std::multimap<int, vk::PhysicalDevice> PhysicalDevice::rateMostSuitablePhysicalDevices(const std::vector<vk::PhysicalDevice>& vulkanPhysicalDevices, const vk::SurfaceKHR& vulkanWindowSurface) const
 {
 	std::multimap<int, vk::PhysicalDevice> mostSuitablePhysicalDevices;
 	for (const auto& vulkanPhysicalDevice : vulkanPhysicalDevices)
@@ -24,9 +24,7 @@ std::multimap<int, vk::PhysicalDevice> PhysicalDevice::rateMostSuitablePhysicalD
 		PhysicalDeviceSuitabilityRaterInfo physicalDeviceSuitabilityRaterInfo{
 			.vulkanPhysicalDevice = vulkanPhysicalDevice,
 			.vulkanWindowSurface = vulkanWindowSurface,
-			.vulkanDeviceExtensions = vulkanDeviceExtensions,
-			.framebufferSize = framebufferSize,
-			.queueFamilyIndices = QueueFamilyIndices(vulkanPhysicalDevice, vulkanWindowSurface)
+			.vulkanDeviceExtensions = vulkanDeviceExtensions
 		};
 		int score{ physicalDeviceSuitabilityRater.rate(physicalDeviceSuitabilityRaterInfo) };
 		mostSuitablePhysicalDevices.insert(std::make_pair(score, vulkanPhysicalDevice));
@@ -46,14 +44,16 @@ vk::PhysicalDevice PhysicalDevice::selectMostSuitablePhysicalDevice(const std::m
 	}
 }
 
-std::unique_ptr<LogicalDevice> PhysicalDevice::createLogicalDevice(const ValidationLayer& validationLayer, const vk::SurfaceKHR& vulkanWindowSurface)
+std::unique_ptr<LogicalDevice> PhysicalDevice::createLogicalDevice(const ValidationLayer& validationLayer, const vk::SurfaceKHR& vulkanWindowSurface, const WindowSize& framebufferSize)
 {
-	const LogicalDeviceInfo logicalDeviceInfo{
+	const LogicalDeviceCreateInfo logicalDeviceCreateInfo{
 		.queueFamilyIndices = QueueFamilyIndices(vulkanPhysicalDevice, vulkanWindowSurface),
 		.vulkanPhysicalDevice = vulkanPhysicalDevice,
+		.vulkanWindowSurface = vulkanWindowSurface,
 		.vulkanDeviceExtensions = vulkanDeviceExtensions,
+		.framebufferSize = framebufferSize,
 		.enabledLayerCount = validationLayer.getEnabledLayerCount(),
 		.enabledLayerNames = validationLayer.getEnabledLayerNames()
 	};
-	return std::make_unique<LogicalDevice>(logicalDeviceInfo);
+	return std::make_unique<LogicalDevice>(logicalDeviceCreateInfo);
 }

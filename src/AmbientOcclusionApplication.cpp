@@ -6,8 +6,8 @@ AmbientOcclusionApplication::AmbientOcclusionApplication(const int windowWidth, 
 	window = std::make_unique<Window>(windowWidth, windowHeight, applicationName);
 	graphicInstance = std::make_unique<GraphicInstance>(applicationName);
 	windowSurface = std::make_unique<WindowSurface>(graphicInstance->getVulkanInstance(), window->getGLFWWindow());
-	graphicInstance->selectPhysicalDevice(windowSurface->getVulkanWindowSurface(), window->getFramebufferSize());
-	graphicInstance->createLogicalDevice(windowSurface->getVulkanWindowSurface());
+	graphicInstance->selectPhysicalDevice(windowSurface->getVulkanWindowSurface());
+	graphicInstance->createLogicalDevice(windowSurface->getVulkanWindowSurface(), window->getFramebufferSize());
 }
 
 void AmbientOcclusionApplication::run() const noexcept

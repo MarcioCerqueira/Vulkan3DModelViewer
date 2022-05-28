@@ -1,47 +1,60 @@
 #include "LogicalDevice.h"
 
-LogicalDevice::LogicalDevice(const LogicalDeviceInfo& logicalDeviceInfo)
+LogicalDevice::LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateInfo)
 {
 	const std::set<uint32_t> uniqueQueueFamilies = { 
-		logicalDeviceInfo.queueFamilyIndices.getGraphicsFamilyIndex().value(),
-		logicalDeviceInfo.queueFamilyIndices.getPresentFamilyIndex().value()
+		logicalDeviceCreateInfo.queueFamilyIndices.getGraphicsFamilyIndex().value(),
+		logicalDeviceCreateInfo.queueFamilyIndices.getPresentFamilyIndex().value()
 	};
-	const float queuePriority{ 1.0f };
-	const std::vector<vk::DeviceQueueCreateInfo> deviceQueueCreateInfos = buildDeviceQueueCreateInfos(uniqueQueueFamilies);
-	
-	vk::PhysicalDeviceFeatures physicalDeviceFeatures{};
-	const vk::DeviceCreateInfo vulkanLogicalDeviceCreateInfo{
-		.sType = vk::StructureType::eDeviceCreateInfo,
-		.queueCreateInfoCount = static_cast<uint32_t>(deviceQueueCreateInfos.size()),
-		.pQueueCreateInfos = deviceQueueCreateInfos.data(),
-		.enabledLayerCount = logicalDeviceInfo.enabledLayerCount,
-		.ppEnabledLayerNames = logicalDeviceInfo.enabledLayerNames,
-		.enabledExtensionCount = static_cast<uint32_t>(logicalDeviceInfo.vulkanDeviceExtensions.size()),
-		.ppEnabledExtensionNames = logicalDeviceInfo.vulkanDeviceExtensions.data(),
-		.pEnabledFeatures = &physicalDeviceFeatures
-	};
-	vulkanLogicalDevice = logicalDeviceInfo.vulkanPhysicalDevice.createDevice(vulkanLogicalDeviceCreateInfo);
+	const std::vector<vk::DeviceQueueCreateInfo> deviceQueueCreateInfos{ buildDeviceQueueCreateInfos(uniqueQueueFamilies) };
+	const vk::DeviceCreateInfo vulkanLogicalDeviceCreateInfo{ buildVulkanLogicalDeviceCreateInfo(deviceQueueCreateInfos, logicalDeviceCreateInfo) };
+	vulkanLogicalDevice = logicalDeviceCreateInfo.vulkanPhysicalDevice.createDevice(vulkanLogicalDeviceCreateInfo);
+	createSwapChain(logicalDeviceCreateInfo);
 }
 
 std::vector<vk::DeviceQueueCreateInfo> LogicalDevice::buildDeviceQueueCreateInfos(const std::set<uint32_t>& uniqueQueueFamilies) const
 {
-	const float queuePriority{ 1.0f };
 	std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
-	for (uint32_t queueFamily : uniqueQueueFamilies)
+	for (uint32_t queueFamilyIndex : uniqueQueueFamilies)
 	{
-		vk::DeviceQueueCreateInfo logicalDeviceQueueCreateInfo{
-			.sType = vk::StructureType::eDeviceQueueCreateInfo,
-			.queueFamilyIndex = queueFamily,
-			.queueCount = 1,
-			.pQueuePriorities = &queuePriority
-		};
-		queueCreateInfos.push_back(logicalDeviceQueueCreateInfo);
+		queueCreateInfos.push_back(buildDeviceQueueCreateInfo(queueFamilyIndex));
 	}
 	return queueCreateInfos;
 }
 
-SwapChain LogicalDevice::createSwapChain(SwapChainInfo& swapChainInfo) const
+vk::DeviceQueueCreateInfo LogicalDevice::buildDeviceQueueCreateInfo(uint32_t queueFamilyIndex) const
 {
-	swapChainInfo.vulkanLogicalDevice = vulkanLogicalDevice;
-	return SwapChain(swapChainInfo);
+	const float queuePriority{ 1.0f };
+	return vk::DeviceQueueCreateInfo{
+		.sType = vk::StructureType::eDeviceQueueCreateInfo,
+		.queueFamilyIndex = queueFamilyIndex,
+		.queueCount = 1,
+		.pQueuePriorities = &queuePriority
+	};
+}
+
+vk::DeviceCreateInfo LogicalDevice::buildVulkanLogicalDeviceCreateInfo(const std::vector<vk::DeviceQueueCreateInfo>& deviceQueueCreateInfos, const LogicalDeviceCreateInfo& logicalDeviceCreateInfo) const
+{
+	return vk::DeviceCreateInfo{
+		.sType = vk::StructureType::eDeviceCreateInfo,
+		.queueCreateInfoCount = static_cast<uint32_t>(deviceQueueCreateInfos.size()),
+		.pQueueCreateInfos = deviceQueueCreateInfos.data(),
+		.enabledLayerCount = logicalDeviceCreateInfo.enabledLayerCount,
+		.ppEnabledLayerNames = logicalDeviceCreateInfo.enabledLayerNames,
+		.enabledExtensionCount = static_cast<uint32_t>(logicalDeviceCreateInfo.vulkanDeviceExtensions.size()),
+		.ppEnabledExtensionNames = logicalDeviceCreateInfo.vulkanDeviceExtensions.data(),
+		.pEnabledFeatures = &physicalDeviceFeatures
+	};
+}
+
+void LogicalDevice::createSwapChain(const LogicalDeviceCreateInfo& logicalDeviceCreateInfo)
+{
+	const SwapChainCreateInfo swapChainCreateInfo{
+		.vulkanPhysicalDevice = logicalDeviceCreateInfo.vulkanPhysicalDevice,
+		.vulkanWindowSurface = logicalDeviceCreateInfo.vulkanWindowSurface,
+		.framebufferSize = logicalDeviceCreateInfo.framebufferSize,
+		.queueFamilyIndices = logicalDeviceCreateInfo.queueFamilyIndices,
+		.vulkanLogicalDevice = this->vulkanLogicalDevice
+	};
+	swapChain = std::make_shared<SwapChain>(swapChainCreateInfo);
 }

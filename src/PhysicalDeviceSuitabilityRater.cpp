@@ -35,8 +35,8 @@ int PhysicalDeviceSuitabilityRater::rateByQueueFamilyProperties(const PhysicalDe
 {
 	int score{ 0 };
 	const QueueFamilyIndices queueFamilyIndices{ 
-		physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice, 
-		physicalDeviceSuitabilityRaterInfo.vulkanWindowSurface 
+		physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice,
+		physicalDeviceSuitabilityRaterInfo.vulkanWindowSurface
 	};
 	score += 1000 * static_cast<int>(queueFamilyIndices.getGraphicsFamilyIndex().has_value());
 	score += 1000 * static_cast<int>(queueFamilyIndices.getPresentFamilyIndex().has_value());
@@ -56,20 +56,5 @@ int PhysicalDeviceSuitabilityRater::rateByDeviceExtensionSupport(const PhysicalD
 
 int PhysicalDeviceSuitabilityRater::rateBySwapChainProperties(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
 {
-	ValidationLayer validationLayer;
-	LogicalDeviceInfo logicalDeviceInfo{
-		.queueFamilyIndices = physicalDeviceSuitabilityRaterInfo.queueFamilyIndices,
-		.vulkanPhysicalDevice = physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice,
-		.vulkanDeviceExtensions = physicalDeviceSuitabilityRaterInfo.vulkanDeviceExtensions,
-		.enabledLayerCount = validationLayer.getEnabledLayerCount(),
-		.enabledLayerNames = validationLayer.getEnabledLayerNames()
-	};
-	LogicalDevice logicalDevice(logicalDeviceInfo);
-	SwapChainInfo swapChainInfo{
-		.vulkanPhysicalDevice = physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice,
-		.vulkanWindowSurface = physicalDeviceSuitabilityRaterInfo.vulkanWindowSurface,
-		.framebufferSize = physicalDeviceSuitabilityRaterInfo.framebufferSize,
-		.queueFamilyIndices = physicalDeviceSuitabilityRaterInfo.queueFamilyIndices
-	};
-	return static_cast<int>(logicalDevice.createSwapChain(swapChainInfo).isValid());
+	return SwapChain::isValid(physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice, physicalDeviceSuitabilityRaterInfo.vulkanWindowSurface);
 }

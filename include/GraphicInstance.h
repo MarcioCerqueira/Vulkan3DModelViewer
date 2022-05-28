@@ -17,12 +17,14 @@ public:
 	~GraphicInstance();
 
 	vk::Instance getVulkanInstance() const noexcept;
-	void selectPhysicalDevice(const vk::SurfaceKHR& vulkanWindowSurface, const WindowSize& framebufferSize);
-	void createLogicalDevice(const vk::SurfaceKHR& vulkanWindowSurface);
+	void selectPhysicalDevice(const vk::SurfaceKHR& vulkanWindowSurface);
+	void createLogicalDevice(const vk::SurfaceKHR& vulkanWindowSurface, const WindowSize& framebufferSize);
 
 private:
 	void createVulkanInstance(const std::string& applicationName);
-	
+	vk::ApplicationInfo createApplicationInfo(const std::string& applicationName) const;
+	vk::InstanceCreateInfo createVulkanInstanceInfo(const vk::ApplicationInfo& applicationInfo) const;
+
 	vk::Instance vulkanInstance;
 	PhysicalDevice physicalDevice;
 	std::unique_ptr<LogicalDevice> logicalDevice;

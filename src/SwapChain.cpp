@@ -1,22 +1,16 @@
 #include "SwapChain.h"
 
-SwapChain::SwapChain(const SwapChainInfo& swapChainInfo)
+SwapChain::SwapChain(const SwapChainCreateInfo& swapChainCreateInfo)
 {
-    vk::SurfaceCapabilitiesKHR capabilities{ swapChainInfo.vulkanPhysicalDevice.getSurfaceCapabilitiesKHR(swapChainInfo.vulkanWindowSurface) };
-    const std::vector<vk::SurfaceFormatKHR> availableFormats{ swapChainInfo.vulkanPhysicalDevice.getSurfaceFormatsKHR(swapChainInfo.vulkanWindowSurface) };
-    std::vector<vk::PresentModeKHR> availablePresentModes{ swapChainInfo.vulkanPhysicalDevice.getSurfacePresentModesKHR(swapChainInfo.vulkanWindowSurface) };
+    vk::SurfaceCapabilitiesKHR capabilities{ swapChainCreateInfo.vulkanPhysicalDevice.getSurfaceCapabilitiesKHR(swapChainCreateInfo.vulkanWindowSurface) };
+    const std::vector<vk::SurfaceFormatKHR> availableFormats{ swapChainCreateInfo.vulkanPhysicalDevice.getSurfaceFormatsKHR(swapChainCreateInfo.vulkanWindowSurface) };
+    std::vector<vk::PresentModeKHR> availablePresentModes{ swapChainCreateInfo.vulkanPhysicalDevice.getSurfacePresentModesKHR(swapChainCreateInfo.vulkanWindowSurface) };
 
-    checkSwapChainValidity(availableFormats, availablePresentModes);
     chooseSwapSurfaceFormat(availableFormats);
     chooseSwapPresentMode(availablePresentModes);
-    chooseSwapExtent(capabilities, swapChainInfo.framebufferSize);
+    chooseSwapExtent(capabilities, swapChainCreateInfo.framebufferSize);
     setImageCount(capabilities);
-    createVulkanSwapChainInfo(swapChainInfo, capabilities);
-}
-
-void SwapChain::checkSwapChainValidity(const std::vector<vk::SurfaceFormatKHR>& availableFormats, const std::vector<vk::PresentModeKHR>& availablePresentModes)
-{
-    valid = !availableFormats.empty() && !availablePresentModes.empty();
+    buildVulkanSwapChainCreateInfo(swapChainCreateInfo, capabilities);
 }
 
 void SwapChain::chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats)
@@ -68,19 +62,22 @@ void SwapChain::setImageCount(const vk::SurfaceCapabilitiesKHR& capabilities)
     }
 }
 
-bool SwapChain::isValid() const noexcept
+bool SwapChain::isValid(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface)
 {
-    return valid;
+    const std::vector<vk::SurfaceFormatKHR> availableFormats{ vulkanPhysicalDevice.getSurfaceFormatsKHR(vulkanWindowSurface) };
+    const std::vector<vk::PresentModeKHR> availablePresentModes{ vulkanPhysicalDevice.getSurfacePresentModesKHR(vulkanWindowSurface) };
+    return !availableFormats.empty() && !availablePresentModes.empty();
 }
 
-void SwapChain::createVulkanSwapChainInfo(const SwapChainInfo& swapChainInfo, const vk::SurfaceCapabilitiesKHR& capabilities)
+void SwapChain::buildVulkanSwapChainCreateInfo(const SwapChainCreateInfo& swapChainCreateInfo, const vk::SurfaceCapabilitiesKHR& capabilities)
 {
-    std::optional<uint32_t> graphicsFamilyIndex{ swapChainInfo.queueFamilyIndices.getGraphicsFamilyIndex() };
-    std::optional<uint32_t> presentFamilyIndex{ swapChainInfo.queueFamilyIndices.getPresentFamilyIndex() };
+    std::optional<uint32_t> graphicsFamilyIndex{ swapChainCreateInfo.queueFamilyIndices.getGraphicsFamilyIndex() };
+    std::optional<uint32_t> presentFamilyIndex{ swapChainCreateInfo.queueFamilyIndices.getPresentFamilyIndex() };
     uint32_t queueFamilyIndices[] = { graphicsFamilyIndex.value(), presentFamilyIndex.value() };
     vk::SwapchainCreateInfoKHR swapChainCreateInfoKHR{
+        .sType = vk::StructureType::eSwapchainCreateInfoKHR,
         .flags = {},
-        .surface = swapChainInfo.vulkanWindowSurface,
+        .surface = swapChainCreateInfo.vulkanWindowSurface,
         .minImageCount = imageCount,
         .imageFormat = surfaceFormat.format,
         .imageColorSpace = surfaceFormat.colorSpace,
@@ -94,6 +91,6 @@ void SwapChain::createVulkanSwapChainInfo(const SwapChainInfo& swapChainInfo, co
         .compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque,
         .presentMode = presentMode
     };
-    vulkanSwapChain = swapChainInfo.vulkanLogicalDevice.createSwapchainKHR(swapChainCreateInfoKHR);
-    swapChainImages = swapChainInfo.vulkanLogicalDevice.getSwapchainImagesKHR(vulkanSwapChain);
+    vulkanSwapChain = swapChainCreateInfo.vulkanLogicalDevice.createSwapchainKHR(swapChainCreateInfoKHR);
+    swapChainImages = swapChainCreateInfo.vulkanLogicalDevice.getSwapchainImagesKHR(vulkanSwapChain);
 }
