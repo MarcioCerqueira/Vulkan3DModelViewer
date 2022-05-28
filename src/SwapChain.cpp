@@ -1,6 +1,6 @@
 #include "SwapChain.h"
 
-SwapChain::SwapChain(const SwapChainCreateInfo& swapChainCreateInfo)
+SwapChain::SwapChain(const SwapChainCreateInfo& swapChainCreateInfo) : swapChainCreateInfo(swapChainCreateInfo)
 {
     vk::SurfaceCapabilitiesKHR capabilities{ swapChainCreateInfo.vulkanPhysicalDevice.getSurfaceCapabilitiesKHR(swapChainCreateInfo.vulkanWindowSurface) };
     const std::vector<vk::SurfaceFormatKHR> availableFormats{ swapChainCreateInfo.vulkanPhysicalDevice.getSurfaceFormatsKHR(swapChainCreateInfo.vulkanWindowSurface) };
@@ -10,7 +10,8 @@ SwapChain::SwapChain(const SwapChainCreateInfo& swapChainCreateInfo)
     chooseSwapPresentMode(availablePresentModes);
     chooseSwapExtent(capabilities, swapChainCreateInfo.framebufferSize);
     setImageCount(capabilities);
-    buildVulkanSwapChainCreateInfo(swapChainCreateInfo, capabilities);
+    buildVulkanSwapChain(swapChainCreateInfo, capabilities);
+    buildSwapChainImageViews(swapChainCreateInfo);
 }
 
 void SwapChain::chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats)
@@ -69,7 +70,7 @@ bool SwapChain::isValid(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk
     return !availableFormats.empty() && !availablePresentModes.empty();
 }
 
-void SwapChain::buildVulkanSwapChainCreateInfo(const SwapChainCreateInfo& swapChainCreateInfo, const vk::SurfaceCapabilitiesKHR& capabilities)
+void SwapChain::buildVulkanSwapChain(const SwapChainCreateInfo& swapChainCreateInfo, const vk::SurfaceCapabilitiesKHR& capabilities)
 {
     std::optional<uint32_t> graphicsFamilyIndex{ swapChainCreateInfo.queueFamilyIndices.getGraphicsFamilyIndex() };
     std::optional<uint32_t> presentFamilyIndex{ swapChainCreateInfo.queueFamilyIndices.getPresentFamilyIndex() };
@@ -92,5 +93,29 @@ void SwapChain::buildVulkanSwapChainCreateInfo(const SwapChainCreateInfo& swapCh
         .presentMode = presentMode
     };
     vulkanSwapChain = swapChainCreateInfo.vulkanLogicalDevice.createSwapchainKHR(swapChainCreateInfoKHR);
-    swapChainImages = swapChainCreateInfo.vulkanLogicalDevice.getSwapchainImagesKHR(vulkanSwapChain);
+    images = swapChainCreateInfo.vulkanLogicalDevice.getSwapchainImagesKHR(vulkanSwapChain);
+}
+
+
+void SwapChain::buildSwapChainImageViews(const SwapChainCreateInfo& swapChainCreateInfo)
+{
+    imageViews.resize(images.size());
+    for (size_t imageIndex = 0; imageIndex < images.size(); imageIndex++)
+    {
+        vk::ImageViewCreateInfo imageViewCreateInfo{
+            .sType = vk::StructureType::eImageViewCreateInfo,
+            .image = images[imageIndex],
+            .viewType = vk::ImageViewType::e2D,
+            .format = surfaceFormat.format,
+            .components = vk::ComponentSwizzle::eIdentity,
+            .subresourceRange = vk::ImageSubresourceRange{
+                .aspectMask = vk::ImageAspectFlagBits::eColor,
+                .baseMipLevel = 0,
+                .levelCount = 1,
+                .baseArrayLayer = 0,
+                .layerCount = 1
+            }
+        };
+        imageViews[imageIndex] = swapChainCreateInfo.vulkanLogicalDevice.createImageView(imageViewCreateInfo);
+    }
 }

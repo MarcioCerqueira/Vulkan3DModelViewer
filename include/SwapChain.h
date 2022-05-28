@@ -20,10 +20,13 @@ private:
 	void chooseSwapPresentMode(const std::vector<vk::PresentModeKHR>& availablePresentModes);
 	void chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities, const WindowSize& framebufferSize);
 	void setImageCount(const vk::SurfaceCapabilitiesKHR& capabilities);
-	void buildVulkanSwapChainCreateInfo(const SwapChainCreateInfo& swapChainCreateInfo, const vk::SurfaceCapabilitiesKHR& capabilities);
+	void buildVulkanSwapChain(const SwapChainCreateInfo& swapChainCreateInfo, const vk::SurfaceCapabilitiesKHR& capabilities);
+	void buildSwapChainImageViews(const SwapChainCreateInfo& swapChainCreateInfo);
 
+	const SwapChainCreateInfo swapChainCreateInfo;
 	vk::SwapchainKHR vulkanSwapChain; 
-	std::vector<vk::Image> swapChainImages;
+	std::vector<vk::Image> images; 
+	std::vector<vk::ImageView> imageViews;
 	vk::SurfaceFormatKHR surfaceFormat;
 	vk::PresentModeKHR presentMode;
 	vk::Extent2D extent;
