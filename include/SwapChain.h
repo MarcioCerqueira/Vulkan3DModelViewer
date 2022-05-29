@@ -19,8 +19,8 @@ private:
 	void chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats);
 	void chooseSwapPresentMode(const std::vector<vk::PresentModeKHR>& availablePresentModes);
 	void chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities, const WindowSize& framebufferSize);
-	void setImageCount(const vk::SurfaceCapabilitiesKHR& capabilities);
-	void buildVulkanSwapChain(const SwapChainCreateInfo& swapChainCreateInfo, const vk::SurfaceCapabilitiesKHR& capabilities);
+	uint32_t estimateImageCount(const vk::SurfaceCapabilitiesKHR& capabilities);
+	void buildVulkanSwapChain(const SwapChainCreateInfo& swapChainCreateInfo, const vk::SurfaceCapabilitiesKHR& capabilities, const uint32_t imageCount);
 	void buildSwapChainImageViews(const SwapChainCreateInfo& swapChainCreateInfo);
 	vk::ImageViewCreateInfo buildImageViewCreateInfo(const int imageIndex) const;
 	vk::ImageSubresourceRange createImageSubresourceRange() const;
@@ -32,5 +32,4 @@ private:
 	vk::SurfaceFormatKHR surfaceFormat;
 	vk::PresentModeKHR presentMode;
 	vk::Extent2D extent;
-	uint32_t imageCount;
 };

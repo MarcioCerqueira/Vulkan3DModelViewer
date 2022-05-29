@@ -9,8 +9,7 @@ SwapChain::SwapChain(const SwapChainCreateInfo& swapChainCreateInfo) : swapChain
     chooseSwapSurfaceFormat(availableFormats);
     chooseSwapPresentMode(availablePresentModes);
     chooseSwapExtent(capabilities, swapChainCreateInfo.framebufferSize);
-    setImageCount(capabilities);
-    buildVulkanSwapChain(swapChainCreateInfo, capabilities);
+    buildVulkanSwapChain(swapChainCreateInfo, capabilities, estimateImageCount(capabilities));
     buildSwapChainImageViews(swapChainCreateInfo);
 }
 
@@ -54,13 +53,14 @@ void SwapChain::chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities,
     }
 }
 
-void SwapChain::setImageCount(const vk::SurfaceCapabilitiesKHR& capabilities)
+uint32_t SwapChain::estimateImageCount(const vk::SurfaceCapabilitiesKHR& capabilities)
 {
-    imageCount = capabilities.minImageCount + 1;
+    uint32_t imageCount{ capabilities.minImageCount + 1 };
     if (capabilities.maxImageCount > 0 && imageCount > capabilities.maxImageCount) 
     {
         imageCount = capabilities.maxImageCount;
     }
+    return imageCount;
 }
 
 bool SwapChain::isValid(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface)
@@ -70,7 +70,7 @@ bool SwapChain::isValid(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk
     return !availableFormats.empty() && !availablePresentModes.empty();
 }
 
-void SwapChain::buildVulkanSwapChain(const SwapChainCreateInfo& swapChainCreateInfo, const vk::SurfaceCapabilitiesKHR& capabilities)
+void SwapChain::buildVulkanSwapChain(const SwapChainCreateInfo& swapChainCreateInfo, const vk::SurfaceCapabilitiesKHR& capabilities, const uint32_t imageCount)
 {
     std::optional<uint32_t> graphicsFamilyIndex{ swapChainCreateInfo.queueFamilyIndices.getGraphicsFamilyIndex() };
     std::optional<uint32_t> presentFamilyIndex{ swapChainCreateInfo.queueFamilyIndices.getPresentFamilyIndex() };
