@@ -4,6 +4,8 @@
 #include <fstream>
 #include <sstream>
 
+#include "ExceptionChecker.h"
+
 class ArgumentParser
 {
 public:

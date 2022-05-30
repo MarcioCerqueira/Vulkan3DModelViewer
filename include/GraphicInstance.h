@@ -17,6 +17,7 @@ public:
 	~GraphicInstance();
 
 	vk::Instance getVulkanInstance() const noexcept;
+	vk::Device getVulkanLogicalDevice() const;
 	void selectPhysicalDevice(const vk::SurfaceKHR& vulkanWindowSurface);
 	void createLogicalDevice(const vk::SurfaceKHR& vulkanWindowSurface, const WindowSize& framebufferSize);
 

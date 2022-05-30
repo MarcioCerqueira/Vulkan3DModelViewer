@@ -58,3 +58,8 @@ void LogicalDevice::createSwapChain(const LogicalDeviceCreateInfo& logicalDevice
 	};
 	swapChain = std::make_shared<SwapChain>(swapChainCreateInfo);
 }
+
+vk::Device LogicalDevice::getVulkanLogicalDevice() const noexcept
+{
+	return vulkanLogicalDevice;
+}

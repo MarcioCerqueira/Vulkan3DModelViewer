@@ -30,10 +30,6 @@ void ArgumentParser::loadConfigurationFile(const char* configurationFilePath)
 std::ifstream ArgumentParser::openFile(const char* filePath) const
 {
 	std::ifstream file(filePath);
-	if (!file.is_open())
-	{
-		std::string errorMessage = "Error opening file located at " + std::string(filePath);
-		throw std::runtime_error(errorMessage);
-	}
+	ExceptionChecker::isFileOpen(file, filePath);
 	return file;
 }

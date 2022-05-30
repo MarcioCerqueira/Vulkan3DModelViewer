@@ -47,6 +47,11 @@ vk::Instance GraphicInstance::getVulkanInstance() const noexcept
 	return vulkanInstance;
 }
 
+vk::Device GraphicInstance::getVulkanLogicalDevice() const
+{
+	return logicalDevice->getVulkanLogicalDevice();
+}
+
 void GraphicInstance::selectPhysicalDevice(const vk::SurfaceKHR& vulkanWindowSurface)
 {
 	const std::vector<vk::PhysicalDevice> vulkanPhysicalDevices{ vulkanInstance.enumeratePhysicalDevices() };
