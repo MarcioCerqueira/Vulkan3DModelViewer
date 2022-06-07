@@ -52,6 +52,11 @@ vk::Device GraphicInstance::getVulkanLogicalDevice() const
 	return logicalDevice->getVulkanLogicalDevice();
 }
 
+std::shared_ptr<SwapChain> GraphicInstance::getSwapChain() const
+{
+	return logicalDevice->getSwapChain();
+}
+
 void GraphicInstance::selectPhysicalDevice(const vk::SurfaceKHR& vulkanWindowSurface)
 {
 	const std::vector<vk::PhysicalDevice> vulkanPhysicalDevices{ vulkanInstance.enumeratePhysicalDevices() };

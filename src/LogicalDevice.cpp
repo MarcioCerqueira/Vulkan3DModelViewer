@@ -63,3 +63,8 @@ vk::Device LogicalDevice::getVulkanLogicalDevice() const noexcept
 {
 	return vulkanLogicalDevice;
 }
+
+std::shared_ptr<SwapChain> LogicalDevice::getSwapChain() const noexcept
+{
+	return swapChain;
+}

@@ -6,6 +6,8 @@
 #include "GraphicInstance.h"
 #include "WindowSurface.h"
 #include "Shader.h"
+#include "GraphicsPipeline.h"
+#include "RenderPass.h"
 
 class AmbientOcclusionApplication
 {

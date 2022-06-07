@@ -100,7 +100,7 @@ void SwapChain::buildVulkanSwapChain(const SwapChainCreateInfo& swapChainCreateI
 void SwapChain::buildSwapChainImageViews(const SwapChainCreateInfo& swapChainCreateInfo)
 {
     imageViews.resize(images.size());
-    for (size_t imageIndex = 0; imageIndex < images.size(); imageIndex++)
+    for (int imageIndex = 0; imageIndex < images.size(); ++imageIndex)
     {
         vk::ImageViewCreateInfo imageViewCreateInfo{ buildImageViewCreateInfo(imageIndex) };
         imageViews[imageIndex] = swapChainCreateInfo.vulkanLogicalDevice.createImageView(imageViewCreateInfo);
@@ -127,4 +127,14 @@ vk::ImageSubresourceRange SwapChain::createImageSubresourceRange() const
         .baseArrayLayer = 0,
         .layerCount = 1
     };
+}
+
+vk::Extent2D SwapChain::getExtent() const noexcept
+{
+    return extent;
+}
+
+vk::SurfaceFormatKHR SwapChain::getSurfaceFormat() const noexcept
+{
+    return surfaceFormat;
 }

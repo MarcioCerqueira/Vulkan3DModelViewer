@@ -15,6 +15,8 @@ void AmbientOcclusionApplication::loadGraphicsPipeline()
 {
 	Shader vertexShader("shaders/vert.spv", graphicInstance->getVulkanLogicalDevice(), vk::ShaderStageFlagBits::eVertex);
 	Shader fragmentShader("shaders/frag.spv", graphicInstance->getVulkanLogicalDevice(), vk::ShaderStageFlagBits::eFragment);
+	GraphicsPipeline graphicsPipeline(graphicInstance->getVulkanLogicalDevice(), graphicInstance->getSwapChain()->getExtent());
+	RenderPass renderPass(graphicInstance->getVulkanLogicalDevice(), graphicInstance->getSwapChain()->getSurfaceFormat());
 }
 
 void AmbientOcclusionApplication::run() const noexcept

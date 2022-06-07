@@ -14,6 +14,8 @@ class SwapChain
 public:
 	explicit SwapChain(const SwapChainCreateInfo& swapChainCreateInfo);
 	static bool isValid(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface);
+	vk::Extent2D getExtent() const noexcept;
+	vk::SurfaceFormatKHR getSurfaceFormat() const noexcept;
 
 private:
 	void chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats);
