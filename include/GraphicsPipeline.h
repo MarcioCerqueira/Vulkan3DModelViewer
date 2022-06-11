@@ -7,6 +7,7 @@ class GraphicsPipeline
 {
 public:
 	GraphicsPipeline(const vk::Device& vulkanLogicalDevice, const vk::Extent2D& swapChainExtent, const std::vector<vk::PipelineShaderStageCreateInfo>& shaderStages, vk::RenderPass vulkanRenderPass);
+	~GraphicsPipeline();
 
 private:
 	vk::GraphicsPipelineCreateInfo buildGraphicsPipelineCreateInfo(const vk::Extent2D& swapChainExtent, const std::vector<vk::PipelineShaderStageCreateInfo>& shaderStages, vk::RenderPass vulkanRenderPass) const;
@@ -23,6 +24,7 @@ private:
 	vk::PipelineLayoutCreateInfo buildPipelineLayoutCreateInfo() const;
 	void buildPipelineLayout(const vk::Device& vulkanLogicalDevice, const vk::PipelineLayoutCreateInfo& pipelineLayoutCreateInfo);
 	
+	const vk::Device vulkanLogicalDevice;
 	vk::PipelineLayout pipelineLayout;
 	vk::Pipeline pipeline;
 };

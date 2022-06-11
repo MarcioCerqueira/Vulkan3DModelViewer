@@ -12,6 +12,13 @@ LogicalDevice::LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateI
 	createSwapChain(logicalDeviceCreateInfo);
 }
 
+LogicalDevice::~LogicalDevice()
+{
+	swapChain.reset();
+	printf("Logical Device\n");
+	vulkanLogicalDevice.destroy();
+}
+
 std::vector<vk::DeviceQueueCreateInfo> LogicalDevice::buildDeviceQueueCreateInfos(const std::set<uint32_t>& uniqueQueueFamilies) const
 {
 	std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
@@ -26,7 +33,6 @@ vk::DeviceQueueCreateInfo LogicalDevice::buildDeviceQueueCreateInfo(uint32_t que
 {
 	const float queuePriority{ 1.0f };
 	return vk::DeviceQueueCreateInfo{
-		.sType = vk::StructureType::eDeviceQueueCreateInfo,
 		.queueFamilyIndex = queueFamilyIndex,
 		.queueCount = 1,
 		.pQueuePriorities = &queuePriority
@@ -36,7 +42,6 @@ vk::DeviceQueueCreateInfo LogicalDevice::buildDeviceQueueCreateInfo(uint32_t que
 vk::DeviceCreateInfo LogicalDevice::buildVulkanLogicalDeviceCreateInfo(const std::vector<vk::DeviceQueueCreateInfo>& deviceQueueCreateInfos, const LogicalDeviceCreateInfo& logicalDeviceCreateInfo) const
 {
 	return vk::DeviceCreateInfo{
-		.sType = vk::StructureType::eDeviceCreateInfo,
 		.queueCreateInfoCount = static_cast<uint32_t>(deviceQueueCreateInfos.size()),
 		.pQueueCreateInfos = deviceQueueCreateInfos.data(),
 		.enabledLayerCount = logicalDeviceCreateInfo.enabledLayerCount,
@@ -56,7 +61,7 @@ void LogicalDevice::createSwapChain(const LogicalDeviceCreateInfo& logicalDevice
 		.queueFamilyIndices = logicalDeviceCreateInfo.queueFamilyIndices,
 		.vulkanLogicalDevice = this->vulkanLogicalDevice
 	};
-	swapChain = std::make_shared<SwapChain>(swapChainCreateInfo);
+	swapChain = std::make_unique<SwapChain>(swapChainCreateInfo);
 }
 
 vk::Device LogicalDevice::getVulkanLogicalDevice() const noexcept
@@ -64,7 +69,12 @@ vk::Device LogicalDevice::getVulkanLogicalDevice() const noexcept
 	return vulkanLogicalDevice;
 }
 
-std::shared_ptr<SwapChain> LogicalDevice::getSwapChain() const noexcept
+vk::Extent2D LogicalDevice::getSwapChainExtent() const
 {
-	return swapChain;
+	return swapChain->getExtent();
+}
+
+vk::SurfaceFormatKHR LogicalDevice::getSwapChainSurfaceFormat() const
+{
+	return swapChain->getSurfaceFormat();
 }

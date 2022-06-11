@@ -18,7 +18,8 @@ public:
 
 	vk::Instance getVulkanInstance() const noexcept;
 	vk::Device getVulkanLogicalDevice() const;
-	std::shared_ptr<SwapChain> getSwapChain() const;
+	vk::Extent2D getSwapChainExtent() const;
+	vk::SurfaceFormatKHR getSwapChainSurfaceFormat() const;
 
 	void selectPhysicalDevice(const vk::SurfaceKHR& vulkanWindowSurface);
 	void createLogicalDevice(const vk::SurfaceKHR& vulkanWindowSurface, const WindowSize& framebufferSize);

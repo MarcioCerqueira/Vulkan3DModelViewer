@@ -13,6 +13,15 @@ SwapChain::SwapChain(const SwapChainCreateInfo& swapChainCreateInfo) : swapChain
     buildSwapChainImageViews(swapChainCreateInfo);
 }
 
+SwapChain::~SwapChain()
+{
+    for (auto imageView : imageViews)
+    {
+        printf("Image View\n");
+        swapChainCreateInfo.vulkanLogicalDevice.destroyImageView(imageView);
+    }
+}
+
 void SwapChain::chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats)
 {
     surfaceFormat = availableFormats[0];
@@ -76,8 +85,6 @@ void SwapChain::buildVulkanSwapChain(const SwapChainCreateInfo& swapChainCreateI
     std::optional<uint32_t> presentFamilyIndex{ swapChainCreateInfo.queueFamilyIndices.getPresentFamilyIndex() };
     uint32_t queueFamilyIndices[] = { graphicsFamilyIndex.value(), presentFamilyIndex.value() };
     vk::SwapchainCreateInfoKHR swapChainCreateInfoKHR{
-        .sType = vk::StructureType::eSwapchainCreateInfoKHR,
-        .flags = {},
         .surface = swapChainCreateInfo.vulkanWindowSurface,
         .minImageCount = imageCount,
         .imageFormat = surfaceFormat.format,
@@ -110,7 +117,6 @@ void SwapChain::buildSwapChainImageViews(const SwapChainCreateInfo& swapChainCre
 vk::ImageViewCreateInfo SwapChain::buildImageViewCreateInfo(const int imageIndex) const
 {
     return vk::ImageViewCreateInfo{
-        .sType = vk::StructureType::eImageViewCreateInfo,
         .image = images[imageIndex],
         .viewType = vk::ImageViewType::e2D,
         .format = surfaceFormat.format,

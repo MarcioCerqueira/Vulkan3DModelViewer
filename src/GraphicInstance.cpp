@@ -52,9 +52,14 @@ vk::Device GraphicInstance::getVulkanLogicalDevice() const
 	return logicalDevice->getVulkanLogicalDevice();
 }
 
-std::shared_ptr<SwapChain> GraphicInstance::getSwapChain() const
+vk::Extent2D GraphicInstance::getSwapChainExtent() const
 {
-	return logicalDevice->getSwapChain();
+	return logicalDevice->getSwapChainExtent();
+}
+
+vk::SurfaceFormatKHR GraphicInstance::getSwapChainSurfaceFormat() const
+{
+	return logicalDevice->getSwapChainSurfaceFormat();
 }
 
 void GraphicInstance::selectPhysicalDevice(const vk::SurfaceKHR& vulkanWindowSurface)

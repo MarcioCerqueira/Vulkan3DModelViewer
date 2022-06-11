@@ -13,14 +13,15 @@ AmbientOcclusionApplication::AmbientOcclusionApplication(const int windowWidth, 
 
 void AmbientOcclusionApplication::loadGraphicsPipeline()
 {
+
 	Shader vertexShader("shaders/vert.spv", graphicInstance->getVulkanLogicalDevice(), vk::ShaderStageFlagBits::eVertex);
 	Shader fragmentShader("shaders/frag.spv", graphicInstance->getVulkanLogicalDevice(), vk::ShaderStageFlagBits::eFragment);
 	std::vector<vk::PipelineShaderStageCreateInfo> shaderStages(2);
 	shaderStages[0] = vertexShader.buildPipelineShaderStageCreateInfo();
 	shaderStages[1] = fragmentShader.buildPipelineShaderStageCreateInfo();
 
-	RenderPass renderPass(graphicInstance->getVulkanLogicalDevice(), graphicInstance->getSwapChain()->getSurfaceFormat());
-	GraphicsPipeline graphicsPipeline(graphicInstance->getVulkanLogicalDevice(), graphicInstance->getSwapChain()->getExtent(), shaderStages, renderPass.getVulkanRenderPass());
+	RenderPass renderPass(graphicInstance->getVulkanLogicalDevice(), graphicInstance->getSwapChainSurfaceFormat());
+	GraphicsPipeline graphicsPipeline(graphicInstance->getVulkanLogicalDevice(), graphicInstance->getSwapChainExtent(), shaderStages, renderPass.getVulkanRenderPass());
 }
 
 void AmbientOcclusionApplication::run() const noexcept

@@ -1,21 +1,49 @@
 #include "GraphicsPipeline.h"
 
-GraphicsPipeline::GraphicsPipeline(const vk::Device& vulkanLogicalDevice, const vk::Extent2D& swapChainExtent, const std::vector<vk::PipelineShaderStageCreateInfo>& shaderStages, vk::RenderPass vulkanRenderPass)
+GraphicsPipeline::GraphicsPipeline(const vk::Device& vulkanLogicalDevice, const vk::Extent2D& swapChainExtent, const std::vector<vk::PipelineShaderStageCreateInfo>& shaderStages, vk::RenderPass vulkanRenderPass) : vulkanLogicalDevice(vulkanLogicalDevice)
 {
 	const vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{ buildPipelineLayoutCreateInfo() };
-	vk::PipelineLayout pipelineLayout = vulkanLogicalDevice.createPipelineLayout(pipelineLayoutCreateInfo);
-	vk::GraphicsPipelineCreateInfo graphicsPipelineCreateInfo{ buildGraphicsPipelineCreateInfo(swapChainExtent, shaderStages, vulkanRenderPass) };
-	/*
-	vk::Pipeline graphicsPipeline = vulkanLogicalDevice.createGraphicsPipeline({}, graphicsPipelineCreateInfo).value;
-	if (graphicsPipelineCreation.result == vk::Result::eSuccess)
+	vk::PipelineVertexInputStateCreateInfo vertexInputState{ buildPipelineVertexInputStateCreateInfo() };
+	vk::PipelineInputAssemblyStateCreateInfo inputAssemblyState{ buildPipelineInputAssemblyStateCreateInfo() };
+	vk::Viewport viewport{ buildViewport(swapChainExtent) };
+	vk::Rect2D scissor{ buildScissor(swapChainExtent) };
+	vk::PipelineViewportStateCreateInfo _viewportState{ buildPipelineViewportStateCreateInfo(swapChainExtent, viewport, scissor) };
+	vk::PipelineRasterizationStateCreateInfo rasterizationState{ buildPipelineRasterizationStateCreateInfo() };
+	vk::PipelineMultisampleStateCreateInfo multisampleState{ buildPipelineMultisampleStateCreateInfo() };
+	vk::PipelineColorBlendAttachmentState colorBlendAttachmentState{ buildPipelineColorBlendAttachmentState() };
+	vk::PipelineColorBlendStateCreateInfo  colorBlendState{ buildPipelineColorBlendStateCreateInfo(colorBlendAttachmentState) };
+	vk::PipelineDynamicStateCreateInfo  dynamicState{ buildPipelineDynamicStateCreateInfo() };
+	pipelineLayout = vulkanLogicalDevice.createPipelineLayout(pipelineLayoutCreateInfo);
+	vk::GraphicsPipelineCreateInfo graphicsPipelineCreateInfo{
+		.stageCount = 2,
+		.pStages = shaderStages.data(),
+		.pVertexInputState = &vertexInputState,
+		.pInputAssemblyState = &inputAssemblyState,
+		.pViewportState = &_viewportState,
+		.pRasterizationState = &rasterizationState,
+		.pMultisampleState = &multisampleState,
+		.pColorBlendState = &colorBlendState,
+		.layout = pipelineLayout,
+		.renderPass = vulkanRenderPass,
+		.subpass = 0,
+		.basePipelineHandle = nullptr,
+		.basePipelineIndex = -1
+	};
+	vk::ResultValue<vk::Pipeline> graphicsPipeline = vulkanLogicalDevice.createGraphicsPipeline({}, graphicsPipelineCreateInfo);
+	if (graphicsPipeline.result == vk::Result::eSuccess)
 	{
-		pipeline = graphicsPipelineCreation.value;
+		pipeline = graphicsPipeline.value;
 	}
 	else
 	{
 		throw std::runtime_error("Error! Unable to create the graphics pipeline");
 	}
-	*/
+}
+
+GraphicsPipeline::~GraphicsPipeline()
+{
+	printf("Pipeline Layout\n");
+	vulkanLogicalDevice.destroyPipelineLayout(pipelineLayout);
 }
 
 vk::GraphicsPipelineCreateInfo GraphicsPipeline::buildGraphicsPipelineCreateInfo(const vk::Extent2D& swapChainExtent, const std::vector<vk::PipelineShaderStageCreateInfo>& shaderStages, vk::RenderPass vulkanRenderPass) const
@@ -29,19 +57,17 @@ vk::GraphicsPipelineCreateInfo GraphicsPipeline::buildGraphicsPipelineCreateInfo
 	vk::PipelineMultisampleStateCreateInfo multisampleState{ buildPipelineMultisampleStateCreateInfo() };
 	vk::PipelineColorBlendAttachmentState colorBlendAttachmentState{ buildPipelineColorBlendAttachmentState() };
 	vk::PipelineColorBlendStateCreateInfo  colorBlendState{ buildPipelineColorBlendStateCreateInfo(colorBlendAttachmentState) };
-	vk::PipelineShaderStageCreateInfo shaderStages2[] = { shaderStages[0], shaderStages[1] };
+	vk::PipelineDynamicStateCreateInfo  dynamicState{ buildPipelineDynamicStateCreateInfo() };
 	return vk::GraphicsPipelineCreateInfo{
-		.sType = vk::StructureType::eGraphicsPipelineCreateInfo,
 		.stageCount = 2,
-		.pStages = shaderStages2,
+		.pStages = shaderStages.data(),
 		.pVertexInputState = &vertexInputState,
 		.pInputAssemblyState = &inputAssemblyState,
 		.pViewportState = &viewportState,
 		.pRasterizationState = &rasterizationState,
 		.pMultisampleState = &multisampleState,
-		.pDepthStencilState = nullptr,
 		.pColorBlendState = &colorBlendState,
-		.pDynamicState = nullptr,
+		.pDynamicState = &dynamicState,
 		.layout = pipelineLayout,
 		.renderPass = vulkanRenderPass,
 		.subpass = 0,
@@ -53,7 +79,6 @@ vk::GraphicsPipelineCreateInfo GraphicsPipeline::buildGraphicsPipelineCreateInfo
 vk::PipelineVertexInputStateCreateInfo GraphicsPipeline::buildPipelineVertexInputStateCreateInfo() const
 {
 	return vk::PipelineVertexInputStateCreateInfo{
-		.sType = vk::StructureType::ePipelineVertexInputStateCreateInfo,
 		.vertexBindingDescriptionCount = 0,
 		.pVertexBindingDescriptions = nullptr,
 		.vertexAttributeDescriptionCount = 0,
@@ -64,7 +89,6 @@ vk::PipelineVertexInputStateCreateInfo GraphicsPipeline::buildPipelineVertexInpu
 vk::PipelineInputAssemblyStateCreateInfo GraphicsPipeline::buildPipelineInputAssemblyStateCreateInfo() const
 {
 	return vk::PipelineInputAssemblyStateCreateInfo{
-		.sType = vk::StructureType::ePipelineInputAssemblyStateCreateInfo,
 		.topology = vk::PrimitiveTopology::eTriangleList,
 		.primitiveRestartEnable = vk::Bool32(0)
 	};
@@ -93,7 +117,6 @@ vk::Rect2D GraphicsPipeline::buildScissor(const vk::Extent2D& swapChainExtent) c
 vk::PipelineViewportStateCreateInfo GraphicsPipeline::buildPipelineViewportStateCreateInfo(const vk::Extent2D& swapChainExtent, const vk::Viewport& viewport, const vk::Rect2D& scissor) const
 {
 	return vk::PipelineViewportStateCreateInfo{
-		.sType = vk::StructureType::ePipelineViewportStateCreateInfo,
 		.viewportCount = 1,
 		.pViewports = &viewport,
 		.scissorCount = 1,
@@ -105,7 +128,6 @@ vk::PipelineViewportStateCreateInfo GraphicsPipeline::buildPipelineViewportState
 vk::PipelineRasterizationStateCreateInfo GraphicsPipeline::buildPipelineRasterizationStateCreateInfo() const
 {
 	return vk::PipelineRasterizationStateCreateInfo{
-		.sType = vk::StructureType::ePipelineRasterizationStateCreateInfo,
 		.depthClampEnable = vk::Bool32(0),
 		.rasterizerDiscardEnable = vk::Bool32(0),
 		.polygonMode = vk::PolygonMode::eFill,
@@ -122,7 +144,6 @@ vk::PipelineRasterizationStateCreateInfo GraphicsPipeline::buildPipelineRasteriz
 vk::PipelineMultisampleStateCreateInfo GraphicsPipeline::buildPipelineMultisampleStateCreateInfo() const
 {
 	return vk::PipelineMultisampleStateCreateInfo{
-		.sType = vk::StructureType::ePipelineMultisampleStateCreateInfo,
 		.rasterizationSamples = vk::SampleCountFlagBits::e1,
 		.sampleShadingEnable = vk::Bool32(0),
 		.minSampleShading = 1.0f,
@@ -151,7 +172,6 @@ vk::PipelineColorBlendStateCreateInfo GraphicsPipeline::buildPipelineColorBlendS
 {
 	const std::array<float, 4> blendConstants = { 0.0f, 0.0f, 0.0f, 0.0f };
 	return vk::PipelineColorBlendStateCreateInfo{
-		.sType = vk::StructureType::ePipelineColorBlendStateCreateInfo,
 		.logicOpEnable = vk::Bool32(0),
 		.logicOp = vk::LogicOp::eCopy,
 		.attachmentCount = 1,
@@ -164,7 +184,6 @@ vk::PipelineDynamicStateCreateInfo GraphicsPipeline::buildPipelineDynamicStateCr
 {
 	const std::vector<vk::DynamicState> dynamicStates = { vk::DynamicState::eViewport, vk::DynamicState::eLineWidth };
 	return vk::PipelineDynamicStateCreateInfo{
-		.sType = vk::StructureType::ePipelineDynamicStateCreateInfo,
 		.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()),
 		.pDynamicStates = dynamicStates.data()
 	};
@@ -173,7 +192,6 @@ vk::PipelineDynamicStateCreateInfo GraphicsPipeline::buildPipelineDynamicStateCr
 vk::PipelineLayoutCreateInfo GraphicsPipeline::buildPipelineLayoutCreateInfo() const
 {
 	return vk::PipelineLayoutCreateInfo{
-		.sType = vk::StructureType::ePipelineLayoutCreateInfo,
 		.setLayoutCount = 0,
 		.pSetLayouts = nullptr,
 		.pushConstantRangeCount = 0,

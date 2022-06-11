@@ -13,8 +13,11 @@ class LogicalDevice
 {
 public:
 	explicit LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateInfo);
+	~LogicalDevice();
+
 	vk::Device getVulkanLogicalDevice() const noexcept;
-	std::shared_ptr<SwapChain> getSwapChain() const noexcept;
+	vk::Extent2D getSwapChainExtent() const;
+	vk::SurfaceFormatKHR getSwapChainSurfaceFormat() const;
 
 private:
 	std::vector<vk::DeviceQueueCreateInfo> buildDeviceQueueCreateInfos(const std::set<uint32_t>& uniqueQueueFamilies) const;
@@ -23,6 +26,6 @@ private:
 	void createSwapChain(const LogicalDeviceCreateInfo& logicalDeviceCreateInfo);
 
 	vk::Device vulkanLogicalDevice; 
-	std::shared_ptr<SwapChain> swapChain;
+	std::unique_ptr<SwapChain> swapChain;
 	vk::PhysicalDeviceFeatures physicalDeviceFeatures;
 };

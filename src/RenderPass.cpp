@@ -1,12 +1,18 @@
 #include "RenderPass.h"
 
-RenderPass::RenderPass(const vk::Device& vulkanLogicalDevice, const vk::SurfaceFormatKHR& swapChainSurfaceFormat)
+RenderPass::RenderPass(const vk::Device& vulkanLogicalDevice, const vk::SurfaceFormatKHR& swapChainSurfaceFormat) : vulkanLogicalDevice(vulkanLogicalDevice)
 {
 	const vk::AttachmentDescription attachmentDescription = createAttachmentDescription(swapChainSurfaceFormat);
 	const vk::AttachmentReference attachmentReference = createAttachmentReference();
 	const vk::SubpassDescription subpassDescription = createSubpassDescription(attachmentReference);
 	const vk::RenderPassCreateInfo renderPassCreateInfo = createRenderPassCreateInfo(attachmentDescription, subpassDescription);
 	vulkanRenderPass = vulkanLogicalDevice.createRenderPass(renderPassCreateInfo);
+}
+
+RenderPass::~RenderPass()
+{
+	printf("Render Pass\n");
+	vulkanLogicalDevice.destroyRenderPass(vulkanRenderPass);
 }
 
 vk::RenderPass RenderPass::getVulkanRenderPass() const noexcept
@@ -48,7 +54,6 @@ vk::SubpassDescription RenderPass::createSubpassDescription(const vk::Attachment
 vk::RenderPassCreateInfo RenderPass::createRenderPassCreateInfo(const vk::AttachmentDescription& attachmentDescription, const vk::SubpassDescription& subpassDescription)
 {
 	return vk::RenderPassCreateInfo{
-		.sType = vk::StructureType::eRenderPassCreateInfo,
 		.attachmentCount = 1,
 		.pAttachments = &attachmentDescription,
 		.subpassCount = 1,

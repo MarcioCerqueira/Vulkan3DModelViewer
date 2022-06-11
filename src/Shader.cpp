@@ -1,10 +1,16 @@
 #include "Shader.h"
 
-Shader::Shader(const std::string& filename, const vk::Device& vulkanLogicalDevice, const vk::ShaderStageFlagBits stage) : stage(stage)
+Shader::Shader(const std::string& filename, const vk::Device& vulkanLogicalDevice, const vk::ShaderStageFlagBits stage) : stage(stage), vulkanLogicalDevice(vulkanLogicalDevice)
 {
 	std::vector<char> shaderCode{ readFile(filename) };
 	createShaderModule(shaderCode, vulkanLogicalDevice);
 	std::cout << "Shader file located at " << filename << " has been loaded" << std::endl;
+}
+
+Shader::~Shader()
+{
+	printf("Destroying Shader Module\n");
+	vulkanLogicalDevice.destroyShaderModule(vulkanShaderModule);
 }
 
 std::vector<char> Shader::readFile(const std::string& filename) const
@@ -21,8 +27,8 @@ std::vector<char> Shader::readFile(const std::string& filename) const
 
 void Shader::createShaderModule(const std::vector<char>& shaderCode, const vk::Device& vulkanLogicalDevice)
 {
+
 	vk::ShaderModuleCreateInfo shaderModuleCreateInfo{
-		.sType = vk::StructureType::eShaderModuleCreateInfo,
 		.codeSize = shaderCode.size(),
 		.pCode = reinterpret_cast<const uint32_t*>(shaderCode.data())
 	};
@@ -31,10 +37,9 @@ void Shader::createShaderModule(const std::vector<char>& shaderCode, const vk::D
 
 vk::PipelineShaderStageCreateInfo Shader::buildPipelineShaderStageCreateInfo() const
 {
-	return vk::PipelineShaderStageCreateInfo{
-		.sType = vk::StructureType::ePipelineShaderStageCreateInfo,
-		.stage = stage,
-		.module = vulkanShaderModule,
-		.pName = "main"
-	};
+	vk::PipelineShaderStageCreateInfo p;
+	p.stage = stage;
+	p.module = vulkanShaderModule;
+	p.pName = "main";
+	return p;
 }

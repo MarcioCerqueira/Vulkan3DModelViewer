@@ -13,12 +13,15 @@ class Shader
 {
 public:
 	Shader(const std::string& filename, const vk::Device& vulkanLogicalDevice, const vk::ShaderStageFlagBits stage);
+	~Shader();
+
 	vk::PipelineShaderStageCreateInfo buildPipelineShaderStageCreateInfo() const;
 
 private:
 	std::vector<char> readFile(const std::string& filename) const;
 	void createShaderModule(const std::vector<char>& shaderCode, const vk::Device& vulkanLogicalDevice);
 
+	const vk::Device vulkanLogicalDevice;
 	vk::ShaderModule vulkanShaderModule;
 	const vk::ShaderStageFlagBits stage;
 
