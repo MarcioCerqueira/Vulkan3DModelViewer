@@ -6,9 +6,10 @@
 class GraphicsPipeline
 {
 public:
-	explicit GraphicsPipeline(const vk::Device& vulkanLogicalDevice, const vk::Extent2D& swapChainExtent);
+	GraphicsPipeline(const vk::Device& vulkanLogicalDevice, const vk::Extent2D& swapChainExtent, const std::vector<vk::PipelineShaderStageCreateInfo>& shaderStages, vk::RenderPass vulkanRenderPass);
 
 private:
+	vk::GraphicsPipelineCreateInfo buildGraphicsPipelineCreateInfo(const vk::Extent2D& swapChainExtent, const std::vector<vk::PipelineShaderStageCreateInfo>& shaderStages, vk::RenderPass vulkanRenderPass) const;
 	vk::PipelineVertexInputStateCreateInfo buildPipelineVertexInputStateCreateInfo() const;
 	vk::PipelineInputAssemblyStateCreateInfo buildPipelineInputAssemblyStateCreateInfo() const;
 	vk::Viewport buildViewport(const vk::Extent2D& swapChainExtent) const;
@@ -21,6 +22,7 @@ private:
 	vk::PipelineDynamicStateCreateInfo buildPipelineDynamicStateCreateInfo() const;
 	vk::PipelineLayoutCreateInfo buildPipelineLayoutCreateInfo() const;
 	void buildPipelineLayout(const vk::Device& vulkanLogicalDevice, const vk::PipelineLayoutCreateInfo& pipelineLayoutCreateInfo);
-
+	
 	vk::PipelineLayout pipelineLayout;
+	vk::Pipeline pipeline;
 };

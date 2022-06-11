@@ -9,6 +9,11 @@ RenderPass::RenderPass(const vk::Device& vulkanLogicalDevice, const vk::SurfaceF
 	vulkanRenderPass = vulkanLogicalDevice.createRenderPass(renderPassCreateInfo);
 }
 
+vk::RenderPass RenderPass::getVulkanRenderPass() const noexcept
+{
+	return vulkanRenderPass;
+}
+
 vk::AttachmentDescription RenderPass::createAttachmentDescription(const vk::SurfaceFormatKHR& swapChainSurfaceFormat) const
 {
 	return vk::AttachmentDescription{

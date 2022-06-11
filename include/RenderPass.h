@@ -7,6 +7,7 @@ class RenderPass
 {
 public:
 	RenderPass(const vk::Device& vulkanLogicalDevice, const vk::SurfaceFormatKHR& swapChainSurfaceFormat);
+	vk::RenderPass getVulkanRenderPass() const noexcept;
 
 private:
 	vk::AttachmentDescription createAttachmentDescription(const vk::SurfaceFormatKHR& swapChainSurfaceFormat) const;
