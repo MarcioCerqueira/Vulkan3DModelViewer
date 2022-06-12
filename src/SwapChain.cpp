@@ -17,9 +17,9 @@ SwapChain::~SwapChain()
 {
     for (auto imageView : imageViews)
     {
-        printf("Image View\n");
         swapChainCreateInfo.vulkanLogicalDevice.destroyImageView(imageView);
     }
+    swapChainCreateInfo.vulkanLogicalDevice.destroySwapchainKHR(vulkanSwapChain);
 }
 
 void SwapChain::chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats)

@@ -9,20 +9,22 @@
 #include "PhysicalDevice.h"
 #include "LogicalDevice.h"
 #include "ValidationLayer.h"
+#include "WindowSurface.h"
 
-class GraphicInstance
+class GraphicsInstance
 {
 public:
-	explicit GraphicInstance(const std::string& applicationName);
-	~GraphicInstance();
+	explicit GraphicsInstance(const std::string& applicationName);
+	~GraphicsInstance();
 
 	vk::Instance getVulkanInstance() const noexcept;
 	vk::Device getVulkanLogicalDevice() const;
 	vk::Extent2D getSwapChainExtent() const;
 	vk::SurfaceFormatKHR getSwapChainSurfaceFormat() const;
 
-	void selectPhysicalDevice(const vk::SurfaceKHR& vulkanWindowSurface);
-	void createLogicalDevice(const vk::SurfaceKHR& vulkanWindowSurface, const WindowSize& framebufferSize);
+	void createWindowSurface(GLFWwindow* glfwWindow);
+	void selectPhysicalDevice();
+	void createLogicalDevice(const WindowSize& framebufferSize);
 
 private:
 	void createVulkanInstance(const std::string& applicationName);
@@ -32,5 +34,6 @@ private:
 	vk::Instance vulkanInstance;
 	PhysicalDevice physicalDevice;
 	std::unique_ptr<LogicalDevice> logicalDevice;
+	std::unique_ptr<WindowSurface> windowSurface;
 	const ValidationLayer validationLayer;
 };

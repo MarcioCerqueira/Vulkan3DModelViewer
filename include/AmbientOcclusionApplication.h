@@ -3,8 +3,7 @@
 #include <memory>
 
 #include "Window.h"
-#include "GraphicInstance.h"
-#include "WindowSurface.h"
+#include "GraphicsInstance.h"
 #include "Shader.h"
 #include "GraphicsPipeline.h"
 #include "RenderPass.h"
@@ -20,6 +19,5 @@ private:
 	void loadGraphicsPipeline();
 
 	std::unique_ptr<Window> window;
-	std::unique_ptr<GraphicInstance> graphicInstance;
-	std::unique_ptr<WindowSurface> windowSurface;
+	std::unique_ptr<GraphicsInstance> graphicsInstance;
 };

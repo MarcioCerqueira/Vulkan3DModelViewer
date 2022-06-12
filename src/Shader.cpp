@@ -9,7 +9,6 @@ Shader::Shader(const std::string& filename, const vk::Device& vulkanLogicalDevic
 
 Shader::~Shader()
 {
-	printf("Destroying Shader Module\n");
 	vulkanLogicalDevice.destroyShaderModule(vulkanShaderModule);
 }
 

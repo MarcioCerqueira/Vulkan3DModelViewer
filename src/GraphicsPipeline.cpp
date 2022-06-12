@@ -42,7 +42,7 @@ GraphicsPipeline::GraphicsPipeline(const vk::Device& vulkanLogicalDevice, const 
 
 GraphicsPipeline::~GraphicsPipeline()
 {
-	printf("Pipeline Layout\n");
+	vulkanLogicalDevice.destroyPipeline(pipeline);
 	vulkanLogicalDevice.destroyPipelineLayout(pipelineLayout);
 }
 

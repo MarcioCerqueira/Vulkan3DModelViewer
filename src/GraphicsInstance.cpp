@@ -1,23 +1,25 @@
-#include "GraphicInstance.h"
+#include "GraphicsInstance.h"
 
-GraphicInstance::GraphicInstance(const std::string& applicationName)
+GraphicsInstance::GraphicsInstance(const std::string& applicationName)
 {
 	createVulkanInstance(applicationName);
 }
 
-GraphicInstance::~GraphicInstance()
+GraphicsInstance::~GraphicsInstance()
 {
+	logicalDevice.reset();
+	windowSurface.reset();
 	vulkanInstance.destroy();
 }
 
-void GraphicInstance::createVulkanInstance(const std::string& applicationName)
+void GraphicsInstance::createVulkanInstance(const std::string& applicationName)
 {
 	const vk::ApplicationInfo applicationInfo{ createApplicationInfo(applicationName) };
 	const vk::InstanceCreateInfo createInfo{ createVulkanInstanceInfo(applicationInfo) };
 	vulkanInstance = vk::createInstance(createInfo);
 }
 
-vk::ApplicationInfo GraphicInstance::createApplicationInfo(const std::string& applicationName) const
+vk::ApplicationInfo GraphicsInstance::createApplicationInfo(const std::string& applicationName) const
 {
 	return vk::ApplicationInfo{
 		.pApplicationName = applicationName.c_str(),
@@ -28,7 +30,7 @@ vk::ApplicationInfo GraphicInstance::createApplicationInfo(const std::string& ap
 	};
 }
 
-vk::InstanceCreateInfo GraphicInstance::createVulkanInstanceInfo(const vk::ApplicationInfo& applicationInfo) const
+vk::InstanceCreateInfo GraphicsInstance::createVulkanInstanceInfo(const vk::ApplicationInfo& applicationInfo) const
 {
 	uint32_t glfwExtensionCount{ 0 };
 	const char** glfwExtensions{ glfwGetRequiredInstanceExtensions(&glfwExtensionCount) };
@@ -42,33 +44,38 @@ vk::InstanceCreateInfo GraphicInstance::createVulkanInstanceInfo(const vk::Appli
 	};
 }
 
-vk::Instance GraphicInstance::getVulkanInstance() const noexcept
+vk::Instance GraphicsInstance::getVulkanInstance() const noexcept
 {
 	return vulkanInstance;
 }
 
-vk::Device GraphicInstance::getVulkanLogicalDevice() const
+vk::Device GraphicsInstance::getVulkanLogicalDevice() const
 {
 	return logicalDevice->getVulkanLogicalDevice();
 }
 
-vk::Extent2D GraphicInstance::getSwapChainExtent() const
+vk::Extent2D GraphicsInstance::getSwapChainExtent() const
 {
 	return logicalDevice->getSwapChainExtent();
 }
 
-vk::SurfaceFormatKHR GraphicInstance::getSwapChainSurfaceFormat() const
+vk::SurfaceFormatKHR GraphicsInstance::getSwapChainSurfaceFormat() const
 {
 	return logicalDevice->getSwapChainSurfaceFormat();
 }
 
-void GraphicInstance::selectPhysicalDevice(const vk::SurfaceKHR& vulkanWindowSurface)
+void GraphicsInstance::createWindowSurface(GLFWwindow* glfwWindow)
 {
-	const std::vector<vk::PhysicalDevice> vulkanPhysicalDevices{ vulkanInstance.enumeratePhysicalDevices() };
-	physicalDevice.pick(vulkanPhysicalDevices, vulkanWindowSurface);
+	windowSurface = std::make_unique<WindowSurface>(vulkanInstance, glfwWindow);
 }
 
-void GraphicInstance::createLogicalDevice(const vk::SurfaceKHR& vulkanWindowSurface, const WindowSize& framebufferSize)
+void GraphicsInstance::selectPhysicalDevice()
 {
-	logicalDevice = physicalDevice.createLogicalDevice(validationLayer, vulkanWindowSurface, framebufferSize);
+	const std::vector<vk::PhysicalDevice> vulkanPhysicalDevices{ vulkanInstance.enumeratePhysicalDevices() };
+	physicalDevice.pick(vulkanPhysicalDevices, windowSurface->getVulkanWindowSurface());
+}
+
+void GraphicsInstance::createLogicalDevice(const WindowSize& framebufferSize)
+{
+	logicalDevice = physicalDevice.createLogicalDevice(validationLayer, windowSurface->getVulkanWindowSurface(), framebufferSize);
 }

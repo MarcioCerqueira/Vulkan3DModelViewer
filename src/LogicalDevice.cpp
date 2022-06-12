@@ -15,7 +15,6 @@ LogicalDevice::LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateI
 LogicalDevice::~LogicalDevice()
 {
 	swapChain.reset();
-	printf("Logical Device\n");
 	vulkanLogicalDevice.destroy();
 }
 

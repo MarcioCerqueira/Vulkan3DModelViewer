@@ -11,7 +11,6 @@ RenderPass::RenderPass(const vk::Device& vulkanLogicalDevice, const vk::SurfaceF
 
 RenderPass::~RenderPass()
 {
-	printf("Render Pass\n");
 	vulkanLogicalDevice.destroyRenderPass(vulkanRenderPass);
 }
 

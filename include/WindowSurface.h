@@ -8,8 +8,11 @@ class WindowSurface
 {
 public:
 	WindowSurface(const vk::Instance& vulkanInstance, GLFWwindow* glfwWindow);
+	~WindowSurface();
+
 	vk::SurfaceKHR getVulkanWindowSurface() const noexcept;
 
 private:
+	const vk::Instance vulkanInstance;
 	vk::SurfaceKHR vulkanWindowSurface;
 };
