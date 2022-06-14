@@ -13,8 +13,7 @@
 #include "AmbientOcclusionApplication.h"
 
 int main(const int argc, const char* argv[]) 
-{
-	
+{	
 	try 
 	{
 		ArgumentParser argumentParser{ argc, argv };
@@ -40,5 +39,4 @@ int main(const int argc, const char* argv[])
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;
-
 }

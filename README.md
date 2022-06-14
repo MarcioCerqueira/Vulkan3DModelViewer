@@ -12,7 +12,7 @@ The provided source codes were tested in Windows 10 using the following librarie
 - glm 0.9.9.8;
 - rapidjson;
 
-To run the application, you need to pass the `config.json` file path as an argument to it (_e.g._ `main.exe config.json`).
+To run the application, you need to pass the `config.json` file path as an argument to it (_e.g._ `main.exe config.json`). Also, we suggest you to move the `shaders` folder to the same folder where the executable is located.
 
 If you want to recompile the shaders, please update the `compileShaders.bat` file (Windows) or create a new one following this [tutorial](https://vulkan-tutorial.com/Drawing_a_triangle/Graphics_pipeline_basics/Shader_modules#page_Compiling-the-shaders).
  

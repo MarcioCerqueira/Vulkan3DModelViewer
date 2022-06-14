@@ -36,9 +36,9 @@ void Shader::createShaderModule(const std::vector<char>& shaderCode, const vk::D
 
 vk::PipelineShaderStageCreateInfo Shader::buildPipelineShaderStageCreateInfo() const
 {
-	vk::PipelineShaderStageCreateInfo p;
-	p.stage = stage;
-	p.module = vulkanShaderModule;
-	p.pName = "main";
-	return p;
+	return vk::PipelineShaderStageCreateInfo{
+		.stage = stage,
+		.module = vulkanShaderModule,
+		.pName = "main"
+	};
 }

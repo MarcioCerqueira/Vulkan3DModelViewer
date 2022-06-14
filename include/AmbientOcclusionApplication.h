@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-
 #include "Window.h"
 #include "GraphicsInstance.h"
 #include "Shader.h"
