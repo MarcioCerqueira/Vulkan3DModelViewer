@@ -2,7 +2,7 @@
 
 RenderPass::RenderPass(const vk::Device& vulkanLogicalDevice, const vk::SurfaceFormatKHR& swapChainSurfaceFormat) : vulkanLogicalDevice(vulkanLogicalDevice)
 {
-	const vk::RenderPassCreateInfo renderPassCreateInfo = createRenderPassCreateInfo(swapChainSurfaceFormat);
+	const vk::RenderPassCreateInfo renderPassCreateInfo{ createRenderPassCreateInfo(swapChainSurfaceFormat) };
 	vulkanRenderPass = vulkanLogicalDevice.createRenderPass(renderPassCreateInfo);
 }
 
@@ -18,8 +18,8 @@ vk::RenderPass RenderPass::getVulkanRenderPass() const noexcept
 
 vk::RenderPassCreateInfo RenderPass::createRenderPassCreateInfo(const vk::SurfaceFormatKHR& swapChainSurfaceFormat) const
 {
-	const vk::AttachmentDescription attachmentDescription = createAttachmentDescription(swapChainSurfaceFormat);
-	const vk::SubpassDescription subpassDescription = createSubpassDescription();
+	const vk::AttachmentDescription attachmentDescription{ createAttachmentDescription(swapChainSurfaceFormat) };
+	const vk::SubpassDescription subpassDescription{ createSubpassDescription() };
 	return vk::RenderPassCreateInfo{
 		.attachmentCount = 1,
 		.pAttachments = &attachmentDescription,
@@ -44,7 +44,7 @@ vk::AttachmentDescription RenderPass::createAttachmentDescription(const vk::Surf
 
 vk::SubpassDescription RenderPass::createSubpassDescription() const
 {
-	const vk::AttachmentReference attachmentReference = createAttachmentReference();
+	const vk::AttachmentReference attachmentReference{ createAttachmentReference() };
 	return vk::SubpassDescription{
 		.pipelineBindPoint = vk::PipelineBindPoint::eGraphics,
 		.colorAttachmentCount = 1,

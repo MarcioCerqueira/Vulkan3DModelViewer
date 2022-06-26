@@ -144,3 +144,21 @@ vk::SurfaceFormatKHR SwapChain::getSurfaceFormat() const noexcept
 {
     return surfaceFormat;
 }
+
+int SwapChain::getNumberOfImageViews() const noexcept
+{
+    return imageViews.size();
+}
+
+vk::ImageView SwapChain::getImageView(int index) const
+{
+    if (index < 0)
+    {
+        throw std::runtime_error("Error! You need to pass a valid index (>= 0) for SwapChain::getImageView");
+    }
+    if (index > imageViews.size())
+    {
+        throw std::runtime_error("Error! You need to pass a valid index (< imageViews.size()) for SwapChain::getImageView");
+    }
+    return imageViews[index];
+}

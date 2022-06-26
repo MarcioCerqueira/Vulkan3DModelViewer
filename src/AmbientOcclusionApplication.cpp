@@ -8,25 +8,18 @@ AmbientOcclusionApplication::AmbientOcclusionApplication(const int windowWidth, 
 	graphicsInstance->createWindowSurface(window->getGLFWWindow());
 	graphicsInstance->selectPhysicalDevice();
 	graphicsInstance->createLogicalDevice(window->getFramebufferSize());
-	loadGraphicsPipeline();
+	graphicsInstance->createGraphicsPipeline(loadShaders(graphicsInstance->getVulkanLogicalDevice()));
 }
 
-void AmbientOcclusionApplication::loadGraphicsPipeline()
+std::vector<std::shared_ptr<Shader>> AmbientOcclusionApplication::loadShaders(const vk::Device& vulkanLogicalDevice) const
 {
-	const vk::Device vulkanLogicalDevice = graphicsInstance->getVulkanLogicalDevice();
-	const Shader vertexShader("shaders/vert.spv", vulkanLogicalDevice, vk::ShaderStageFlagBits::eVertex);
-	const Shader fragmentShader("shaders/frag.spv", vulkanLogicalDevice, vk::ShaderStageFlagBits::eFragment);
-	const RenderPass renderPass(vulkanLogicalDevice, graphicsInstance->getSwapChainSurfaceFormat());
-	GraphicsPipelineCreateInfo graphicsPipelineCreateInfo;
-	graphicsPipelineCreateInfo.vulkanLogicalDevice = vulkanLogicalDevice;
-	graphicsPipelineCreateInfo.swapChainExtent = graphicsInstance->getSwapChainExtent();
-	graphicsPipelineCreateInfo.shaderStages.push_back(vertexShader.buildPipelineShaderStageCreateInfo());
-	graphicsPipelineCreateInfo.shaderStages.push_back(fragmentShader.buildPipelineShaderStageCreateInfo());
-	graphicsPipelineCreateInfo.vulkanRenderPass = renderPass.getVulkanRenderPass();
-	const GraphicsPipeline graphicsPipeline(graphicsPipelineCreateInfo);
+	std::vector<std::shared_ptr<Shader>> shaders;
+	shaders.push_back(std::make_shared<Shader>("shaders/vert.spv", vulkanLogicalDevice, vk::ShaderStageFlagBits::eVertex));
+	shaders.push_back(std::make_shared<Shader>("shaders/frag.spv", vulkanLogicalDevice, vk::ShaderStageFlagBits::eFragment));
+	return shaders;
 }
 
-void AmbientOcclusionApplication::run() const noexcept
+void AmbientOcclusionApplication::run() const
 {
 	window->open();
 }

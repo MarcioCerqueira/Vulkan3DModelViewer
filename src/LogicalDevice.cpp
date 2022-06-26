@@ -10,10 +10,18 @@ LogicalDevice::LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateI
 	const vk::DeviceCreateInfo vulkanLogicalDeviceCreateInfo{ buildVulkanLogicalDeviceCreateInfo(deviceQueueCreateInfos, logicalDeviceCreateInfo) };
 	vulkanLogicalDevice = logicalDeviceCreateInfo.vulkanPhysicalDevice.createDevice(vulkanLogicalDeviceCreateInfo);
 	createSwapChain(logicalDeviceCreateInfo);
+	createRenderPass();
+	createFramebuffers();
 }
 
 LogicalDevice::~LogicalDevice()
 {
+	for (auto& framebuffer : framebuffers)
+	{
+		framebuffer.reset();
+	}
+	graphicsPipeline.reset();
+	renderPass.reset();
 	swapChain.reset();
 	vulkanLogicalDevice.destroy();
 }
@@ -63,17 +71,34 @@ void LogicalDevice::createSwapChain(const LogicalDeviceCreateInfo& logicalDevice
 	swapChain = std::make_unique<SwapChain>(swapChainCreateInfo);
 }
 
+void LogicalDevice::createRenderPass()
+{
+	renderPass = std::make_unique<RenderPass>(vulkanLogicalDevice, swapChain->getSurfaceFormat());
+}
+
+void LogicalDevice::createFramebuffers()
+{
+	framebuffers.resize(swapChain->getNumberOfImageViews());
+	for (int framebufferIndex = 0; framebufferIndex < framebuffers.size(); framebufferIndex++)
+	{
+		framebuffers[framebufferIndex] = std::make_unique<Framebuffer>(vulkanLogicalDevice, renderPass->getVulkanRenderPass(), swapChain->getImageView(framebufferIndex), swapChain->getExtent());
+	}
+}
+
 vk::Device LogicalDevice::getVulkanLogicalDevice() const noexcept
 {
 	return vulkanLogicalDevice;
 }
 
-vk::Extent2D LogicalDevice::getSwapChainExtent() const
+void LogicalDevice::createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders)
 {
-	return swapChain->getExtent();
-}
-
-vk::SurfaceFormatKHR LogicalDevice::getSwapChainSurfaceFormat() const
-{
-	return swapChain->getSurfaceFormat();
+	GraphicsPipelineCreateInfo graphicsPipelineCreateInfo;
+	graphicsPipelineCreateInfo.vulkanLogicalDevice = vulkanLogicalDevice;
+	graphicsPipelineCreateInfo.swapChainExtent = swapChain->getExtent();
+	for (const auto& shader : shaders)
+	{
+		graphicsPipelineCreateInfo.shaderStages.push_back(shader->buildPipelineShaderStageCreateInfo());
+	}
+	graphicsPipelineCreateInfo.vulkanRenderPass = renderPass->getVulkanRenderPass();
+	graphicsPipeline = std::make_unique<GraphicsPipeline>(graphicsPipelineCreateInfo);
 }

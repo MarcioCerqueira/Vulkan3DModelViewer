@@ -44,26 +44,6 @@ vk::InstanceCreateInfo GraphicsInstance::createVulkanInstanceInfo(const vk::Appl
 	};
 }
 
-vk::Instance GraphicsInstance::getVulkanInstance() const noexcept
-{
-	return vulkanInstance;
-}
-
-vk::Device GraphicsInstance::getVulkanLogicalDevice() const
-{
-	return logicalDevice->getVulkanLogicalDevice();
-}
-
-vk::Extent2D GraphicsInstance::getSwapChainExtent() const
-{
-	return logicalDevice->getSwapChainExtent();
-}
-
-vk::SurfaceFormatKHR GraphicsInstance::getSwapChainSurfaceFormat() const
-{
-	return logicalDevice->getSwapChainSurfaceFormat();
-}
-
 void GraphicsInstance::createWindowSurface(GLFWwindow* glfwWindow)
 {
 	windowSurface = std::make_unique<WindowSurface>(vulkanInstance, glfwWindow);
@@ -78,4 +58,14 @@ void GraphicsInstance::selectPhysicalDevice()
 void GraphicsInstance::createLogicalDevice(const WindowSize& framebufferSize)
 {
 	logicalDevice = physicalDevice.createLogicalDevice(validationLayer, windowSurface->getVulkanWindowSurface(), framebufferSize);
+}
+
+void GraphicsInstance::createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders)
+{
+	logicalDevice->createGraphicsPipeline(shaders);
+}
+
+vk::Device GraphicsInstance::getVulkanLogicalDevice() const
+{
+	return logicalDevice->getVulkanLogicalDevice();
 }

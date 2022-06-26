@@ -17,14 +17,12 @@ public:
 	explicit GraphicsInstance(const std::string& applicationName);
 	~GraphicsInstance();
 
-	vk::Instance getVulkanInstance() const noexcept;
-	vk::Device getVulkanLogicalDevice() const;
-	vk::Extent2D getSwapChainExtent() const;
-	vk::SurfaceFormatKHR getSwapChainSurfaceFormat() const;
-
 	void createWindowSurface(GLFWwindow* glfwWindow);
 	void selectPhysicalDevice();
 	void createLogicalDevice(const WindowSize& framebufferSize);
+	void createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders);
+
+	vk::Device getVulkanLogicalDevice() const;
 
 private:
 	void createVulkanInstance(const std::string& applicationName);

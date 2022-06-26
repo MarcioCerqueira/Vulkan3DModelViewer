@@ -22,7 +22,6 @@ private:
 	vk::PipelineColorBlendAttachmentState buildPipelineColorBlendAttachmentState() const;
 	vk::PipelineDynamicStateCreateInfo buildPipelineDynamicStateCreateInfo() const;
 	vk::PipelineLayoutCreateInfo buildPipelineLayoutCreateInfo() const;
-	void buildPipelineLayout(const vk::Device& vulkanLogicalDevice, const vk::PipelineLayoutCreateInfo& pipelineLayoutCreateInfo);
 	
 	const vk::Device vulkanLogicalDevice;
 	vk::PipelineLayout pipelineLayout;
