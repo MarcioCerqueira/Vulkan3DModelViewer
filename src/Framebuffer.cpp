@@ -22,3 +22,8 @@ vk::FramebufferCreateInfo Framebuffer::buildFramebufferCreateInfo(const vk::Rend
 		.layers = 1
 	};
 }
+
+vk::Framebuffer Framebuffer::getVulkanFramebuffer() const noexcept
+{
+	return vulkanFramebuffer;
+}

@@ -11,11 +11,6 @@ RenderPass::~RenderPass()
 	vulkanLogicalDevice.destroyRenderPass(vulkanRenderPass);
 }
 
-vk::RenderPass RenderPass::getVulkanRenderPass() const noexcept
-{
-	return vulkanRenderPass;
-}
-
 vk::RenderPassCreateInfo RenderPass::createRenderPassCreateInfo(const vk::SurfaceFormatKHR& swapChainSurfaceFormat) const
 {
 	const vk::AttachmentDescription attachmentDescription{ createAttachmentDescription(swapChainSurfaceFormat) };
@@ -58,4 +53,27 @@ vk::AttachmentReference RenderPass::createAttachmentReference() const
 		.attachment = 0,
 		.layout = vk::ImageLayout::eColorAttachmentOptimal
 	};
+}
+
+vk::RenderPassBeginInfo RenderPass::createRenderPassBeginInfo(const vk::Framebuffer& vulkanFramebuffer, const vk::Extent2D& swapChainExtent) const
+{
+	vk::ClearValue clearColor{
+		.color = vk::ClearColorValue(std::array<float, 4>{ 0.0f, 0.0f, 0.0f, 1.0f })
+	};
+	vk::Rect2D renderArea{
+		.offset = {0, 0},
+		.extent = swapChainExtent
+	};
+	return vk::RenderPassBeginInfo{
+		.renderPass = vulkanRenderPass,
+		.framebuffer = vulkanFramebuffer,
+		.renderArea = renderArea,
+		.clearValueCount = 1,
+		.pClearValues = &clearColor
+	};
+}
+
+vk::RenderPass RenderPass::getVulkanRenderPass() const noexcept
+{
+	return vulkanRenderPass;
 }

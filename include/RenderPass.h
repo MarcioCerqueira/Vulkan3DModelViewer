@@ -9,6 +9,7 @@ public:
 	RenderPass(const vk::Device& vulkanLogicalDevice, const vk::SurfaceFormatKHR& swapChainSurfaceFormat);
 	~RenderPass();
 
+	vk::RenderPassBeginInfo createRenderPassBeginInfo(const vk::Framebuffer& vulkanFramebuffer, const vk::Extent2D& swapChainExtent) const;
 	vk::RenderPass getVulkanRenderPass() const noexcept;
 
 private:

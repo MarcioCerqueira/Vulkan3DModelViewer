@@ -2,16 +2,15 @@
 
 LogicalDevice::LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateInfo)
 {
-	const std::set<uint32_t> uniqueQueueFamilies = { 
-		logicalDeviceCreateInfo.queueFamilyIndices.getGraphicsFamilyIndex().value(),
-		logicalDeviceCreateInfo.queueFamilyIndices.getPresentFamilyIndex().value()
-	};
+	const std::set<uint32_t> uniqueQueueFamilies = createUniqueQueueFamilies(logicalDeviceCreateInfo.queueFamilyIndices);
 	const std::vector<vk::DeviceQueueCreateInfo> deviceQueueCreateInfos{ buildDeviceQueueCreateInfos(uniqueQueueFamilies) };
 	const vk::DeviceCreateInfo vulkanLogicalDeviceCreateInfo{ buildVulkanLogicalDeviceCreateInfo(deviceQueueCreateInfos, logicalDeviceCreateInfo) };
 	vulkanLogicalDevice = logicalDeviceCreateInfo.vulkanPhysicalDevice.createDevice(vulkanLogicalDeviceCreateInfo);
 	createSwapChain(logicalDeviceCreateInfo);
 	createRenderPass();
 	createFramebuffers();
+	createCommandPool(logicalDeviceCreateInfo.queueFamilyIndices.getGraphicsFamilyIndex());
+	createCommandBuffer();
 }
 
 LogicalDevice::~LogicalDevice()
@@ -20,10 +19,20 @@ LogicalDevice::~LogicalDevice()
 	{
 		framebuffer.reset();
 	}
+	commandPool.reset();
 	graphicsPipeline.reset();
 	renderPass.reset();
 	swapChain.reset();
 	vulkanLogicalDevice.destroy();
+}
+
+std::set<uint32_t> LogicalDevice::createUniqueQueueFamilies(const QueueFamilyIndices& queueFamilyIndices) const
+{
+	std::set<uint32_t> uniqueQueueFamilies = {
+		queueFamilyIndices.getGraphicsFamilyIndex().value(),
+		queueFamilyIndices.getPresentFamilyIndex().value()
+	};
+	return uniqueQueueFamilies;
 }
 
 std::vector<vk::DeviceQueueCreateInfo> LogicalDevice::buildDeviceQueueCreateInfos(const std::set<uint32_t>& uniqueQueueFamilies) const
@@ -83,6 +92,16 @@ void LogicalDevice::createFramebuffers()
 	{
 		framebuffers[framebufferIndex] = std::make_unique<Framebuffer>(vulkanLogicalDevice, renderPass->getVulkanRenderPass(), swapChain->getImageView(framebufferIndex), swapChain->getExtent());
 	}
+}
+
+void LogicalDevice::createCommandPool(const std::optional<uint32_t> graphicsFamilyIndex)
+{
+	commandPool = std::make_unique<CommandPool>(vulkanLogicalDevice, graphicsFamilyIndex);
+}
+
+void LogicalDevice::createCommandBuffer()
+{
+	commandBuffer = std::make_unique<CommandBuffer>(vulkanLogicalDevice, commandPool->getVulkanCommandPool());
 }
 
 vk::Device LogicalDevice::getVulkanLogicalDevice() const noexcept
