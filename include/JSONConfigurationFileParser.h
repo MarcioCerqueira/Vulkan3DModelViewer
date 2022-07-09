@@ -7,7 +7,7 @@ class JSONConfigurationFileParser
 {
 public:
 	explicit JSONConfigurationFileParser(const char* configurationFile);
-	ConfigurationFileModel getConfigurationFileModel() const noexcept;
+	const ConfigurationFileModel getConfigurationFileModel() const;
 
 private:
 	void validateJSONConfigurationFile() const;

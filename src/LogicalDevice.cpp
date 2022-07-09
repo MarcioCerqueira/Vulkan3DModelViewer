@@ -26,7 +26,7 @@ LogicalDevice::~LogicalDevice()
 	vulkanLogicalDevice.destroy();
 }
 
-std::set<uint32_t> LogicalDevice::createUniqueQueueFamilies(const QueueFamilyIndices& queueFamilyIndices) const
+const std::set<uint32_t> LogicalDevice::createUniqueQueueFamilies(const QueueFamilyIndices& queueFamilyIndices) const
 {
 	std::set<uint32_t> uniqueQueueFamilies = {
 		queueFamilyIndices.getGraphicsFamilyIndex().value(),
@@ -35,7 +35,7 @@ std::set<uint32_t> LogicalDevice::createUniqueQueueFamilies(const QueueFamilyInd
 	return uniqueQueueFamilies;
 }
 
-std::vector<vk::DeviceQueueCreateInfo> LogicalDevice::buildDeviceQueueCreateInfos(const std::set<uint32_t>& uniqueQueueFamilies) const
+const std::vector<vk::DeviceQueueCreateInfo> LogicalDevice::buildDeviceQueueCreateInfos(const std::set<uint32_t>& uniqueQueueFamilies) const
 {
 	std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
 	for (uint32_t queueFamilyIndex : uniqueQueueFamilies)
@@ -45,7 +45,7 @@ std::vector<vk::DeviceQueueCreateInfo> LogicalDevice::buildDeviceQueueCreateInfo
 	return queueCreateInfos;
 }
 
-vk::DeviceQueueCreateInfo LogicalDevice::buildDeviceQueueCreateInfo(uint32_t queueFamilyIndex) const
+const vk::DeviceQueueCreateInfo LogicalDevice::buildDeviceQueueCreateInfo(uint32_t queueFamilyIndex) const
 {
 	const float queuePriority{ 1.0f };
 	return vk::DeviceQueueCreateInfo{
@@ -55,7 +55,7 @@ vk::DeviceQueueCreateInfo LogicalDevice::buildDeviceQueueCreateInfo(uint32_t que
 	};
 }
 
-vk::DeviceCreateInfo LogicalDevice::buildVulkanLogicalDeviceCreateInfo(const std::vector<vk::DeviceQueueCreateInfo>& deviceQueueCreateInfos, const LogicalDeviceCreateInfo& logicalDeviceCreateInfo) const
+const vk::DeviceCreateInfo LogicalDevice::buildVulkanLogicalDeviceCreateInfo(const std::vector<vk::DeviceQueueCreateInfo>& deviceQueueCreateInfos, const LogicalDeviceCreateInfo& logicalDeviceCreateInfo) const
 {
 	return vk::DeviceCreateInfo{
 		.queueCreateInfoCount = static_cast<uint32_t>(deviceQueueCreateInfos.size()),
@@ -104,7 +104,7 @@ void LogicalDevice::createCommandBuffer()
 	commandBuffer = std::make_unique<CommandBuffer>(vulkanLogicalDevice, commandPool->getVulkanCommandPool());
 }
 
-vk::Device LogicalDevice::getVulkanLogicalDevice() const noexcept
+const vk::Device LogicalDevice::getVulkanLogicalDevice() const
 {
 	return vulkanLogicalDevice;
 }

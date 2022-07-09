@@ -13,7 +13,7 @@ public:
 	void run() const;
 
 private:
-	std::vector<std::shared_ptr<Shader>> loadShaders(const vk::Device& vulkanLogicalDevice) const;
+	const std::vector<std::shared_ptr<Shader>> loadShaders(const vk::Device& vulkanLogicalDevice) const;
 
 	std::unique_ptr<Window> window;
 	std::unique_ptr<GraphicsInstance> graphicsInstance;

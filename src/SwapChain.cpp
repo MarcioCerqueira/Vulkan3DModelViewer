@@ -62,7 +62,7 @@ void SwapChain::chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities,
     }
 }
 
-uint32_t SwapChain::estimateImageCount(const vk::SurfaceCapabilitiesKHR& capabilities)
+const uint32_t SwapChain::estimateImageCount(const vk::SurfaceCapabilitiesKHR& capabilities)
 {
     uint32_t imageCount{ capabilities.minImageCount + 1 };
     if (capabilities.maxImageCount > 0 && imageCount > capabilities.maxImageCount) 
@@ -72,7 +72,7 @@ uint32_t SwapChain::estimateImageCount(const vk::SurfaceCapabilitiesKHR& capabil
     return imageCount;
 }
 
-bool SwapChain::isValid(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface)
+const bool SwapChain::isValid(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface)
 {
     const std::vector<vk::SurfaceFormatKHR> availableFormats{ vulkanPhysicalDevice.getSurfaceFormatsKHR(vulkanWindowSurface) };
     const std::vector<vk::PresentModeKHR> availablePresentModes{ vulkanPhysicalDevice.getSurfacePresentModesKHR(vulkanWindowSurface) };
@@ -114,7 +114,7 @@ void SwapChain::buildSwapChainImageViews(const SwapChainCreateInfo& swapChainCre
     }
 }
 
-vk::ImageViewCreateInfo SwapChain::buildImageViewCreateInfo(const int imageIndex) const
+const vk::ImageViewCreateInfo SwapChain::buildImageViewCreateInfo(const int imageIndex) const
 {
     return vk::ImageViewCreateInfo{
         .image = images[imageIndex],
@@ -124,7 +124,7 @@ vk::ImageViewCreateInfo SwapChain::buildImageViewCreateInfo(const int imageIndex
         .subresourceRange = createImageSubresourceRange()
     };
 }
-vk::ImageSubresourceRange SwapChain::createImageSubresourceRange() const
+const vk::ImageSubresourceRange SwapChain::createImageSubresourceRange() const
 {
     return vk::ImageSubresourceRange{
         .aspectMask = vk::ImageAspectFlagBits::eColor,
@@ -135,22 +135,22 @@ vk::ImageSubresourceRange SwapChain::createImageSubresourceRange() const
     };
 }
 
-vk::Extent2D SwapChain::getExtent() const noexcept
+const vk::Extent2D SwapChain::getExtent() const
 {
     return extent;
 }
 
-vk::SurfaceFormatKHR SwapChain::getSurfaceFormat() const noexcept
+const vk::SurfaceFormatKHR SwapChain::getSurfaceFormat() const
 {
     return surfaceFormat;
 }
 
-int SwapChain::getNumberOfImageViews() const noexcept
+const int SwapChain::getNumberOfImageViews() const
 {
-    return imageViews.size();
+    return static_cast<int>(imageViews.size());
 }
 
-vk::ImageView SwapChain::getImageView(int index) const
+const vk::ImageView SwapChain::getImageView(int index) const
 {
     if (index < 0)
     {

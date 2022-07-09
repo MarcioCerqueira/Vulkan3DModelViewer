@@ -23,13 +23,13 @@ public:
 
 	void createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders);
 
-	vk::Device getVulkanLogicalDevice() const noexcept;
+	const vk::Device getVulkanLogicalDevice() const;
 
 private:
-	std::set<uint32_t> createUniqueQueueFamilies(const QueueFamilyIndices& queueFamilyIndices) const;
-	std::vector<vk::DeviceQueueCreateInfo> buildDeviceQueueCreateInfos(const std::set<uint32_t>& uniqueQueueFamilies) const;
-	vk::DeviceQueueCreateInfo buildDeviceQueueCreateInfo(uint32_t queueFamilyIndex) const;
-	vk::DeviceCreateInfo buildVulkanLogicalDeviceCreateInfo(const std::vector<vk::DeviceQueueCreateInfo>& deviceQueueCreateInfos, const LogicalDeviceCreateInfo& logicalDeviceCreateInfo) const;
+	const std::set<uint32_t> createUniqueQueueFamilies(const QueueFamilyIndices& queueFamilyIndices) const;
+	const std::vector<vk::DeviceQueueCreateInfo> buildDeviceQueueCreateInfos(const std::set<uint32_t>& uniqueQueueFamilies) const;
+	const vk::DeviceQueueCreateInfo buildDeviceQueueCreateInfo(uint32_t queueFamilyIndex) const;
+	const vk::DeviceCreateInfo buildVulkanLogicalDeviceCreateInfo(const std::vector<vk::DeviceQueueCreateInfo>& deviceQueueCreateInfos, const LogicalDeviceCreateInfo& logicalDeviceCreateInfo) const;
 	void createSwapChain(const LogicalDeviceCreateInfo& logicalDeviceCreateInfo);
 	void createRenderPass();
 	void createFramebuffers();

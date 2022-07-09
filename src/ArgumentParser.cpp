@@ -6,7 +6,7 @@ ArgumentParser::ArgumentParser(const int argc, const char* argv[])
 	loadConfigurationFile(argv[1]);
 }
 
-std::string ArgumentParser::getConfigurationFile() const noexcept
+const std::string ArgumentParser::getConfigurationFile() const
 {
 	return configurationFile;
 }
@@ -27,7 +27,7 @@ void ArgumentParser::loadConfigurationFile(const char* configurationFilePath)
 	configurationFile = buffer.str();
 }
 
-std::ifstream ArgumentParser::openFile(const char* filePath) const
+const std::ifstream ArgumentParser::openFile(const char* filePath) const
 {
 	std::ifstream file(filePath);
 	ExceptionChecker::isFileOpen(file, filePath);

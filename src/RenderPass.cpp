@@ -11,7 +11,7 @@ RenderPass::~RenderPass()
 	vulkanLogicalDevice.destroyRenderPass(vulkanRenderPass);
 }
 
-vk::RenderPassCreateInfo RenderPass::createRenderPassCreateInfo(const vk::SurfaceFormatKHR& swapChainSurfaceFormat) const
+const vk::RenderPassCreateInfo RenderPass::createRenderPassCreateInfo(const vk::SurfaceFormatKHR& swapChainSurfaceFormat) const
 {
 	const vk::AttachmentDescription attachmentDescription{ createAttachmentDescription(swapChainSurfaceFormat) };
 	const vk::SubpassDescription subpassDescription{ createSubpassDescription() };
@@ -23,7 +23,7 @@ vk::RenderPassCreateInfo RenderPass::createRenderPassCreateInfo(const vk::Surfac
 	};
 }
 
-vk::AttachmentDescription RenderPass::createAttachmentDescription(const vk::SurfaceFormatKHR& swapChainSurfaceFormat) const
+const vk::AttachmentDescription RenderPass::createAttachmentDescription(const vk::SurfaceFormatKHR& swapChainSurfaceFormat) const
 {
 	return vk::AttachmentDescription{
 		.format = swapChainSurfaceFormat.format,
@@ -37,7 +37,7 @@ vk::AttachmentDescription RenderPass::createAttachmentDescription(const vk::Surf
 	};
 }
 
-vk::SubpassDescription RenderPass::createSubpassDescription() const
+const vk::SubpassDescription RenderPass::createSubpassDescription() const
 {
 	const vk::AttachmentReference attachmentReference{ createAttachmentReference() };
 	return vk::SubpassDescription{
@@ -47,7 +47,7 @@ vk::SubpassDescription RenderPass::createSubpassDescription() const
 	};
 }
 
-vk::AttachmentReference RenderPass::createAttachmentReference() const
+const vk::AttachmentReference RenderPass::createAttachmentReference() const
 {
 	return vk::AttachmentReference{
 		.attachment = 0,
@@ -55,7 +55,7 @@ vk::AttachmentReference RenderPass::createAttachmentReference() const
 	};
 }
 
-vk::RenderPassBeginInfo RenderPass::createRenderPassBeginInfo(const vk::Framebuffer& vulkanFramebuffer, const vk::Extent2D& swapChainExtent) const
+const vk::RenderPassBeginInfo RenderPass::createRenderPassBeginInfo(const vk::Framebuffer& vulkanFramebuffer, const vk::Extent2D& swapChainExtent) const
 {
 	vk::ClearValue clearColor{
 		.color = vk::ClearColorValue(std::array<float, 4>{ 0.0f, 0.0f, 0.0f, 1.0f })
@@ -73,7 +73,7 @@ vk::RenderPassBeginInfo RenderPass::createRenderPassBeginInfo(const vk::Framebuf
 	};
 }
 
-vk::RenderPass RenderPass::getVulkanRenderPass() const noexcept
+const vk::RenderPass RenderPass::getVulkanRenderPass() const
 {
 	return vulkanRenderPass;
 }

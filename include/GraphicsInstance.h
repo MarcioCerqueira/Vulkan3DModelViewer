@@ -22,12 +22,12 @@ public:
 	void createLogicalDevice(const WindowSize& framebufferSize);
 	void createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders);
 
-	vk::Device getVulkanLogicalDevice() const;
+	const vk::Device getVulkanLogicalDevice() const;
 
 private:
 	void createVulkanInstance(const std::string& applicationName);
-	vk::ApplicationInfo createApplicationInfo(const std::string& applicationName) const;
-	vk::InstanceCreateInfo createVulkanInstanceInfo(const vk::ApplicationInfo& applicationInfo) const;
+	const vk::ApplicationInfo createApplicationInfo(const std::string& applicationName) const;
+	const vk::InstanceCreateInfo createVulkanInstanceInfo(const vk::ApplicationInfo& applicationInfo) const;
 
 	vk::Instance vulkanInstance;
 	PhysicalDevice physicalDevice;

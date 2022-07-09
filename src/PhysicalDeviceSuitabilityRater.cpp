@@ -1,6 +1,6 @@
 #include "PhysicalDeviceSuitabilityRater.h"
 
-int PhysicalDeviceSuitabilityRater::rate(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
+const int PhysicalDeviceSuitabilityRater::rate(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
 {
 	int score{ 0 };
 	score += rateByPhysicalDeviceType(physicalDeviceSuitabilityRaterInfo);
@@ -10,7 +10,7 @@ int PhysicalDeviceSuitabilityRater::rate(const PhysicalDeviceSuitabilityRaterInf
 	return score;
 }
 
-int PhysicalDeviceSuitabilityRater::rateByPhysicalDeviceType(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
+const int PhysicalDeviceSuitabilityRater::rateByPhysicalDeviceType(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
 {
 	int score{ 0 };
 	switch (physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice.getProperties().deviceType)
@@ -31,7 +31,7 @@ int PhysicalDeviceSuitabilityRater::rateByPhysicalDeviceType(const PhysicalDevic
 	return score;
 }
 
-int PhysicalDeviceSuitabilityRater::rateByQueueFamilyProperties(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
+const int PhysicalDeviceSuitabilityRater::rateByQueueFamilyProperties(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
 {
 	int score{ 0 };
 	const QueueFamilyIndices queueFamilyIndices{ 
@@ -43,7 +43,7 @@ int PhysicalDeviceSuitabilityRater::rateByQueueFamilyProperties(const PhysicalDe
 	return score;
 }
 
-int PhysicalDeviceSuitabilityRater::rateByDeviceExtensionSupport(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
+const int PhysicalDeviceSuitabilityRater::rateByDeviceExtensionSupport(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
 {
 	const std::vector<vk::ExtensionProperties> availableExtensions = physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice.enumerateDeviceExtensionProperties();
 	std::set<std::string> requiredExtensions(physicalDeviceSuitabilityRaterInfo.vulkanDeviceExtensions.begin(), physicalDeviceSuitabilityRaterInfo.vulkanDeviceExtensions.end());
@@ -54,7 +54,7 @@ int PhysicalDeviceSuitabilityRater::rateByDeviceExtensionSupport(const PhysicalD
 	return static_cast<int>(requiredExtensions.empty());
 }
 
-int PhysicalDeviceSuitabilityRater::rateBySwapChainProperties(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
+const int PhysicalDeviceSuitabilityRater::rateBySwapChainProperties(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
 {
 	return SwapChain::isValid(physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice, physicalDeviceSuitabilityRaterInfo.vulkanWindowSurface);
 }

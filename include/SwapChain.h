@@ -15,21 +15,21 @@ public:
 	explicit SwapChain(const SwapChainCreateInfo& swapChainCreateInfo);
 	~SwapChain();
 
-	static bool isValid(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface);
-	vk::Extent2D getExtent() const noexcept;
-	vk::SurfaceFormatKHR getSurfaceFormat() const noexcept;
-	int getNumberOfImageViews() const noexcept;
-	vk::ImageView getImageView(int index) const;
+	static const bool isValid(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface);
+	const vk::Extent2D getExtent() const;
+	const vk::SurfaceFormatKHR getSurfaceFormat() const;
+	const int getNumberOfImageViews() const;
+	const vk::ImageView getImageView(int index) const;
 
 private:
 	void chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats);
 	void chooseSwapPresentMode(const std::vector<vk::PresentModeKHR>& availablePresentModes);
 	void chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities, const WindowSize& framebufferSize);
-	uint32_t estimateImageCount(const vk::SurfaceCapabilitiesKHR& capabilities);
+	const uint32_t estimateImageCount(const vk::SurfaceCapabilitiesKHR& capabilities);
 	void buildVulkanSwapChain(const SwapChainCreateInfo& swapChainCreateInfo, const vk::SurfaceCapabilitiesKHR& capabilities, const uint32_t imageCount);
 	void buildSwapChainImageViews(const SwapChainCreateInfo& swapChainCreateInfo);
-	vk::ImageViewCreateInfo buildImageViewCreateInfo(const int imageIndex) const;
-	vk::ImageSubresourceRange createImageSubresourceRange() const;
+	const vk::ImageViewCreateInfo buildImageViewCreateInfo(const int imageIndex) const;
+	const vk::ImageSubresourceRange createImageSubresourceRange() const;
 
 	const SwapChainCreateInfo swapChainCreateInfo;
 	vk::SwapchainKHR vulkanSwapChain; 

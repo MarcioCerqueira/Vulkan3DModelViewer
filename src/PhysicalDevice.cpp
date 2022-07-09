@@ -16,7 +16,7 @@ void PhysicalDevice::checkVulkanSupport(const std::vector<vk::PhysicalDevice>& v
 	}
 }
 
-std::multimap<int, vk::PhysicalDevice> PhysicalDevice::rateMostSuitablePhysicalDevices(const std::vector<vk::PhysicalDevice>& vulkanPhysicalDevices, const vk::SurfaceKHR& vulkanWindowSurface) const
+const std::multimap<int, vk::PhysicalDevice> PhysicalDevice::rateMostSuitablePhysicalDevices(const std::vector<vk::PhysicalDevice>& vulkanPhysicalDevices, const vk::SurfaceKHR& vulkanWindowSurface) const
 {
 	std::multimap<int, vk::PhysicalDevice> mostSuitablePhysicalDevices;
 	for (const auto& vulkanPhysicalDevice : vulkanPhysicalDevices)

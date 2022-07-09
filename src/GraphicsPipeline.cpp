@@ -43,7 +43,7 @@ GraphicsPipeline::~GraphicsPipeline()
 	vulkanLogicalDevice.destroyPipelineLayout(pipelineLayout);
 }
 
-vk::PipelineVertexInputStateCreateInfo GraphicsPipeline::buildPipelineVertexInputStateCreateInfo() const
+const vk::PipelineVertexInputStateCreateInfo GraphicsPipeline::buildPipelineVertexInputStateCreateInfo() const
 {
 	return vk::PipelineVertexInputStateCreateInfo{
 		.vertexBindingDescriptionCount = 0,
@@ -53,7 +53,7 @@ vk::PipelineVertexInputStateCreateInfo GraphicsPipeline::buildPipelineVertexInpu
 	};
 }
 
-vk::PipelineInputAssemblyStateCreateInfo GraphicsPipeline::buildPipelineInputAssemblyStateCreateInfo() const
+const vk::PipelineInputAssemblyStateCreateInfo GraphicsPipeline::buildPipelineInputAssemblyStateCreateInfo() const
 {
 	return vk::PipelineInputAssemblyStateCreateInfo{
 		.topology = vk::PrimitiveTopology::eTriangleList,
@@ -61,7 +61,7 @@ vk::PipelineInputAssemblyStateCreateInfo GraphicsPipeline::buildPipelineInputAss
 	};
 }
 
-vk::PipelineViewportStateCreateInfo GraphicsPipeline::buildPipelineViewportStateCreateInfo(const vk::Extent2D& swapChainExtent) const
+const vk::PipelineViewportStateCreateInfo GraphicsPipeline::buildPipelineViewportStateCreateInfo(const vk::Extent2D& swapChainExtent) const
 {
 	const vk::Viewport viewport{ buildViewport(swapChainExtent) };
 	const vk::Rect2D scissor{ buildScissor(swapChainExtent) };
@@ -73,7 +73,7 @@ vk::PipelineViewportStateCreateInfo GraphicsPipeline::buildPipelineViewportState
 	};
 }
 
-vk::Viewport GraphicsPipeline::buildViewport(const vk::Extent2D& swapChainExtent) const
+const vk::Viewport GraphicsPipeline::buildViewport(const vk::Extent2D& swapChainExtent) const
 {
 	return vk::Viewport{
 		.x = 0.0f,
@@ -85,7 +85,7 @@ vk::Viewport GraphicsPipeline::buildViewport(const vk::Extent2D& swapChainExtent
 	};
 }
 
-vk::Rect2D GraphicsPipeline::buildScissor(const vk::Extent2D& swapChainExtent) const
+const vk::Rect2D GraphicsPipeline::buildScissor(const vk::Extent2D& swapChainExtent) const
 {
 	return vk::Rect2D{
 		.offset = {0, 0},
@@ -93,7 +93,7 @@ vk::Rect2D GraphicsPipeline::buildScissor(const vk::Extent2D& swapChainExtent) c
 	};
 }
 
-vk::PipelineRasterizationStateCreateInfo GraphicsPipeline::buildPipelineRasterizationStateCreateInfo() const
+const vk::PipelineRasterizationStateCreateInfo GraphicsPipeline::buildPipelineRasterizationStateCreateInfo() const
 {
 	return vk::PipelineRasterizationStateCreateInfo{
 		.depthClampEnable = vk::Bool32(0),
@@ -109,7 +109,7 @@ vk::PipelineRasterizationStateCreateInfo GraphicsPipeline::buildPipelineRasteriz
 	};
 }
 
-vk::PipelineMultisampleStateCreateInfo GraphicsPipeline::buildPipelineMultisampleStateCreateInfo() const
+const vk::PipelineMultisampleStateCreateInfo GraphicsPipeline::buildPipelineMultisampleStateCreateInfo() const
 {
 	return vk::PipelineMultisampleStateCreateInfo{
 		.rasterizationSamples = vk::SampleCountFlagBits::e1,
@@ -121,7 +121,7 @@ vk::PipelineMultisampleStateCreateInfo GraphicsPipeline::buildPipelineMultisampl
 	};
 }
 
-vk::PipelineColorBlendStateCreateInfo GraphicsPipeline::buildPipelineColorBlendStateCreateInfo() const
+const vk::PipelineColorBlendStateCreateInfo GraphicsPipeline::buildPipelineColorBlendStateCreateInfo() const
 {
 	const vk::PipelineColorBlendAttachmentState colorBlendAttachmentState{ buildPipelineColorBlendAttachmentState() };
 	const std::array<float, 4> blendConstants = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -134,7 +134,7 @@ vk::PipelineColorBlendStateCreateInfo GraphicsPipeline::buildPipelineColorBlendS
 	};
 }
 
-vk::PipelineColorBlendAttachmentState GraphicsPipeline::buildPipelineColorBlendAttachmentState() const
+const vk::PipelineColorBlendAttachmentState GraphicsPipeline::buildPipelineColorBlendAttachmentState() const
 {
 	return vk::PipelineColorBlendAttachmentState{
 		.blendEnable = vk::Bool32(0),
@@ -149,7 +149,7 @@ vk::PipelineColorBlendAttachmentState GraphicsPipeline::buildPipelineColorBlendA
 	};
 }
 
-vk::PipelineDynamicStateCreateInfo GraphicsPipeline::buildPipelineDynamicStateCreateInfo() const
+const vk::PipelineDynamicStateCreateInfo GraphicsPipeline::buildPipelineDynamicStateCreateInfo() const
 {
 	const std::vector<vk::DynamicState> dynamicStates = { vk::DynamicState::eViewport, vk::DynamicState::eLineWidth };
 	return vk::PipelineDynamicStateCreateInfo{
@@ -158,7 +158,7 @@ vk::PipelineDynamicStateCreateInfo GraphicsPipeline::buildPipelineDynamicStateCr
 	};
 }
 
-vk::PipelineLayoutCreateInfo GraphicsPipeline::buildPipelineLayoutCreateInfo() const
+const vk::PipelineLayoutCreateInfo GraphicsPipeline::buildPipelineLayoutCreateInfo() const
 {
 	return vk::PipelineLayoutCreateInfo{
 		.setLayoutCount = 0,

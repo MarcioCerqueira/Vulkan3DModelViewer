@@ -11,7 +11,7 @@ public:
 	void record(const vk::RenderPassBeginInfo& renderPassBeginInfo, const vk::Pipeline& graphicsPipeline);
 
 private:
-	vk::CommandBufferAllocateInfo buildCommandBufferAllocateInfo(const vk::CommandPool& vulkanCommandPool);
+	const vk::CommandBufferAllocateInfo buildCommandBufferAllocateInfo(const vk::CommandPool& vulkanCommandPool);
 
 	std::vector<vk::CommandBuffer> vulkanCommandBuffers;
 };

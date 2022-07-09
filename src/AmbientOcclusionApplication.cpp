@@ -11,7 +11,7 @@ AmbientOcclusionApplication::AmbientOcclusionApplication(const int windowWidth, 
 	graphicsInstance->createGraphicsPipeline(loadShaders(graphicsInstance->getVulkanLogicalDevice()));
 }
 
-std::vector<std::shared_ptr<Shader>> AmbientOcclusionApplication::loadShaders(const vk::Device& vulkanLogicalDevice) const
+const std::vector<std::shared_ptr<Shader>> AmbientOcclusionApplication::loadShaders(const vk::Device& vulkanLogicalDevice) const
 {
 	std::vector<std::shared_ptr<Shader>> shaders;
 	shaders.push_back(std::make_shared<Shader>("shaders/vert.spv", vulkanLogicalDevice, vk::ShaderStageFlagBits::eVertex));

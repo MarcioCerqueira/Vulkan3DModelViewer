@@ -11,7 +11,7 @@ Framebuffer::~Framebuffer()
 	vulkanLogicalDevice.destroyFramebuffer(vulkanFramebuffer);
 }
 
-vk::FramebufferCreateInfo Framebuffer::buildFramebufferCreateInfo(const vk::RenderPass& vulkanRenderPass, const vk::ImageView& vulkanSwapChainImageView, const vk::Extent2D& swapChainExtent) const
+const vk::FramebufferCreateInfo Framebuffer::buildFramebufferCreateInfo(const vk::RenderPass& vulkanRenderPass, const vk::ImageView& vulkanSwapChainImageView, const vk::Extent2D& swapChainExtent) const
 {
 	return vk::FramebufferCreateInfo{
 		.renderPass = vulkanRenderPass,
@@ -23,7 +23,7 @@ vk::FramebufferCreateInfo Framebuffer::buildFramebufferCreateInfo(const vk::Rend
 	};
 }
 
-vk::Framebuffer Framebuffer::getVulkanFramebuffer() const noexcept
+const vk::Framebuffer Framebuffer::getVulkanFramebuffer() const
 {
 	return vulkanFramebuffer;
 }
