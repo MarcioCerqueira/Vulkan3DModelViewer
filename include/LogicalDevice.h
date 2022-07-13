@@ -14,7 +14,10 @@
 #include "CommandBuffer.h"
 #include "GraphicsPipeline.h"
 #include "Shader.h"
-
+#include "SynchronizationObjects.h"
+#include "GraphicsQueue.h"
+#include "PresentQueue.h"
+ 
 class LogicalDevice
 {
 public:
@@ -22,6 +25,8 @@ public:
 	~LogicalDevice();
 
 	void createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders);
+	void drawFrame();
+	void waitIdle();
 
 	const vk::Device getVulkanLogicalDevice() const;
 
@@ -35,6 +40,8 @@ private:
 	void createFramebuffers();
 	void createCommandPool(const std::optional<uint32_t> graphicsFamilyIndex);
 	void createCommandBuffer();
+	void createSynchronizationObjects();
+	void createQueues(const QueueFamilyIndices& queueFamilyIndices);
 
 	vk::Device vulkanLogicalDevice; 
 	std::unique_ptr<SwapChain> swapChain;
@@ -43,5 +50,8 @@ private:
 	std::vector<std::unique_ptr<Framebuffer>> framebuffers;
 	std::unique_ptr<CommandPool> commandPool;
 	std::unique_ptr<CommandBuffer> commandBuffer;
+	std::unique_ptr<GraphicsQueue> graphicsQueue;
+	std::unique_ptr<PresentQueue> presentQueue;
 	vk::PhysicalDeviceFeatures physicalDeviceFeatures;
+	SynchronizationObjects synchronizationObjects;
 };

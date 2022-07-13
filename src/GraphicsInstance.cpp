@@ -65,6 +65,16 @@ void GraphicsInstance::createGraphicsPipeline(const std::vector<std::shared_ptr<
 	logicalDevice->createGraphicsPipeline(shaders);
 }
 
+void GraphicsInstance::drawFrame()
+{
+	logicalDevice->drawFrame();
+}
+
+void GraphicsInstance::waitIdle()
+{
+	logicalDevice->waitIdle();
+}
+
 const vk::Device GraphicsInstance::getVulkanLogicalDevice() const
 {
 	return logicalDevice->getVulkanLogicalDevice();

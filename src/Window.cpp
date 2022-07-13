@@ -36,10 +36,11 @@ WindowSize Window::getFramebufferSize() const
 	return framebufferSize;
 }
 
-void Window::open()
+void Window::open(std::function<void()> drawFrame)
 {
 	while(!glfwWindowShouldClose(glfwWindow)) 
 	{
 		glfwPollEvents();
+		drawFrame();
 	}
 }

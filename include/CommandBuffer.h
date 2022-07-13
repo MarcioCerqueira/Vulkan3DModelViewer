@@ -8,7 +8,11 @@ class CommandBuffer
 {
 public:
 	CommandBuffer(const vk::Device& vulkanLogicalDevice, const vk::CommandPool& vulkanCommandPool);
-	void record(const vk::RenderPassBeginInfo& renderPassBeginInfo, const vk::Pipeline& graphicsPipeline);
+
+	const vk::CommandBuffer getVulkanCommandBuffer(const int index) const;
+
+	void record(const vk::RenderPassBeginInfo& renderPassBeginInfo, const vk::Pipeline& graphicsPipeline, const int imageIndex);
+	void reset();
 
 private:
 	const vk::CommandBufferAllocateInfo buildCommandBufferAllocateInfo(const vk::CommandPool& vulkanCommandPool);

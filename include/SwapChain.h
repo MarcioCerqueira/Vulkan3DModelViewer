@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include "SwapChainCreateInfo.h"
+#include "ExceptionChecker.h"
 
 class SwapChain
 {
@@ -16,10 +17,12 @@ public:
 	~SwapChain();
 
 	static const bool isValid(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface);
+	const uint32_t acquireNextImage(vk::Semaphore& imageAvailable) const;
 	const vk::Extent2D getExtent() const;
 	const vk::SurfaceFormatKHR getSurfaceFormat() const;
 	const int getNumberOfImageViews() const;
 	const vk::ImageView getImageView(int index) const;
+	const vk::SwapchainKHR getVulkanSwapChain() const;
 
 private:
 	void chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats);

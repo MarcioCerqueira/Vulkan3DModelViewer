@@ -135,6 +135,15 @@ const vk::ImageSubresourceRange SwapChain::createImageSubresourceRange() const
     };
 }
 
+const uint32_t SwapChain::acquireNextImage(vk::Semaphore& imageAvailable) const
+{
+    uint32_t imageIndex;
+    const uint64_t timeout{ std::numeric_limits<uint64_t>::max() };
+    vk::Result result{ swapChainCreateInfo.vulkanLogicalDevice.acquireNextImageKHR(vulkanSwapChain, timeout, imageAvailable, nullptr, &imageIndex) };
+    ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(result, "Failed to acquire next image!");
+    return imageIndex;
+}
+
 const vk::Extent2D SwapChain::getExtent() const
 {
     return extent;
@@ -161,4 +170,9 @@ const vk::ImageView SwapChain::getImageView(int index) const
         throw std::runtime_error("Error! You need to pass a valid index (< imageViews.size()) for SwapChain::getImageView");
     }
     return imageViews[index];
+}
+
+const vk::SwapchainKHR SwapChain::getVulkanSwapChain() const
+{
+    return vulkanSwapChain;
 }

@@ -15,7 +15,7 @@ Shader::~Shader()
 const std::vector<char> Shader::readFile(const std::string& filename) const
 {
 	std::ifstream file(filename, std::ios::ate | std::ios::binary);
-	ExceptionChecker::isFileOpen(file, filename.c_str());
+	ExceptionChecker::throwExceptionIfFileCouldNotBeOpened(file, filename.c_str());
 	size_t fileSize{ static_cast<size_t>(file.tellg()) };
 	std::vector<char> buffer(fileSize);
 	file.seekg(0);

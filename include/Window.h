@@ -2,6 +2,7 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <string>
+#include <functional>
 
 #include "WindowSize.h"
 
@@ -13,7 +14,7 @@ public:
 	
 	GLFWwindow* getGLFWWindow() const noexcept;
 	WindowSize getFramebufferSize() const;
-	void open();
+	void open(std::function<void()> drawFrame);
 
 private:
 	void setGlfwWindowHints() const;

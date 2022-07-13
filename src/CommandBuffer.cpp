@@ -15,18 +15,38 @@ const vk::CommandBufferAllocateInfo CommandBuffer::buildCommandBufferAllocateInf
 	};
 }
 
-void CommandBuffer::record(const vk::RenderPassBeginInfo& renderPassBeginInfo, const vk::Pipeline& graphicsPipeline)
+void CommandBuffer::record(const vk::RenderPassBeginInfo& renderPassBeginInfo, const vk::Pipeline& graphicsPipeline, const int imageIndex)
 {
+	if (imageIndex >= vulkanCommandBuffers.size())
+	{
+		throw std::runtime_error("Error! Invalid image index");
+	}
+	const uint32_t vertexCount = 3;
+	const uint32_t instanceCount = 1;
+	const uint32_t firstVertex = 0;
+	const uint32_t firstInstance = 0;
 	vk::CommandBufferBeginInfo commandBufferBeginInfo;
-	vulkanCommandBuffers[0].begin(commandBufferBeginInfo);
-	vulkanCommandBuffers[0].beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
-	vulkanCommandBuffers[0].bindPipeline(vk::PipelineBindPoint::eGraphics, graphicsPipeline);
+	vulkanCommandBuffers[imageIndex].begin(commandBufferBeginInfo);
+	vulkanCommandBuffers[imageIndex].beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
+	vulkanCommandBuffers[imageIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, graphicsPipeline);
+	vulkanCommandBuffers[imageIndex].draw(vertexCount, instanceCount, firstVertex, firstInstance);
+	vulkanCommandBuffers[imageIndex].endRenderPass();
+	vulkanCommandBuffers[imageIndex].end();
+}
 
-	uint32_t vertexCount = 3;
-	uint32_t instanceCount = 1;
-	uint32_t firstVertex = 0;
-	uint32_t firstInstance = 0;
-	vulkanCommandBuffers[0].draw(vertexCount, instanceCount, firstVertex, firstInstance);
-	vulkanCommandBuffers[0].endRenderPass();
-	vulkanCommandBuffers[0].end();
+void CommandBuffer::reset()
+{
+	for (auto& vulkanCommandBuffer : vulkanCommandBuffers)
+	{
+		vulkanCommandBuffer.reset();
+	}
+}
+
+const vk::CommandBuffer CommandBuffer::getVulkanCommandBuffer(const int index) const
+{
+	if (index == -1 || index >= vulkanCommandBuffers.size())
+	{
+		throw std::runtime_error("Error! Trying to access an invalid command buffer!");
+	}
+	return vulkanCommandBuffers[index];
 }

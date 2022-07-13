@@ -4,10 +4,13 @@ GraphicsPipeline::GraphicsPipeline(const GraphicsPipelineCreateInfo& graphicsPip
 {
 	const vk::PipelineVertexInputStateCreateInfo vertexInputState{ buildPipelineVertexInputStateCreateInfo() };
 	const vk::PipelineInputAssemblyStateCreateInfo inputAssemblyState{ buildPipelineInputAssemblyStateCreateInfo() };
-	const vk::PipelineViewportStateCreateInfo viewportState{ buildPipelineViewportStateCreateInfo(graphicsPipelineCreateInfo.swapChainExtent) };
+	const vk::Viewport viewport{ buildViewport(graphicsPipelineCreateInfo.swapChainExtent) };
+	const vk::Rect2D scissor{ buildScissor(graphicsPipelineCreateInfo.swapChainExtent) };
+	const vk::PipelineViewportStateCreateInfo viewportState{ buildPipelineViewportStateCreateInfo(viewport, scissor) };
 	const vk::PipelineRasterizationStateCreateInfo rasterizationState{ buildPipelineRasterizationStateCreateInfo() };
 	const vk::PipelineMultisampleStateCreateInfo multisampleState{ buildPipelineMultisampleStateCreateInfo() };
-	const vk::PipelineColorBlendStateCreateInfo  colorBlendState{ buildPipelineColorBlendStateCreateInfo() };
+	const vk::PipelineColorBlendAttachmentState colorBlendAttachmentState{ buildPipelineColorBlendAttachmentState() };
+	const vk::PipelineColorBlendStateCreateInfo  colorBlendState{ buildPipelineColorBlendStateCreateInfo(colorBlendAttachmentState) };
 	const vk::PipelineDynamicStateCreateInfo  dynamicState{ buildPipelineDynamicStateCreateInfo() };
 	const vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{ buildPipelineLayoutCreateInfo() };
 	pipelineLayout = vulkanLogicalDevice.createPipelineLayout(pipelineLayoutCreateInfo);
@@ -27,14 +30,8 @@ GraphicsPipeline::GraphicsPipeline(const GraphicsPipelineCreateInfo& graphicsPip
 		.basePipelineIndex = -1
 	};
 	const vk::ResultValue<vk::Pipeline> graphicsPipeline = vulkanLogicalDevice.createGraphicsPipeline({}, vulkanGraphicsPipelineCreateInfo);
-	if (graphicsPipeline.result == vk::Result::eSuccess)
-	{
-		pipeline = graphicsPipeline.value;
-	}
-	else
-	{
-		throw std::runtime_error("Error! Unable to create the graphics pipeline");
-	}
+	ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(graphicsPipeline.result, "Unable to create the graphics pipeline!");
+	pipeline = graphicsPipeline.value;
 }
 
 GraphicsPipeline::~GraphicsPipeline()
@@ -61,18 +58,6 @@ const vk::PipelineInputAssemblyStateCreateInfo GraphicsPipeline::buildPipelineIn
 	};
 }
 
-const vk::PipelineViewportStateCreateInfo GraphicsPipeline::buildPipelineViewportStateCreateInfo(const vk::Extent2D& swapChainExtent) const
-{
-	const vk::Viewport viewport{ buildViewport(swapChainExtent) };
-	const vk::Rect2D scissor{ buildScissor(swapChainExtent) };
-	return vk::PipelineViewportStateCreateInfo{
-		.viewportCount = 1,
-		.pViewports = &viewport,
-		.scissorCount = 1,
-		.pScissors = &scissor
-	};
-}
-
 const vk::Viewport GraphicsPipeline::buildViewport(const vk::Extent2D& swapChainExtent) const
 {
 	return vk::Viewport{
@@ -90,6 +75,16 @@ const vk::Rect2D GraphicsPipeline::buildScissor(const vk::Extent2D& swapChainExt
 	return vk::Rect2D{
 		.offset = {0, 0},
 		.extent = swapChainExtent
+	};
+}
+
+const vk::PipelineViewportStateCreateInfo GraphicsPipeline::buildPipelineViewportStateCreateInfo(const vk::Viewport& viewport, const vk::Rect2D& scissor) const
+{
+	return vk::PipelineViewportStateCreateInfo{
+		.viewportCount = 1,
+		.pViewports = &viewport,
+		.scissorCount = 1,
+		.pScissors = &scissor
 	};
 }
 
@@ -121,19 +116,6 @@ const vk::PipelineMultisampleStateCreateInfo GraphicsPipeline::buildPipelineMult
 	};
 }
 
-const vk::PipelineColorBlendStateCreateInfo GraphicsPipeline::buildPipelineColorBlendStateCreateInfo() const
-{
-	const vk::PipelineColorBlendAttachmentState colorBlendAttachmentState{ buildPipelineColorBlendAttachmentState() };
-	const std::array<float, 4> blendConstants = { 0.0f, 0.0f, 0.0f, 0.0f };
-	return vk::PipelineColorBlendStateCreateInfo{
-		.logicOpEnable = vk::Bool32(0),
-		.logicOp = vk::LogicOp::eCopy,
-		.attachmentCount = 1,
-		.pAttachments = &colorBlendAttachmentState,
-		.blendConstants = blendConstants
-	};
-}
-
 const vk::PipelineColorBlendAttachmentState GraphicsPipeline::buildPipelineColorBlendAttachmentState() const
 {
 	return vk::PipelineColorBlendAttachmentState{
@@ -146,6 +128,18 @@ const vk::PipelineColorBlendAttachmentState GraphicsPipeline::buildPipelineColor
 		.alphaBlendOp = vk::BlendOp::eAdd,
 		.colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB
 		| vk::ColorComponentFlagBits::eA
+	};
+}
+
+const vk::PipelineColorBlendStateCreateInfo GraphicsPipeline::buildPipelineColorBlendStateCreateInfo(const vk::PipelineColorBlendAttachmentState& colorBlendAttachmentState) const
+{
+	const std::array<float, 4> blendConstants = { 0.0f, 0.0f, 0.0f, 0.0f };
+	return vk::PipelineColorBlendStateCreateInfo{
+		.logicOpEnable = vk::Bool32(0),
+		.logicOp = vk::LogicOp::eCopy,
+		.attachmentCount = 1,
+		.pAttachments = &colorBlendAttachmentState,
+		.blendConstants = blendConstants
 	};
 }
 
@@ -166,5 +160,10 @@ const vk::PipelineLayoutCreateInfo GraphicsPipeline::buildPipelineLayoutCreateIn
 		.pushConstantRangeCount = 0,
 		.pPushConstantRanges = nullptr
 	};
+}
+
+const vk::Pipeline GraphicsPipeline::getVulkanPipeline() const
+{
+	return pipeline;
 }
 

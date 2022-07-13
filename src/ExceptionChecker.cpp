@@ -1,6 +1,14 @@
 #include "ExceptionChecker.h"
 
-void ExceptionChecker::isFileOpen(const std::ifstream& file, const char* path)
+void ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(const vk::Result& result, const std::string& errorMessage)
+{
+	if (result != vk::Result::eSuccess)
+	{
+		throw std::runtime_error(errorMessage);
+	}
+}
+
+void ExceptionChecker::throwExceptionIfFileCouldNotBeOpened(const std::ifstream& file, const char* path)
 {
 	if (!file.is_open())
 	{

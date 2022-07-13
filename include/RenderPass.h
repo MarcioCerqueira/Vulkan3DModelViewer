@@ -13,10 +13,11 @@ public:
 	const vk::RenderPass getVulkanRenderPass() const;
 
 private:
-	const vk::RenderPassCreateInfo createRenderPassCreateInfo(const vk::SurfaceFormatKHR& swapChainSurfaceFormat) const;
+	const vk::RenderPassCreateInfo createRenderPassCreateInfo(const vk::AttachmentDescription& attachmentDescription, const vk::SubpassDescription& subpassDescription, const vk::SubpassDependency& subpassDependency) const;
 	const vk::AttachmentDescription createAttachmentDescription(const vk::SurfaceFormatKHR& swapChainSurfaceFormat) const;
-	const vk::SubpassDescription createSubpassDescription() const;
+	const vk::SubpassDescription createSubpassDescription(const vk::AttachmentReference& attachmentReference) const;
 	const vk::AttachmentReference createAttachmentReference() const;
+	const vk::SubpassDependency createSubpassDependency() const;
 
 	const vk::Device vulkanLogicalDevice;
 	vk::RenderPass vulkanRenderPass;

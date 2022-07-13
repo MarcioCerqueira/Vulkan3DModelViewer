@@ -30,6 +30,6 @@ void ArgumentParser::loadConfigurationFile(const char* configurationFilePath)
 const std::ifstream ArgumentParser::openFile(const char* filePath) const
 {
 	std::ifstream file(filePath);
-	ExceptionChecker::isFileOpen(file, filePath);
+	ExceptionChecker::throwExceptionIfFileCouldNotBeOpened(file, filePath);
 	return file;
 }

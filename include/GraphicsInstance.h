@@ -21,6 +21,8 @@ public:
 	void selectPhysicalDevice();
 	void createLogicalDevice(const WindowSize& framebufferSize);
 	void createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders);
+	void drawFrame();
+	void waitIdle();
 
 	const vk::Device getVulkanLogicalDevice() const;
 
