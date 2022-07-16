@@ -39,19 +39,21 @@ private:
 	void createRenderPass();
 	void createFramebuffers();
 	void createCommandPool(const std::optional<uint32_t> graphicsFamilyIndex);
-	void createCommandBuffer();
+	void createCommandBuffers();
 	void createSynchronizationObjects();
 	void createQueues(const QueueFamilyIndices& queueFamilyIndices);
 
+	const int MAX_FRAMES_IN_FLIGHT = 2;
+	unsigned int currentFrame = 0;
 	vk::Device vulkanLogicalDevice; 
 	std::unique_ptr<SwapChain> swapChain;
 	std::unique_ptr<RenderPass> renderPass;
 	std::unique_ptr<GraphicsPipeline> graphicsPipeline;
 	std::vector<std::unique_ptr<Framebuffer>> framebuffers;
 	std::unique_ptr<CommandPool> commandPool;
-	std::unique_ptr<CommandBuffer> commandBuffer;
+	std::unique_ptr<CommandBuffer> commandBuffers;
 	std::unique_ptr<GraphicsQueue> graphicsQueue;
 	std::unique_ptr<PresentQueue> presentQueue;
-	std::shared_ptr<SynchronizationObjects> synchronizationObjects;
+	std::vector<std::shared_ptr<SynchronizationObjects>> synchronizationObjects;
 	vk::PhysicalDeviceFeatures physicalDeviceFeatures;
 };

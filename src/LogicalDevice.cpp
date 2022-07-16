@@ -10,22 +10,25 @@ LogicalDevice::LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateI
 	createRenderPass();
 	createFramebuffers();
 	createCommandPool(logicalDeviceCreateInfo.queueFamilyIndices.getGraphicsFamilyIndex());
-	createCommandBuffer();
+	createCommandBuffers();
 	createSynchronizationObjects();
 	createQueues(logicalDeviceCreateInfo.queueFamilyIndices);
 }
 
 LogicalDevice::~LogicalDevice()
 {
+	for (auto& synchronizationObject : synchronizationObjects)
+	{
+		synchronizationObject.reset();
+	}
+	commandPool.reset();
 	for (auto& framebuffer : framebuffers)
 	{
 		framebuffer.reset();
 	}
-	commandPool.reset();
 	graphicsPipeline.reset();
 	renderPass.reset();
 	swapChain.reset();
-	synchronizationObjects.reset();
 	vulkanLogicalDevice.destroy();
 }
 
@@ -102,14 +105,18 @@ void LogicalDevice::createCommandPool(const std::optional<uint32_t> graphicsFami
 	commandPool = std::make_unique<CommandPool>(vulkanLogicalDevice, graphicsFamilyIndex);
 }
 
-void LogicalDevice::createCommandBuffer()
+void LogicalDevice::createCommandBuffers()
 {
-	commandBuffer = std::make_unique<CommandBuffer>(vulkanLogicalDevice, commandPool->getVulkanCommandPool());
+	commandBuffers = std::make_unique<CommandBuffer>(vulkanLogicalDevice, commandPool->getVulkanCommandPool(), MAX_FRAMES_IN_FLIGHT);
 }
 
 void LogicalDevice::createSynchronizationObjects()
 {
-	synchronizationObjects = std::make_shared<SynchronizationObjects>(vulkanLogicalDevice);
+	synchronizationObjects.resize(MAX_FRAMES_IN_FLIGHT);
+	for (auto& synchronizationObject : synchronizationObjects)
+	{
+		synchronizationObject = std::make_shared<SynchronizationObjects>(vulkanLogicalDevice);
+	}
 }
 
 void LogicalDevice::createQueues(const QueueFamilyIndices& queueFamilyIndices)
@@ -140,16 +147,17 @@ void LogicalDevice::drawFrame()
 {
 	const uint32_t fenceCount{ 1 };
 	constexpr uint64_t timeout{ std::numeric_limits<uint64_t>::max() };
-	vk::Result result{ vulkanLogicalDevice.waitForFences(fenceCount, &synchronizationObjects->inFlight, vk::Bool32{ true }, timeout) };
+	vk::Result result{ vulkanLogicalDevice.waitForFences(fenceCount, &synchronizationObjects[currentFrame]->inFlight, vk::Bool32{ true }, timeout) };
 	ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(result, "Failed to wait for fences!");
-	result = vulkanLogicalDevice.resetFences(fenceCount, &synchronizationObjects->inFlight);
+	result = vulkanLogicalDevice.resetFences(fenceCount, &synchronizationObjects[currentFrame]->inFlight);
 	ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(result, "Failed to reset fences!");
-	const uint32_t imageIndex{ swapChain->acquireNextImage(synchronizationObjects->imageAvailable) };
-	commandBuffer->reset();
+	const uint32_t imageIndex{ swapChain->acquireNextImage(synchronizationObjects[currentFrame]->imageAvailable) };
+	commandBuffers->reset(currentFrame);
 	const vk::RenderPassBeginInfo renderPassBeginInfo{ renderPass->createRenderPassBeginInfo(framebuffers[imageIndex]->getVulkanFramebuffer(), swapChain->getExtent()) };
-	commandBuffer->record(renderPassBeginInfo, graphicsPipeline->getVulkanPipeline(), imageIndex);
-	graphicsQueue->submit(synchronizationObjects, commandBuffer->getVulkanCommandBuffer(imageIndex));
-	presentQueue->presentResult(synchronizationObjects->renderFinished, swapChain->getVulkanSwapChain(), imageIndex);
+	commandBuffers->record(renderPassBeginInfo, graphicsPipeline->getVulkanPipeline(), currentFrame);
+	graphicsQueue->submit(synchronizationObjects[currentFrame], commandBuffers->getVulkanCommandBuffer(currentFrame));
+	presentQueue->presentResult(synchronizationObjects[currentFrame]->renderFinished, swapChain->getVulkanSwapChain(), imageIndex);
+	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
 void LogicalDevice::waitIdle()

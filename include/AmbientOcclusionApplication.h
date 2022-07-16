@@ -10,6 +10,7 @@ class AmbientOcclusionApplication
 
 public:
 	AmbientOcclusionApplication(const int windowWidth, const int windowHeight);
+	~AmbientOcclusionApplication();
 	void run();
 
 private:
