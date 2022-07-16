@@ -17,10 +17,7 @@ const vk::CommandBufferAllocateInfo CommandBuffer::buildCommandBufferAllocateInf
 
 void CommandBuffer::record(const vk::RenderPassBeginInfo& renderPassBeginInfo, const vk::Pipeline& graphicsPipeline, const int imageIndex)
 {
-	if (imageIndex >= vulkanCommandBuffers.size())
-	{
-		throw std::runtime_error("Error! Invalid image index");
-	}
+	ExceptionChecker::throwExceptionIfIndexIsOutOfBounds(imageIndex, vulkanCommandBuffers.size(), "Error in CommandBuffer! Index is out of bounds");
 	const uint32_t vertexCount = 3;
 	const uint32_t instanceCount = 1;
 	const uint32_t firstVertex = 0;
@@ -44,9 +41,6 @@ void CommandBuffer::reset()
 
 const vk::CommandBuffer CommandBuffer::getVulkanCommandBuffer(const int index) const
 {
-	if (index == -1 || index >= vulkanCommandBuffers.size())
-	{
-		throw std::runtime_error("Error! Trying to access an invalid command buffer!");
-	}
+	ExceptionChecker::throwExceptionIfIndexIsOutOfBounds(index, vulkanCommandBuffers.size(), "Error in CommandBuffer! Index is out of bounds");
 	return vulkanCommandBuffers[index];
 }

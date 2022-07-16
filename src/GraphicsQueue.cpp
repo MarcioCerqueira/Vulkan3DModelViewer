@@ -4,13 +4,13 @@ GraphicsQueue::GraphicsQueue(const vk::Device& vulkanLogicalDevice, const std::o
 {
 }
 
-void GraphicsQueue::submit(vk::Semaphore& imageAvailable, vk::Semaphore& renderFinished, const vk::CommandBuffer& vulkanCommandBuffer, vk::Fence& inFlight)
+void GraphicsQueue::submit(std::shared_ptr<SynchronizationObjects>& synchronizationObjects, const vk::CommandBuffer& vulkanCommandBuffer)
 {
-	vk::Semaphore waitSemaphores[] = { imageAvailable };
-	vk::Semaphore signalSemaphores[] = { renderFinished };
+	vk::Semaphore waitSemaphores[] = { synchronizationObjects->imageAvailable };
+	vk::Semaphore signalSemaphores[] = { synchronizationObjects->renderFinished };
 	vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
 	vk::SubmitInfo submitInfo{ buildSubmitInfo(waitSemaphores, signalSemaphores, waitStages, vulkanCommandBuffer) };
-	vulkanQueue.submit(submitInfo, inFlight);
+	vulkanQueue.submit(submitInfo, synchronizationObjects->inFlight);
 }
 
 vk::SubmitInfo GraphicsQueue::buildSubmitInfo(vk::Semaphore* waitSemaphores, vk::Semaphore* signalSemaphores, vk::PipelineStageFlags* waitStages, const vk::CommandBuffer& vulkanCommandBuffer) const

@@ -16,3 +16,11 @@ void ExceptionChecker::throwExceptionIfFileCouldNotBeOpened(const std::ifstream&
 		throw std::runtime_error(errorMessage);
 	}
 }
+
+void ExceptionChecker::throwExceptionIfIndexIsOutOfBounds(const int index, const size_t vectorSize, const std::string& errorMessage)
+{
+	if (index < 0 || index >= vectorSize)
+	{
+		throw std::runtime_error(errorMessage);
+	}
+}

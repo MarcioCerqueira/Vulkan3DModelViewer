@@ -52,6 +52,6 @@ private:
 	std::unique_ptr<CommandBuffer> commandBuffer;
 	std::unique_ptr<GraphicsQueue> graphicsQueue;
 	std::unique_ptr<PresentQueue> presentQueue;
+	std::shared_ptr<SynchronizationObjects> synchronizationObjects;
 	vk::PhysicalDeviceFeatures physicalDeviceFeatures;
-	SynchronizationObjects synchronizationObjects;
 };

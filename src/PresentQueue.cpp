@@ -2,7 +2,6 @@
 
 PresentQueue::PresentQueue(const vk::Device& vulkanLogicalDevice, const std::optional<uint32_t>& queueFamilyIndex) : Queue(vulkanLogicalDevice, queueFamilyIndex)
 {
-
 }
 
 void PresentQueue::presentResult(vk::Semaphore& renderFinished, const vk::SwapchainKHR& vulkanSwapChain, const uint32_t imageIndex)
