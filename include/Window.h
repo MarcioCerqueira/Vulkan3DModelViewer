@@ -14,7 +14,8 @@ public:
 	
 	GLFWwindow* getGLFWWindow() const noexcept;
 	WindowSize getFramebufferSize() const;
-	void open(std::function<void()> drawFrame);
+	void waitEvents() const;
+	void open(std::function<void(std::function<WindowSize()>, std::function<void()>)> drawFrame);
 
 private:
 	void setGlfwWindowHints() const;

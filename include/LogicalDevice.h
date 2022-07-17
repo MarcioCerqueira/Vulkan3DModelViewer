@@ -9,7 +9,6 @@
 #include "LogicalDeviceCreateInfo.h"
 #include "SwapChain.h"
 #include "RenderPass.h"
-#include "Framebuffer.h"
 #include "CommandPool.h"
 #include "CommandBuffer.h"
 #include "GraphicsPipeline.h"
@@ -25,7 +24,7 @@ public:
 	~LogicalDevice();
 
 	void createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders);
-	void drawFrame();
+	void drawFrame(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents);
 	void waitIdle();
 
 	const vk::Device getVulkanLogicalDevice() const;
@@ -42,6 +41,11 @@ private:
 	void createCommandBuffers();
 	void createSynchronizationObjects();
 	void createQueues(const QueueFamilyIndices& queueFamilyIndices);
+	void waitForFences(const uint32_t fenceCount);
+	const uint32_t acquireNextImageFromSwapChain(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents);
+	void recreateSwapChainIfResultIsOutOfDateOrSuboptimalKHR(vk::Result& result, std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents);
+	void resetFences(const uint32_t fenceCount);
+	void presentResult(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents, const uint32_t imageIndex);
 
 	const int MAX_FRAMES_IN_FLIGHT = 2;
 	unsigned int currentFrame = 0;
@@ -49,7 +53,6 @@ private:
 	std::unique_ptr<SwapChain> swapChain;
 	std::unique_ptr<RenderPass> renderPass;
 	std::unique_ptr<GraphicsPipeline> graphicsPipeline;
-	std::vector<std::unique_ptr<Framebuffer>> framebuffers;
 	std::unique_ptr<CommandPool> commandPool;
 	std::unique_ptr<CommandBuffer> commandBuffers;
 	std::unique_ptr<GraphicsQueue> graphicsQueue;

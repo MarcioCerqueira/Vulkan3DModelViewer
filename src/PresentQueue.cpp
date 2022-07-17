@@ -4,13 +4,12 @@ PresentQueue::PresentQueue(const vk::Device& vulkanLogicalDevice, const std::opt
 {
 }
 
-void PresentQueue::presentResult(vk::Semaphore& renderFinished, const vk::SwapchainKHR& vulkanSwapChain, const uint32_t imageIndex)
+vk::Result PresentQueue::presentResult(vk::Semaphore& renderFinished, const vk::SwapchainKHR& vulkanSwapChain, const uint32_t imageIndex)
 {
 	vk::Semaphore signalSemaphores[] = { renderFinished };
 	vk::SwapchainKHR swapChains[] = { vulkanSwapChain };
     vk::PresentInfoKHR presentInfo{ getPresentInfo(signalSemaphores, swapChains, imageIndex) };
-	const vk::Result result{ vulkanQueue.presentKHR(presentInfo) };
-	ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(result, "Failed to present the results!");
+	return vulkanQueue.presentKHR(presentInfo);
 }
 
 vk::PresentInfoKHR PresentQueue::getPresentInfo(vk::Semaphore* signalSemaphores, vk::SwapchainKHR* swapChains, const uint32_t imageIndex) const

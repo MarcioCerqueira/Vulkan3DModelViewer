@@ -5,7 +5,6 @@ SwapChain::SwapChain(const SwapChainCreateInfo& swapChainCreateInfo) : swapChain
     vk::SurfaceCapabilitiesKHR capabilities{ swapChainCreateInfo.vulkanPhysicalDevice.getSurfaceCapabilitiesKHR(swapChainCreateInfo.vulkanWindowSurface) };
     const std::vector<vk::SurfaceFormatKHR> availableFormats{ swapChainCreateInfo.vulkanPhysicalDevice.getSurfaceFormatsKHR(swapChainCreateInfo.vulkanWindowSurface) };
     std::vector<vk::PresentModeKHR> availablePresentModes{ swapChainCreateInfo.vulkanPhysicalDevice.getSurfacePresentModesKHR(swapChainCreateInfo.vulkanWindowSurface) };
-
     chooseSwapSurfaceFormat(availableFormats);
     chooseSwapPresentMode(availablePresentModes);
     chooseSwapExtent(capabilities, swapChainCreateInfo.framebufferSize);
@@ -15,9 +14,15 @@ SwapChain::SwapChain(const SwapChainCreateInfo& swapChainCreateInfo) : swapChain
 
 SwapChain::~SwapChain()
 {
-    for (auto imageView : imageViews)
+    cleanup();
+}
+
+void SwapChain::cleanup()
+{
+    for (int imageIndex = 0; imageIndex < imageViews.size(); imageIndex++)
     {
-        swapChainCreateInfo.vulkanLogicalDevice.destroyImageView(imageView);
+        framebuffers[imageIndex].reset();
+        imageViews[imageIndex].reset();
     }
     swapChainCreateInfo.vulkanLogicalDevice.destroySwapchainKHR(vulkanSwapChain);
 }
@@ -109,39 +114,47 @@ void SwapChain::buildSwapChainImageViews(const SwapChainCreateInfo& swapChainCre
     imageViews.resize(images.size());
     for (int imageIndex = 0; imageIndex < images.size(); ++imageIndex)
     {
-        vk::ImageViewCreateInfo imageViewCreateInfo{ buildImageViewCreateInfo(imageIndex) };
-        imageViews[imageIndex] = swapChainCreateInfo.vulkanLogicalDevice.createImageView(imageViewCreateInfo);
+        imageViews[imageIndex] = std::make_unique<ImageView>(swapChainCreateInfo.vulkanLogicalDevice, images[imageIndex], surfaceFormat);
     }
 }
 
-const vk::ImageViewCreateInfo SwapChain::buildImageViewCreateInfo(const int imageIndex) const
+void SwapChain::buildFramebuffers(const vk::Device& vulkanLogicalDevice, const vk::RenderPass& vulkanRenderPass)
 {
-    return vk::ImageViewCreateInfo{
-        .image = images[imageIndex],
-        .viewType = vk::ImageViewType::e2D,
-        .format = surfaceFormat.format,
-        .components = vk::ComponentSwizzle::eIdentity,
-        .subresourceRange = createImageSubresourceRange()
-    };
-}
-const vk::ImageSubresourceRange SwapChain::createImageSubresourceRange() const
-{
-    return vk::ImageSubresourceRange{
-        .aspectMask = vk::ImageAspectFlagBits::eColor,
-        .baseMipLevel = 0,
-        .levelCount = 1,
-        .baseArrayLayer = 0,
-        .layerCount = 1
-    };
+    framebuffers.resize(imageViews.size());
+    for (int framebufferIndex = 0; framebufferIndex < framebuffers.size(); framebufferIndex++)
+    {
+        framebuffers[framebufferIndex] = std::make_unique<Framebuffer>(vulkanLogicalDevice, vulkanRenderPass, imageViews[framebufferIndex]->getVulkanImageView(), extent);
+    }
 }
 
-const uint32_t SwapChain::acquireNextImage(vk::Semaphore& imageAvailable) const
+vk::Result SwapChain::acquireNextImage(vk::Semaphore& imageAvailable, const vk::RenderPass& vulkanRenderPass, uint32_t& imageIndex)
 {
-    uint32_t imageIndex;
-    const uint64_t timeout{ std::numeric_limits<uint64_t>::max() };
-    vk::Result result{ swapChainCreateInfo.vulkanLogicalDevice.acquireNextImageKHR(vulkanSwapChain, timeout, imageAvailable, nullptr, &imageIndex) };
-    ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(result, "Failed to acquire next image!");
-    return imageIndex;
+    constexpr uint64_t timeout{ std::numeric_limits<uint64_t>::max() };
+    return swapChainCreateInfo.vulkanLogicalDevice.acquireNextImageKHR(vulkanSwapChain, timeout, imageAvailable, nullptr, &imageIndex);
+}
+
+void SwapChain::recreateIfResultIsOutOfDateOrSuboptimalKHR(vk::Result& result, const SwapChainRecreateInfo& swapChainRecreateInfo)
+{
+    if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR)
+    {
+        waitValidFramebufferSize(swapChainRecreateInfo.getFramebufferSize, swapChainRecreateInfo.waitEvents);
+        swapChainCreateInfo.vulkanLogicalDevice.waitIdle();
+        cleanup();
+        buildVulkanSwapChain(swapChainCreateInfo, swapChainCreateInfo.vulkanPhysicalDevice.getSurfaceCapabilitiesKHR(swapChainCreateInfo.vulkanWindowSurface), static_cast<const uint32_t>(images.size()));
+        buildSwapChainImageViews(swapChainCreateInfo);
+        buildFramebuffers(swapChainCreateInfo.vulkanLogicalDevice, swapChainRecreateInfo.vulkanRenderPass);
+        result = vk::Result::eSuccess;
+    }
+}
+
+void SwapChain::waitValidFramebufferSize(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents)
+{
+    WindowSize framebufferSize = getFramebufferSize();
+    while (framebufferSize.width == 0 || framebufferSize.height == 0)
+    {
+        framebufferSize = getFramebufferSize();
+        waitEvents();
+    }
 }
 
 const vk::Extent2D SwapChain::getExtent() const
@@ -149,27 +162,14 @@ const vk::Extent2D SwapChain::getExtent() const
     return extent;
 }
 
+const vk::Framebuffer SwapChain::getVulkanFramebuffer(const int framebufferIndex) const
+{
+    return framebuffers[framebufferIndex]->getVulkanFramebuffer();
+}
+
 const vk::SurfaceFormatKHR SwapChain::getSurfaceFormat() const
 {
     return surfaceFormat;
-}
-
-const int SwapChain::getNumberOfImageViews() const
-{
-    return static_cast<int>(imageViews.size());
-}
-
-const vk::ImageView SwapChain::getImageView(int index) const
-{
-    if (index < 0)
-    {
-        throw std::runtime_error("Error! You need to pass a valid index (>= 0) for SwapChain::getImageView");
-    }
-    if (index > imageViews.size())
-    {
-        throw std::runtime_error("Error! You need to pass a valid index (< imageViews.size()) for SwapChain::getImageView");
-    }
-    return imageViews[index];
 }
 
 const vk::SwapchainKHR SwapChain::getVulkanSwapChain() const

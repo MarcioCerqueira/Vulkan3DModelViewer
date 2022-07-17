@@ -16,6 +16,6 @@ public:
 private:
 	const std::vector<std::shared_ptr<Shader>> loadShaders(const vk::Device& vulkanLogicalDevice) const;
 
-	std::unique_ptr<Window> window;
+	std::shared_ptr<Window> window;
 	std::shared_ptr<GraphicsInstance> graphicsInstance;
 };

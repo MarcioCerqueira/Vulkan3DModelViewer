@@ -8,7 +8,10 @@
 #include <algorithm>
 
 #include "SwapChainCreateInfo.h"
+#include "SwapChainRecreateInfo.h"
 #include "ExceptionChecker.h"
+#include "Framebuffer.h"
+#include "ImageView.h"
 
 class SwapChain
 {
@@ -17,11 +20,13 @@ public:
 	~SwapChain();
 
 	static const bool isValid(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface);
-	const uint32_t acquireNextImage(vk::Semaphore& imageAvailable) const;
+	vk::Result acquireNextImage(vk::Semaphore& imageAvailable, const vk::RenderPass& vulkanRenderPass, uint32_t& imageIndex);
+	void buildFramebuffers(const vk::Device& vulkanLogicalDevice, const vk::RenderPass& vulkanRenderPass);
+	void recreateIfResultIsOutOfDateOrSuboptimalKHR(vk::Result& result, const SwapChainRecreateInfo& swapChainRecreateInfo);
+
 	const vk::Extent2D getExtent() const;
+	const vk::Framebuffer getVulkanFramebuffer(const int framebufferIndex) const;
 	const vk::SurfaceFormatKHR getSurfaceFormat() const;
-	const int getNumberOfImageViews() const;
-	const vk::ImageView getImageView(int index) const;
 	const vk::SwapchainKHR getVulkanSwapChain() const;
 
 private:
@@ -30,14 +35,15 @@ private:
 	void chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities, const WindowSize& framebufferSize);
 	const uint32_t estimateImageCount(const vk::SurfaceCapabilitiesKHR& capabilities);
 	void buildVulkanSwapChain(const SwapChainCreateInfo& swapChainCreateInfo, const vk::SurfaceCapabilitiesKHR& capabilities, const uint32_t imageCount);
-	void buildSwapChainImageViews(const SwapChainCreateInfo& swapChainCreateInfo);
-	const vk::ImageViewCreateInfo buildImageViewCreateInfo(const int imageIndex) const;
-	const vk::ImageSubresourceRange createImageSubresourceRange() const;
+	void buildSwapChainImageViews(const SwapChainCreateInfo& swapChainCreateInfo); 
+	void waitValidFramebufferSize(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents);
+	void cleanup();
 
 	const SwapChainCreateInfo swapChainCreateInfo;
 	vk::SwapchainKHR vulkanSwapChain; 
 	std::vector<vk::Image> images; 
-	std::vector<vk::ImageView> imageViews;
+	std::vector<std::unique_ptr<ImageView>> imageViews;
+	std::vector<std::unique_ptr<Framebuffer>> framebuffers;
 	vk::SurfaceFormatKHR surfaceFormat;
 	vk::PresentModeKHR presentMode;
 	vk::Extent2D extent;

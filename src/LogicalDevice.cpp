@@ -21,14 +21,10 @@ LogicalDevice::~LogicalDevice()
 	{
 		synchronizationObject.reset();
 	}
+	swapChain.reset();
 	commandPool.reset();
-	for (auto& framebuffer : framebuffers)
-	{
-		framebuffer.reset();
-	}
 	graphicsPipeline.reset();
 	renderPass.reset();
-	swapChain.reset();
 	vulkanLogicalDevice.destroy();
 }
 
@@ -93,11 +89,7 @@ void LogicalDevice::createRenderPass()
 
 void LogicalDevice::createFramebuffers()
 {
-	framebuffers.resize(swapChain->getNumberOfImageViews());
-	for (int framebufferIndex = 0; framebufferIndex < framebuffers.size(); framebufferIndex++)
-	{
-		framebuffers[framebufferIndex] = std::make_unique<Framebuffer>(vulkanLogicalDevice, renderPass->getVulkanRenderPass(), swapChain->getImageView(framebufferIndex), swapChain->getExtent());
-	}
+	swapChain->buildFramebuffers(vulkanLogicalDevice, renderPass->getVulkanRenderPass());
 }
 
 void LogicalDevice::createCommandPool(const std::optional<uint32_t> graphicsFamilyIndex)
@@ -143,21 +135,73 @@ void LogicalDevice::createGraphicsPipeline(const std::vector<std::shared_ptr<Sha
 	graphicsPipeline = std::make_unique<GraphicsPipeline>(graphicsPipelineCreateInfo);
 }
 
-void LogicalDevice::drawFrame()
+void LogicalDevice::drawFrame(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents)
 {
 	const uint32_t fenceCount{ 1 };
-	constexpr uint64_t timeout{ std::numeric_limits<uint64_t>::max() };
-	vk::Result result{ vulkanLogicalDevice.waitForFences(fenceCount, &synchronizationObjects[currentFrame]->inFlight, vk::Bool32{ true }, timeout) };
-	ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(result, "Failed to wait for fences!");
-	result = vulkanLogicalDevice.resetFences(fenceCount, &synchronizationObjects[currentFrame]->inFlight);
-	ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(result, "Failed to reset fences!");
-	const uint32_t imageIndex{ swapChain->acquireNextImage(synchronizationObjects[currentFrame]->imageAvailable) };
+	waitForFences(fenceCount);
+	const uint32_t imageIndex{ acquireNextImageFromSwapChain(getFramebufferSize, waitEvents) };
+	resetFences(fenceCount);
 	commandBuffers->reset(currentFrame);
-	const vk::RenderPassBeginInfo renderPassBeginInfo{ renderPass->createRenderPassBeginInfo(framebuffers[imageIndex]->getVulkanFramebuffer(), swapChain->getExtent()) };
+	const vk::RenderPassBeginInfo renderPassBeginInfo{ renderPass->createRenderPassBeginInfo(swapChain->getVulkanFramebuffer(imageIndex), swapChain->getExtent()) };
 	commandBuffers->record(renderPassBeginInfo, graphicsPipeline->getVulkanPipeline(), currentFrame);
 	graphicsQueue->submit(synchronizationObjects[currentFrame], commandBuffers->getVulkanCommandBuffer(currentFrame));
-	presentQueue->presentResult(synchronizationObjects[currentFrame]->renderFinished, swapChain->getVulkanSwapChain(), imageIndex);
+	presentResult(getFramebufferSize, waitEvents, imageIndex);
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+}
+
+void LogicalDevice::waitForFences(const uint32_t fenceCount)
+{
+	constexpr uint64_t timeout{ std::numeric_limits<uint64_t>::max() };
+	const vk::Result result{ vulkanLogicalDevice.waitForFences(fenceCount, &synchronizationObjects[currentFrame]->inFlight, vk::Bool32{ true }, timeout) };
+	ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(result, "Failed to wait for fences!");
+}
+
+const uint32_t LogicalDevice::acquireNextImageFromSwapChain(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents)
+{
+	uint32_t imageIndex;
+	vk::Result result;
+	try
+	{
+		result = swapChain->acquireNextImage(synchronizationObjects[currentFrame]->imageAvailable, renderPass->getVulkanRenderPass(), imageIndex);
+	}
+	catch (vk::OutOfDateKHRError error)
+	{
+		result = vk::Result::eErrorOutOfDateKHR;
+	}
+	recreateSwapChainIfResultIsOutOfDateOrSuboptimalKHR(result, getFramebufferSize, waitEvents);
+	ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(result, "Failed to acquire next image!");
+	return imageIndex;
+}
+
+void LogicalDevice::recreateSwapChainIfResultIsOutOfDateOrSuboptimalKHR(vk::Result& result, std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents)
+{
+	const SwapChainRecreateInfo swapChainRecreateInfo{
+		.vulkanRenderPass = renderPass->getVulkanRenderPass(),
+		.getFramebufferSize = getFramebufferSize,
+		.waitEvents = waitEvents
+	};
+	swapChain->recreateIfResultIsOutOfDateOrSuboptimalKHR(result, swapChainRecreateInfo);
+}
+
+void LogicalDevice::resetFences(const uint32_t fenceCount)
+{
+	const vk::Result result{ vulkanLogicalDevice.resetFences(fenceCount, &synchronizationObjects[currentFrame]->inFlight) };
+	ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(result, "Failed to reset fences!");
+}
+
+void LogicalDevice::presentResult(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents, const uint32_t imageIndex)
+{
+	vk::Result result;
+	try
+	{
+		result = presentQueue->presentResult(synchronizationObjects[currentFrame]->renderFinished, swapChain->getVulkanSwapChain(), imageIndex);
+	}
+	catch (vk::OutOfDateKHRError error)
+	{
+		result = vk::Result::eErrorOutOfDateKHR;
+	}
+	recreateSwapChainIfResultIsOutOfDateOrSuboptimalKHR(result, getFramebufferSize, waitEvents);
+	ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(result, "Failed to present the results!");
 }
 
 void LogicalDevice::waitIdle()
