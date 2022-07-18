@@ -4,6 +4,7 @@
 #include <vulkan/vulkan.hpp>
 #include "GraphicsPipelineCreateInfo.h"
 #include "ExceptionChecker.h"
+#include "Vertex.h"
 
 class GraphicsPipeline
 {
@@ -14,7 +15,7 @@ public:
 	const vk::Pipeline getVulkanPipeline() const;
 
 private:
-	const vk::PipelineVertexInputStateCreateInfo buildPipelineVertexInputStateCreateInfo() const;
+	const vk::PipelineVertexInputStateCreateInfo buildPipelineVertexInputStateCreateInfo(const vk::VertexInputBindingDescription& vertexBindingDescription, const std::array<vk::VertexInputAttributeDescription, 2>&  vertexAttributeDescriptions) const;
 	const vk::PipelineInputAssemblyStateCreateInfo buildPipelineInputAssemblyStateCreateInfo() const;
 	const vk::Viewport buildViewport(const vk::Extent2D& swapChainExtent) const;
 	const vk::Rect2D buildScissor(const vk::Extent2D& swapChainExtent) const;

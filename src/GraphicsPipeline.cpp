@@ -2,7 +2,9 @@
 
 GraphicsPipeline::GraphicsPipeline(const GraphicsPipelineCreateInfo& graphicsPipelineCreateInfo) : vulkanLogicalDevice(graphicsPipelineCreateInfo.vulkanLogicalDevice)
 {
-	const vk::PipelineVertexInputStateCreateInfo vertexInputState{ buildPipelineVertexInputStateCreateInfo() };
+	const vk::VertexInputBindingDescription vertexBindingDescription{ Vertex::getBindingDescription() };
+	const std::array<vk::VertexInputAttributeDescription, 2> vertexAttributeDescriptions{ Vertex::getAttributeDescriptions() };
+	const vk::PipelineVertexInputStateCreateInfo vertexInputState{ buildPipelineVertexInputStateCreateInfo(vertexBindingDescription, vertexAttributeDescriptions) };
 	const vk::PipelineInputAssemblyStateCreateInfo inputAssemblyState{ buildPipelineInputAssemblyStateCreateInfo() };
 	const vk::Viewport viewport{ buildViewport(graphicsPipelineCreateInfo.swapChainExtent) };
 	const vk::Rect2D scissor{ buildScissor(graphicsPipelineCreateInfo.swapChainExtent) };
@@ -40,13 +42,13 @@ GraphicsPipeline::~GraphicsPipeline()
 	vulkanLogicalDevice.destroyPipelineLayout(pipelineLayout);
 }
 
-const vk::PipelineVertexInputStateCreateInfo GraphicsPipeline::buildPipelineVertexInputStateCreateInfo() const
-{
+const vk::PipelineVertexInputStateCreateInfo GraphicsPipeline::buildPipelineVertexInputStateCreateInfo(const vk::VertexInputBindingDescription& vertexBindingDescription, const std::array<vk::VertexInputAttributeDescription, 2>& vertexAttributeDescriptions) const
+{	
 	return vk::PipelineVertexInputStateCreateInfo{
-		.vertexBindingDescriptionCount = 0,
-		.pVertexBindingDescriptions = nullptr,
-		.vertexAttributeDescriptionCount = 0,
-		.pVertexAttributeDescriptions = nullptr
+		.vertexBindingDescriptionCount = 1,
+		.pVertexBindingDescriptions = &vertexBindingDescription,
+		.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexAttributeDescriptions.size()),
+		.pVertexAttributeDescriptions = vertexAttributeDescriptions.data()
 	};
 }
 
