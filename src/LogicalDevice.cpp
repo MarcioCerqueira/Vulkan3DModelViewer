@@ -10,6 +10,7 @@ LogicalDevice::LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateI
 	createRenderPass();
 	createFramebuffers();
 	createCommandPool(logicalDeviceCreateInfo.queueFamilyIndices.getGraphicsFamilyIndex());
+	createVertexBuffer(logicalDeviceCreateInfo.vertices, logicalDeviceCreateInfo.vulkanPhysicalDevice);
 	createCommandBuffers();
 	createSynchronizationObjects();
 	createQueues(logicalDeviceCreateInfo.queueFamilyIndices);
@@ -25,6 +26,7 @@ LogicalDevice::~LogicalDevice()
 	commandPool.reset();
 	graphicsPipeline.reset();
 	renderPass.reset();
+	vertexBuffer.reset();
 	vulkanLogicalDevice.destroy();
 }
 
@@ -97,6 +99,11 @@ void LogicalDevice::createCommandPool(const std::optional<uint32_t> graphicsFami
 	commandPool = std::make_unique<CommandPool>(vulkanLogicalDevice, graphicsFamilyIndex);
 }
 
+void LogicalDevice::createVertexBuffer(const std::vector<Vertex>& vertices, const vk::PhysicalDevice& vulkanPhysicalDevice)
+{
+	vertexBuffer = std::make_unique<VertexBuffer>(vulkanLogicalDevice, vertices, vulkanPhysicalDevice);
+}
+
 void LogicalDevice::createCommandBuffers()
 {
 	commandBuffers = std::make_unique<CommandBuffer>(vulkanLogicalDevice, commandPool->getVulkanCommandPool(), MAX_FRAMES_IN_FLIGHT);
@@ -142,8 +149,7 @@ void LogicalDevice::drawFrame(std::function<WindowSize()> getFramebufferSize, st
 	const uint32_t imageIndex{ acquireNextImageFromSwapChain(getFramebufferSize, waitEvents) };
 	resetFences(fenceCount);
 	commandBuffers->reset(currentFrame);
-	const vk::RenderPassBeginInfo renderPassBeginInfo{ renderPass->createRenderPassBeginInfo(swapChain->getVulkanFramebuffer(imageIndex), swapChain->getExtent()) };
-	commandBuffers->record(renderPassBeginInfo, graphicsPipeline->getVulkanPipeline(), currentFrame);
+	commandBuffers->record(createCommandBufferRecordInfo(imageIndex));
 	graphicsQueue->submit(synchronizationObjects[currentFrame], commandBuffers->getVulkanCommandBuffer(currentFrame));
 	presentResult(getFramebufferSize, waitEvents, imageIndex);
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
@@ -187,6 +193,17 @@ void LogicalDevice::resetFences(const uint32_t fenceCount)
 {
 	const vk::Result result{ vulkanLogicalDevice.resetFences(fenceCount, &synchronizationObjects[currentFrame]->inFlight) };
 	ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(result, "Failed to reset fences!");
+}
+
+const CommandBufferRecordInfo LogicalDevice::createCommandBufferRecordInfo(const uint32_t imageIndex) const
+{
+	return CommandBufferRecordInfo{
+		.renderPassBeginInfo = renderPass->createRenderPassBeginInfo(swapChain->getVulkanFramebuffer(imageIndex), swapChain->getExtent()),
+		.graphicsPipeline = graphicsPipeline->getVulkanPipeline(),
+		.vulkanVertexBuffer = vertexBuffer->getVulkanVertexBuffer(),
+		.frameIndex = currentFrame,
+		.vertexCount = vertexBuffer->getVertexCount()
+	};
 }
 
 void LogicalDevice::presentResult(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents, const uint32_t imageIndex)

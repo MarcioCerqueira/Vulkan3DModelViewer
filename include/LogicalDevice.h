@@ -16,6 +16,7 @@
 #include "SynchronizationObjects.h"
 #include "GraphicsQueue.h"
 #include "PresentQueue.h"
+#include "VertexBuffer.h"
  
 class LogicalDevice
 {
@@ -38,6 +39,7 @@ private:
 	void createRenderPass();
 	void createFramebuffers();
 	void createCommandPool(const std::optional<uint32_t> graphicsFamilyIndex);
+	void createVertexBuffer(const std::vector<Vertex>& vertices, const vk::PhysicalDevice& vulkanPhysicalDevice);
 	void createCommandBuffers();
 	void createSynchronizationObjects();
 	void createQueues(const QueueFamilyIndices& queueFamilyIndices);
@@ -45,6 +47,7 @@ private:
 	const uint32_t acquireNextImageFromSwapChain(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents);
 	void recreateSwapChainIfResultIsOutOfDateOrSuboptimalKHR(vk::Result& result, std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents);
 	void resetFences(const uint32_t fenceCount);
+	const CommandBufferRecordInfo createCommandBufferRecordInfo(const uint32_t imageIndex) const;
 	void presentResult(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents, const uint32_t imageIndex);
 
 	const int MAX_FRAMES_IN_FLIGHT = 2;
@@ -54,6 +57,7 @@ private:
 	std::unique_ptr<RenderPass> renderPass;
 	std::unique_ptr<GraphicsPipeline> graphicsPipeline;
 	std::unique_ptr<CommandPool> commandPool;
+	std::unique_ptr<VertexBuffer> vertexBuffer;
 	std::unique_ptr<CommandBuffer> commandBuffers;
 	std::unique_ptr<GraphicsQueue> graphicsQueue;
 	std::unique_ptr<PresentQueue> presentQueue;

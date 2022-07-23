@@ -55,9 +55,16 @@ void GraphicsInstance::selectPhysicalDevice()
 	physicalDevice.pick(vulkanPhysicalDevices, windowSurface->getVulkanWindowSurface());
 }
 
-void GraphicsInstance::createLogicalDevice(const WindowSize& framebufferSize)
+void GraphicsInstance::createLogicalDevice(const WindowSize& framebufferSize, const std::vector<Vertex>& vertices)
 {
-	logicalDevice = physicalDevice.createLogicalDevice(validationLayer, windowSurface->getVulkanWindowSurface(), framebufferSize);
+	const LogicalDevicePartialCreateInfo logicalDevicePartialCreateInfo{
+		.vulkanWindowSurface = windowSurface->getVulkanWindowSurface(),
+		.framebufferSize = framebufferSize,
+		.enabledLayerCount = validationLayer.getEnabledLayerCount(),
+		.enabledLayerNames = validationLayer.getEnabledLayerNames(),
+		.vertices = vertices
+	};
+	logicalDevice = physicalDevice.createLogicalDevice(logicalDevicePartialCreateInfo);
 }
 
 void GraphicsInstance::createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders)

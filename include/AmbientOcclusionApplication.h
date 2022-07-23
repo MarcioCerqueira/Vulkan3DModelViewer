@@ -4,6 +4,7 @@
 #include "Window.h"
 #include "GraphicsInstance.h"
 #include "Shader.h"
+#include "Vertex.h"
 
 class AmbientOcclusionApplication
 {
@@ -18,4 +19,9 @@ private:
 
 	std::shared_ptr<Window> window;
 	std::shared_ptr<GraphicsInstance> graphicsInstance;
+	const std::vector<Vertex> vertices = {
+		{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+		{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+		{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+	};
 };

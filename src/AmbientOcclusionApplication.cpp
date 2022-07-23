@@ -7,7 +7,7 @@ AmbientOcclusionApplication::AmbientOcclusionApplication(const int windowWidth, 
 	graphicsInstance = std::make_shared<GraphicsInstance>(applicationName);
 	graphicsInstance->createWindowSurface(window->getGLFWWindow());
 	graphicsInstance->selectPhysicalDevice();
-	graphicsInstance->createLogicalDevice(window->getFramebufferSize());
+	graphicsInstance->createLogicalDevice(window->getFramebufferSize(), vertices);
 	graphicsInstance->createGraphicsPipeline(loadShaders(graphicsInstance->getVulkanLogicalDevice()));
 }
 

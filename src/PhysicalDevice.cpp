@@ -44,16 +44,17 @@ vk::PhysicalDevice PhysicalDevice::selectMostSuitablePhysicalDevice(const std::m
 	}
 }
 
-std::unique_ptr<LogicalDevice> PhysicalDevice::createLogicalDevice(const ValidationLayer& validationLayer, const vk::SurfaceKHR& vulkanWindowSurface, const WindowSize& framebufferSize)
+std::unique_ptr<LogicalDevice> PhysicalDevice::createLogicalDevice(const LogicalDevicePartialCreateInfo& logicalDevicePartialCreateInfo)
 {
 	const LogicalDeviceCreateInfo logicalDeviceCreateInfo{
-		.queueFamilyIndices = QueueFamilyIndices(vulkanPhysicalDevice, vulkanWindowSurface),
+		.queueFamilyIndices = QueueFamilyIndices(vulkanPhysicalDevice, logicalDevicePartialCreateInfo.vulkanWindowSurface),
 		.vulkanPhysicalDevice = vulkanPhysicalDevice,
-		.vulkanWindowSurface = vulkanWindowSurface,
+		.vulkanWindowSurface = logicalDevicePartialCreateInfo.vulkanWindowSurface,
 		.vulkanDeviceExtensions = vulkanDeviceExtensions,
-		.framebufferSize = framebufferSize,
-		.enabledLayerCount = validationLayer.getEnabledLayerCount(),
-		.enabledLayerNames = validationLayer.getEnabledLayerNames()
+		.framebufferSize = logicalDevicePartialCreateInfo.framebufferSize,
+		.enabledLayerCount = logicalDevicePartialCreateInfo.enabledLayerCount,
+		.enabledLayerNames = logicalDevicePartialCreateInfo.enabledLayerNames,
+		.vertices = logicalDevicePartialCreateInfo.vertices
 	};
 	return std::make_unique<LogicalDevice>(logicalDeviceCreateInfo);
 }

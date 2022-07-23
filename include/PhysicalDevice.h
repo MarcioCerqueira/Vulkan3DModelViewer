@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "LogicalDevice.h"
+#include "LogicalDevicePartialCreateInfo.h"
 #include "SwapChain.h"
 #include "PhysicalDeviceSuitabilityRater.h"
 #include "ValidationLayer.h"
@@ -15,7 +16,7 @@ class PhysicalDevice
 {
 public:
 	void pick(const std::vector<vk::PhysicalDevice>& vulkanPhysicalDevices, const vk::SurfaceKHR& vulkanWindowSurface);
-	std::unique_ptr<LogicalDevice> createLogicalDevice(const ValidationLayer& validationLayer, const vk::SurfaceKHR& vulkanWindowSurface, const WindowSize& framebufferSize);
+	std::unique_ptr<LogicalDevice> createLogicalDevice(const LogicalDevicePartialCreateInfo& logicalDevicePartialCreateInfo);
 
 private:
 	void checkVulkanSupport(const std::vector<vk::PhysicalDevice>& vulkanPhysicalDevices) const;
