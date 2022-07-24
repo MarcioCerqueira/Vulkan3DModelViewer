@@ -4,12 +4,14 @@
 #include <vulkan/vulkan.hpp>
 #include "CommandPool.h"
 #include "ExceptionChecker.h"
+#include "CommandBufferCopyInfo.h"
 #include "CommandBufferRecordInfo.h"
 
 class CommandBuffer
 {
 public:
 	CommandBuffer(const vk::Device& vulkanLogicalDevice, const vk::CommandPool& vulkanCommandPool, const int maxFramesInFlight);
+	void copy(const CommandBufferCopyInfo& commandBufferCopyInfo);
 	void record(const CommandBufferRecordInfo& commandBufferRecordInfo);
 	void reset(const int frameIndex);
 

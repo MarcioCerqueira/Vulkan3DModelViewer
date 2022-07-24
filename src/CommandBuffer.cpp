@@ -16,6 +16,16 @@ const vk::CommandBufferAllocateInfo CommandBuffer::buildCommandBufferAllocateInf
 	};
 }
 
+void CommandBuffer::copy(const CommandBufferCopyInfo& commandBufferCopyInfo)
+{
+	ExceptionChecker::throwExceptionIfIndexIsOutOfBounds(commandBufferCopyInfo.frameIndex, vulkanCommandBuffers.size(), "Error in CommandBuffer! Index is out of bounds");
+	const vk::CommandBufferBeginInfo commandBufferBeginInfo{ .flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit };
+	const vk::BufferCopy bufferCopyRegion{ .size = commandBufferCopyInfo.bufferSize };
+	vulkanCommandBuffers[commandBufferCopyInfo.frameIndex].begin(commandBufferBeginInfo);
+	vulkanCommandBuffers[commandBufferCopyInfo.frameIndex].copyBuffer(commandBufferCopyInfo.srcBuffer, commandBufferCopyInfo.dstBuffer, 1, &bufferCopyRegion);
+	vulkanCommandBuffers[commandBufferCopyInfo.frameIndex].end();
+}
+
 void CommandBuffer::record(const CommandBufferRecordInfo& commandBufferRecordInfo)
 {
 	ExceptionChecker::throwExceptionIfIndexIsOutOfBounds(commandBufferRecordInfo.frameIndex, vulkanCommandBuffers.size(), "Error in CommandBuffer! Index is out of bounds");

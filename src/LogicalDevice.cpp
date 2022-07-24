@@ -10,10 +10,10 @@ LogicalDevice::LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateI
 	createRenderPass();
 	createFramebuffers();
 	createCommandPool(logicalDeviceCreateInfo.queueFamilyIndices.getGraphicsFamilyIndex());
-	createVertexBuffer(logicalDeviceCreateInfo.vertices, logicalDeviceCreateInfo.vulkanPhysicalDevice);
 	createCommandBuffers();
 	createSynchronizationObjects();
 	createQueues(logicalDeviceCreateInfo.queueFamilyIndices);
+	createVertexBuffer(logicalDeviceCreateInfo.vertices, logicalDeviceCreateInfo.vulkanPhysicalDevice);
 }
 
 LogicalDevice::~LogicalDevice()
@@ -99,11 +99,6 @@ void LogicalDevice::createCommandPool(const std::optional<uint32_t> graphicsFami
 	commandPool = std::make_unique<CommandPool>(vulkanLogicalDevice, graphicsFamilyIndex);
 }
 
-void LogicalDevice::createVertexBuffer(const std::vector<Vertex>& vertices, const vk::PhysicalDevice& vulkanPhysicalDevice)
-{
-	vertexBuffer = std::make_unique<VertexBuffer>(vulkanLogicalDevice, vertices, vulkanPhysicalDevice);
-}
-
 void LogicalDevice::createCommandBuffers()
 {
 	commandBuffers = std::make_unique<CommandBuffer>(vulkanLogicalDevice, commandPool->getVulkanCommandPool(), MAX_FRAMES_IN_FLIGHT);
@@ -120,8 +115,20 @@ void LogicalDevice::createSynchronizationObjects()
 
 void LogicalDevice::createQueues(const QueueFamilyIndices& queueFamilyIndices)
 {
-	graphicsQueue = std::make_unique<GraphicsQueue>(vulkanLogicalDevice, queueFamilyIndices.getGraphicsFamilyIndex());
+	graphicsQueue = std::make_shared<GraphicsQueue>(vulkanLogicalDevice, queueFamilyIndices.getGraphicsFamilyIndex());
 	presentQueue = std::make_unique<PresentQueue>(vulkanLogicalDevice, queueFamilyIndices.getPresentFamilyIndex());
+}
+
+void LogicalDevice::createVertexBuffer(const std::vector<Vertex>& vertices, const vk::PhysicalDevice& vulkanPhysicalDevice)
+{
+	const VertexBufferCreateInfo vertexBufferCreateInfo{
+		.vulkanLogicalDevice = vulkanLogicalDevice,
+		.vertices = vertices,
+		.vulkanPhysicalDevice = vulkanPhysicalDevice,
+		.vulkanCommandPool = commandPool->getVulkanCommandPool(),
+		.graphicsQueue = graphicsQueue
+	};
+	vertexBuffer = std::make_unique<VertexBuffer>(vertexBufferCreateInfo);
 }
 
 const vk::Device LogicalDevice::getVulkanLogicalDevice() const

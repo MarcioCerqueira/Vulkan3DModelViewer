@@ -39,10 +39,10 @@ private:
 	void createRenderPass();
 	void createFramebuffers();
 	void createCommandPool(const std::optional<uint32_t> graphicsFamilyIndex);
-	void createVertexBuffer(const std::vector<Vertex>& vertices, const vk::PhysicalDevice& vulkanPhysicalDevice);
 	void createCommandBuffers();
 	void createSynchronizationObjects();
 	void createQueues(const QueueFamilyIndices& queueFamilyIndices);
+	void createVertexBuffer(const std::vector<Vertex>& vertices, const vk::PhysicalDevice& vulkanPhysicalDevice);
 	void waitForFences(const uint32_t fenceCount);
 	const uint32_t acquireNextImageFromSwapChain(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents);
 	void recreateSwapChainIfResultIsOutOfDateOrSuboptimalKHR(vk::Result& result, std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents);
@@ -59,7 +59,7 @@ private:
 	std::unique_ptr<CommandPool> commandPool;
 	std::unique_ptr<VertexBuffer> vertexBuffer;
 	std::unique_ptr<CommandBuffer> commandBuffers;
-	std::unique_ptr<GraphicsQueue> graphicsQueue;
+	std::shared_ptr<GraphicsQueue> graphicsQueue;
 	std::unique_ptr<PresentQueue> presentQueue;
 	std::vector<std::shared_ptr<SynchronizationObjects>> synchronizationObjects;
 	vk::PhysicalDeviceFeatures physicalDeviceFeatures;

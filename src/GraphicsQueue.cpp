@@ -25,3 +25,22 @@ vk::SubmitInfo GraphicsQueue::buildSubmitInfo(vk::Semaphore* waitSemaphores, vk:
 		.pSignalSemaphores = signalSemaphores
 	};
 }
+
+void GraphicsQueue::submit(const vk::CommandBuffer& vulkanCommandBuffer)
+{
+	vk::SubmitInfo submitInfo{ buildSubmitInfo(vulkanCommandBuffer) };
+	vulkanQueue.submit(submitInfo);
+}
+
+vk::SubmitInfo GraphicsQueue::buildSubmitInfo(const vk::CommandBuffer& vulkanCommandBuffer) const
+{
+	return vk::SubmitInfo{
+		.commandBufferCount = 1,
+		.pCommandBuffers = &vulkanCommandBuffer
+	};
+}
+
+void GraphicsQueue::waitIdle() const
+{
+	vulkanQueue.waitIdle();
+}
