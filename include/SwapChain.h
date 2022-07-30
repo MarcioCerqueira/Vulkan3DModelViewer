@@ -7,8 +7,8 @@
 #include <limits>
 #include <algorithm>
 
-#include "SwapChainCreateInfo.h"
-#include "SwapChainRecreateInfo.h"
+#include "structs/SwapChainCreateInfo.h"
+#include "structs/SwapChainRecreateInfo.h"
 #include "ExceptionChecker.h"
 #include "Framebuffer.h"
 #include "ImageView.h"

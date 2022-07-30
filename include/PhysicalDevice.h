@@ -7,7 +7,7 @@
 #include <memory>
 
 #include "LogicalDevice.h"
-#include "LogicalDevicePartialCreateInfo.h"
+#include "structs/LogicalDevicePartialCreateInfo.h"
 #include "SwapChain.h"
 #include "PhysicalDeviceSuitabilityRater.h"
 #include "ValidationLayer.h"

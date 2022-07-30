@@ -2,7 +2,7 @@
 
 #include "Buffer.h"
 #include "Vertex.h"
-#include "ContentBufferCreateInfo.h"
+#include "structs/ContentBufferCreateInfo.h"
 
 class VertexBuffer : public Buffer
 {

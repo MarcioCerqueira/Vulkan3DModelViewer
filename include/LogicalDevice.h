@@ -6,7 +6,7 @@
 #include <iostream>
 #include <set>
 
-#include "LogicalDeviceCreateInfo.h"
+#include "structs/LogicalDeviceCreateInfo.h"
 #include "SwapChain.h"
 #include "RenderPass.h"
 #include "CommandPool.h"

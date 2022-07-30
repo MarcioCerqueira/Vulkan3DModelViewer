@@ -4,8 +4,8 @@
 #include <vulkan/vulkan.hpp>
 #include "CommandPool.h"
 #include "ExceptionChecker.h"
-#include "CommandBufferCopyInfo.h"
-#include "CommandBufferRecordInfo.h"
+#include "structs/CommandBufferCopyInfo.h"
+#include "structs/CommandBufferRecordInfo.h"
 
 class CommandBuffer
 {

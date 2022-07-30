@@ -5,7 +5,7 @@
 #include <set>
 #include <string>
 
-#include "PhysicalDeviceSuitabilityRaterInfo.h"
+#include "structs/PhysicalDeviceSuitabilityRaterInfo.h"
 #include "QueueFamilyIndices.h"
 #include "SwapChain.h"
 #include "LogicalDevice.h"

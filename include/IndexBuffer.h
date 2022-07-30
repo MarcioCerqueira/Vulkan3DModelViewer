@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Buffer.h"
-#include "ContentBufferCreateInfo.h"
+#include "structs/ContentBufferCreateInfo.h"
 
 class IndexBuffer : public Buffer
 {

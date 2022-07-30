@@ -1,7 +1,7 @@
 #pragma once
 
 #include "rapidjson/document.h"
-#include "ConfigurationFileModel.h"
+#include "structs/ConfigurationFileModel.h"
 
 class JSONConfigurationFileParser
 {

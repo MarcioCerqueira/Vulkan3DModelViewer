@@ -2,7 +2,7 @@
 
 #define VULKAN_HPP_NO_CONSTRUCTORS
 #include <vulkan/vulkan.hpp>
-#include "GraphicsPipelineCreateInfo.h"
+#include "structs/GraphicsPipelineCreateInfo.h"
 #include "ExceptionChecker.h"
 #include "Vertex.h"
 
