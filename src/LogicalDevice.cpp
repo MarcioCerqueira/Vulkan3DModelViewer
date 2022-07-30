@@ -14,6 +14,7 @@ LogicalDevice::LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateI
 	createSynchronizationObjects();
 	createQueues(logicalDeviceCreateInfo.queueFamilyIndices);
 	createVertexBuffer(logicalDeviceCreateInfo.vertices, logicalDeviceCreateInfo.vulkanPhysicalDevice);
+	createIndexBuffer(logicalDeviceCreateInfo.indices, logicalDeviceCreateInfo.vulkanPhysicalDevice);
 }
 
 LogicalDevice::~LogicalDevice()
@@ -27,6 +28,7 @@ LogicalDevice::~LogicalDevice()
 	graphicsPipeline.reset();
 	renderPass.reset();
 	vertexBuffer.reset();
+	indexBuffer.reset();
 	vulkanLogicalDevice.destroy();
 }
 
@@ -121,14 +123,26 @@ void LogicalDevice::createQueues(const QueueFamilyIndices& queueFamilyIndices)
 
 void LogicalDevice::createVertexBuffer(const std::vector<Vertex>& vertices, const vk::PhysicalDevice& vulkanPhysicalDevice)
 {
-	const VertexBufferCreateInfo vertexBufferCreateInfo{
+	const ContentBufferCreateInfo<Vertex> contentBufferCreateInfo{ buildContentBufferCreateInfo<Vertex>(vertices, vulkanPhysicalDevice) };
+	vertexBuffer = std::make_unique<VertexBuffer>(contentBufferCreateInfo);
+}
+
+template<typename T>
+const ContentBufferCreateInfo<T> LogicalDevice::buildContentBufferCreateInfo(const std::vector<T>& content, const vk::PhysicalDevice& vulkanPhysicalDevice) const
+{
+	return ContentBufferCreateInfo<T>{
 		.vulkanLogicalDevice = vulkanLogicalDevice,
-		.vertices = vertices,
+		.content = content,
 		.vulkanPhysicalDevice = vulkanPhysicalDevice,
 		.vulkanCommandPool = commandPool->getVulkanCommandPool(),
 		.graphicsQueue = graphicsQueue
 	};
-	vertexBuffer = std::make_unique<VertexBuffer>(vertexBufferCreateInfo);
+}
+
+void LogicalDevice::createIndexBuffer(const std::vector<uint16_t>& indices, const vk::PhysicalDevice& vulkanPhysicalDevice)
+{
+	const ContentBufferCreateInfo<uint16_t> contentBufferCreateInfo{ buildContentBufferCreateInfo<uint16_t>(indices, vulkanPhysicalDevice) };
+	indexBuffer = std::make_unique<IndexBuffer>(contentBufferCreateInfo);
 }
 
 const vk::Device LogicalDevice::getVulkanLogicalDevice() const
@@ -207,9 +221,11 @@ const CommandBufferRecordInfo LogicalDevice::createCommandBufferRecordInfo(const
 	return CommandBufferRecordInfo{
 		.renderPassBeginInfo = renderPass->createRenderPassBeginInfo(swapChain->getVulkanFramebuffer(imageIndex), swapChain->getExtent()),
 		.graphicsPipeline = graphicsPipeline->getVulkanPipeline(),
-		.vulkanVertexBuffer = vertexBuffer->getVulkanVertexBuffer(),
+		.vulkanVertexBuffer = vertexBuffer->getVulkanBuffer(),
+		.vulkanIndexBuffer = indexBuffer->getVulkanBuffer(),
 		.frameIndex = currentFrame,
-		.vertexCount = vertexBuffer->getVertexCount()
+		.indexCount = indexBuffer->getIndexCount(),
+		.indexType = vk::IndexType::eUint16
 	};
 }
 

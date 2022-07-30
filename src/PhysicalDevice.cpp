@@ -54,7 +54,8 @@ std::unique_ptr<LogicalDevice> PhysicalDevice::createLogicalDevice(const Logical
 		.framebufferSize = logicalDevicePartialCreateInfo.framebufferSize,
 		.enabledLayerCount = logicalDevicePartialCreateInfo.enabledLayerCount,
 		.enabledLayerNames = logicalDevicePartialCreateInfo.enabledLayerNames,
-		.vertices = logicalDevicePartialCreateInfo.vertices
+		.vertices = logicalDevicePartialCreateInfo.vertices,
+		.indices = logicalDevicePartialCreateInfo.indices
 	};
 	return std::make_unique<LogicalDevice>(logicalDeviceCreateInfo);
 }

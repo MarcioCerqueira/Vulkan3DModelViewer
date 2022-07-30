@@ -17,6 +17,7 @@
 #include "GraphicsQueue.h"
 #include "PresentQueue.h"
 #include "VertexBuffer.h"
+#include "IndexBuffer.h"
  
 class LogicalDevice
 {
@@ -43,6 +44,9 @@ private:
 	void createSynchronizationObjects();
 	void createQueues(const QueueFamilyIndices& queueFamilyIndices);
 	void createVertexBuffer(const std::vector<Vertex>& vertices, const vk::PhysicalDevice& vulkanPhysicalDevice);
+	template<typename T>
+	const ContentBufferCreateInfo<T> buildContentBufferCreateInfo(const std::vector<T>& content, const vk::PhysicalDevice& vulkanPhysicalDevice) const;
+	void createIndexBuffer(const std::vector<uint16_t>& indices, const vk::PhysicalDevice& vulkanPhysicalDevice);
 	void waitForFences(const uint32_t fenceCount);
 	const uint32_t acquireNextImageFromSwapChain(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents);
 	void recreateSwapChainIfResultIsOutOfDateOrSuboptimalKHR(vk::Result& result, std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents);
@@ -58,6 +62,7 @@ private:
 	std::unique_ptr<GraphicsPipeline> graphicsPipeline;
 	std::unique_ptr<CommandPool> commandPool;
 	std::unique_ptr<VertexBuffer> vertexBuffer;
+	std::unique_ptr<IndexBuffer> indexBuffer;
 	std::unique_ptr<CommandBuffer> commandBuffers;
 	std::shared_ptr<GraphicsQueue> graphicsQueue;
 	std::unique_ptr<PresentQueue> presentQueue;

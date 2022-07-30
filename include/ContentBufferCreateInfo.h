@@ -4,10 +4,11 @@
 #include <vulkan/vulkan.hpp>
 #include "GraphicsQueue.h"
 
-struct VertexBufferCreateInfo
+template<typename T>
+struct ContentBufferCreateInfo
 {
 	vk::Device vulkanLogicalDevice;
-	std::vector<Vertex> vertices;
+	std::vector<T> content;
 	vk::PhysicalDevice vulkanPhysicalDevice;
 	vk::CommandPool vulkanCommandPool;
 	std::shared_ptr<GraphicsQueue> graphicsQueue;

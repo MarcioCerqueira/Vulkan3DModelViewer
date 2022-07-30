@@ -19,7 +19,7 @@ public:
 
 	void createWindowSurface(GLFWwindow* glfwWindow);
 	void selectPhysicalDevice();
-	void createLogicalDevice(const WindowSize& framebufferSize, const std::vector<Vertex>& vertices);
+	void createLogicalDevice(const WindowSize& framebufferSize, const std::vector<Vertex>& vertices, const std::vector<uint16_t>& indices);
 	void createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders);
 	void drawFrame(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents);
 	void waitIdle();

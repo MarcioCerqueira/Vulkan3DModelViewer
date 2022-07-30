@@ -18,4 +18,5 @@ struct LogicalDeviceCreateInfo
 	uint32_t enabledLayerCount;
 	char* const* enabledLayerNames;
 	std::vector<Vertex> vertices;
+	std::vector<uint16_t> indices;
 };

@@ -29,19 +29,14 @@ void CommandBuffer::copy(const CommandBufferCopyInfo& commandBufferCopyInfo)
 void CommandBuffer::record(const CommandBufferRecordInfo& commandBufferRecordInfo)
 {
 	ExceptionChecker::throwExceptionIfIndexIsOutOfBounds(commandBufferRecordInfo.frameIndex, vulkanCommandBuffers.size(), "Error in CommandBuffer! Index is out of bounds");
-	const uint32_t firstBinding = 0;
-	const uint32_t bindingCount = 1;
-	const uint32_t instanceCount = 1;
-	const uint32_t firstVertex = 0;
-	const uint32_t firstInstance = 0;
 	vk::Buffer vulkanVertexBuffers[] = { commandBufferRecordInfo.vulkanVertexBuffer };
-	vk::DeviceSize offsets[] = { 0 };
-	vk::CommandBufferBeginInfo commandBufferBeginInfo;
-	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].begin(commandBufferBeginInfo);
+	vk::DeviceSize offsets[] = { commandBufferRecordInfo.offset };
+	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].begin(vk::CommandBufferBeginInfo{});
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].beginRenderPass(commandBufferRecordInfo.renderPassBeginInfo, vk::SubpassContents::eInline);
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, commandBufferRecordInfo.graphicsPipeline);
-	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].bindVertexBuffers(firstBinding, bindingCount, vulkanVertexBuffers, offsets);
-	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].draw(static_cast<uint32_t>(commandBufferRecordInfo.vertexCount), instanceCount, firstVertex, firstInstance);
+	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].bindVertexBuffers(commandBufferRecordInfo.firstBinding, commandBufferRecordInfo.bindingCount, vulkanVertexBuffers, offsets);
+	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].bindIndexBuffer(commandBufferRecordInfo.vulkanIndexBuffer, commandBufferRecordInfo.offset, commandBufferRecordInfo.indexType);
+	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].drawIndexed(static_cast<uint32_t>(commandBufferRecordInfo.indexCount), commandBufferRecordInfo.instanceCount, commandBufferRecordInfo.firstIndex, commandBufferRecordInfo.vertexOffset, commandBufferRecordInfo.firstInstance);
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].endRenderPass();
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].end();
 }
