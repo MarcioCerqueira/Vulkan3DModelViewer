@@ -12,9 +12,10 @@ IndexBuffer::IndexBuffer(const ContentBufferCreateInfo<uint16_t>& contentBufferC
 void IndexBuffer::createIndexData(const std::vector<uint16_t>& indices, const vk::PhysicalDevice& vulkanPhysicalDevice)
 {
 	const vk::BufferUsageFlags indexBufferUsage{ vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eIndexBuffer };
-	vulkanBuffer = Buffer::createVulkanBuffer<uint16_t>(indices, indexBufferUsage);
-	const vk::MemoryPropertyFlags vertexMemoryPropertyFlags{ vk::MemoryPropertyFlagBits::eDeviceLocal };
-	vulkanBufferMemory = Buffer::createVulkanBufferMemory(vulkanPhysicalDevice, vertexMemoryPropertyFlags);
+	const vk::DeviceSize contentSize{ sizeof(indices[0]) * indices.size() };
+	vulkanBuffer = Buffer::createVulkanBuffer(contentSize, indexBufferUsage);
+	const vk::MemoryPropertyFlags indexMemoryPropertyFlags{ vk::MemoryPropertyFlagBits::eDeviceLocal };
+	vulkanBufferMemory = Buffer::createVulkanBufferMemory(vulkanPhysicalDevice, indexMemoryPropertyFlags);
 	Buffer::bindBufferMemory(vulkanBuffer, vulkanBufferMemory);
 }
 

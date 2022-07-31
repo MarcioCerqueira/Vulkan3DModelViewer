@@ -10,4 +10,5 @@ struct GraphicsPipelineCreateInfo
 	vk::Extent2D swapChainExtent;
 	std::vector<vk::PipelineShaderStageCreateInfo> shaderStages;
 	vk::RenderPass vulkanRenderPass;
+	vk::DescriptorSetLayout vulkanDescriptorSetLayout;
 };

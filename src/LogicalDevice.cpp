@@ -15,6 +15,8 @@ LogicalDevice::LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateI
 	createQueues(logicalDeviceCreateInfo.queueFamilyIndices);
 	createVertexBuffer(logicalDeviceCreateInfo.vertices, logicalDeviceCreateInfo.vulkanPhysicalDevice);
 	createIndexBuffer(logicalDeviceCreateInfo.indices, logicalDeviceCreateInfo.vulkanPhysicalDevice);
+	createUniformBuffers(logicalDeviceCreateInfo.vulkanPhysicalDevice);
+	createDescriptorSetLayout();
 }
 
 LogicalDevice::~LogicalDevice()
@@ -25,6 +27,11 @@ LogicalDevice::~LogicalDevice()
 	}
 	swapChain.reset();
 	commandPool.reset();
+	for (auto& uniformBuffer : uniformBuffers)
+	{
+		uniformBuffer.reset();
+	}
+	descriptorSetLayout.reset();
 	graphicsPipeline.reset();
 	renderPass.reset();
 	vertexBuffer.reset();
@@ -145,6 +152,21 @@ void LogicalDevice::createIndexBuffer(const std::vector<uint16_t>& indices, cons
 	indexBuffer = std::make_unique<IndexBuffer>(contentBufferCreateInfo);
 }
 
+void LogicalDevice::createUniformBuffers(const vk::PhysicalDevice& vulkanPhysicalDevice)
+{
+	const vk::DeviceSize bufferSize{ sizeof(ModelViewProjectionTransformation) };
+	uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+	for (auto& uniformBuffer : uniformBuffers)
+	{
+		uniformBuffer = std::make_unique<UniformBuffer>(vulkanLogicalDevice, vulkanPhysicalDevice, bufferSize);
+	}
+}
+
+void LogicalDevice::createDescriptorSetLayout()
+{
+	descriptorSetLayout = std::make_unique<DescriptorSetLayout>(vulkanLogicalDevice);
+}
+
 const vk::Device LogicalDevice::getVulkanLogicalDevice() const
 {
 	return vulkanLogicalDevice;
@@ -160,6 +182,7 @@ void LogicalDevice::createGraphicsPipeline(const std::vector<std::shared_ptr<Sha
 		graphicsPipelineCreateInfo.shaderStages.push_back(shader->buildPipelineShaderStageCreateInfo());
 	}
 	graphicsPipelineCreateInfo.vulkanRenderPass = renderPass->getVulkanRenderPass();
+	graphicsPipelineCreateInfo.vulkanDescriptorSetLayout = descriptorSetLayout->getVulkanDescriptorSetLayout();
 	graphicsPipeline = std::make_unique<GraphicsPipeline>(graphicsPipelineCreateInfo);
 }
 
@@ -171,6 +194,7 @@ void LogicalDevice::drawFrame(std::function<WindowSize()> getFramebufferSize, st
 	resetFences(fenceCount);
 	commandBuffers->reset(currentFrame);
 	commandBuffers->record(createCommandBufferRecordInfo(imageIndex));
+	updateUniformBuffer();
 	graphicsQueue->submit(synchronizationObjects[currentFrame], commandBuffers->getVulkanCommandBuffer(currentFrame));
 	presentResult(getFramebufferSize, waitEvents, imageIndex);
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
@@ -227,6 +251,21 @@ const CommandBufferRecordInfo LogicalDevice::createCommandBufferRecordInfo(const
 		.indexCount = indexBuffer->getIndexCount(),
 		.indexType = vk::IndexType::eUint16
 	};
+}
+
+void LogicalDevice::updateUniformBuffer()
+{
+	const vk::Extent2D swapChainExtent{ swapChain->getExtent() };
+	static std::chrono::steady_clock::time_point startTime{ std::chrono::high_resolution_clock::now() };
+	const std::chrono::steady_clock::time_point currentTime{ std::chrono::high_resolution_clock::now() };
+	const float time{ std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count() };
+	ModelViewProjectionTransformation MVP{
+		.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+		.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+		.projection = glm::perspective(glm::radians(45.0f), swapChainExtent.width / static_cast<float>(swapChainExtent.height), 0.1f, 10.0f)
+	};
+	MVP.projection[1][1] *= -1;
+	uniformBuffers[currentFrame]->copyFromCPUToDeviceMemory<ModelViewProjectionTransformation>(&MVP);
 }
 
 void LogicalDevice::presentResult(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents, const uint32_t imageIndex)

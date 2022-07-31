@@ -2,11 +2,16 @@
 
 #define VULKAN_HPP_NO_CONSTRUCTORS
 #include <vulkan/vulkan.hpp>
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <optional>
 #include <iostream>
 #include <set>
+#include <chrono>
 
 #include "structs/LogicalDeviceCreateInfo.h"
+#include "structs/ModelViewProjectionTransformation.h"
 #include "SwapChain.h"
 #include "RenderPass.h"
 #include "CommandPool.h"
@@ -18,6 +23,8 @@
 #include "PresentQueue.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "UniformBuffer.h"
+#include "DescriptorSetLayout.h"
  
 class LogicalDevice
 {
@@ -47,11 +54,14 @@ private:
 	template<typename T>
 	const ContentBufferCreateInfo<T> buildContentBufferCreateInfo(const std::vector<T>& content, const vk::PhysicalDevice& vulkanPhysicalDevice) const;
 	void createIndexBuffer(const std::vector<uint16_t>& indices, const vk::PhysicalDevice& vulkanPhysicalDevice);
+	void createUniformBuffers(const vk::PhysicalDevice& vulkanPhysicalDevice);
+	void createDescriptorSetLayout();
 	void waitForFences(const uint32_t fenceCount);
 	const uint32_t acquireNextImageFromSwapChain(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents);
 	void recreateSwapChainIfResultIsOutOfDateOrSuboptimalKHR(vk::Result& result, std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents);
 	void resetFences(const uint32_t fenceCount);
 	const CommandBufferRecordInfo createCommandBufferRecordInfo(const uint32_t imageIndex) const;
+	void updateUniformBuffer();
 	void presentResult(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents, const uint32_t imageIndex);
 
 	const int MAX_FRAMES_IN_FLIGHT = 2;
@@ -59,10 +69,12 @@ private:
 	vk::Device vulkanLogicalDevice; 
 	std::unique_ptr<SwapChain> swapChain;
 	std::unique_ptr<RenderPass> renderPass;
+	std::unique_ptr<DescriptorSetLayout> descriptorSetLayout;
 	std::unique_ptr<GraphicsPipeline> graphicsPipeline;
 	std::unique_ptr<CommandPool> commandPool;
 	std::unique_ptr<VertexBuffer> vertexBuffer;
 	std::unique_ptr<IndexBuffer> indexBuffer;
+	std::vector<std::unique_ptr<UniformBuffer>> uniformBuffers;
 	std::unique_ptr<CommandBuffer> commandBuffers;
 	std::shared_ptr<GraphicsQueue> graphicsQueue;
 	std::unique_ptr<PresentQueue> presentQueue;

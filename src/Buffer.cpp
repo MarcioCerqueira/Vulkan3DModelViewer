@@ -7,9 +7,27 @@ Buffer::Buffer(const vk::Device& vulkanLogicalDevice) : vulkanLogicalDevice(vulk
 Buffer::~Buffer()
 {
 	vulkanLogicalDevice.destroyBuffer(vulkanBuffer);
-	vulkanLogicalDevice.destroyBuffer(vulkanStagingBuffer);
 	vulkanLogicalDevice.freeMemory(vulkanBufferMemory);
-	vulkanLogicalDevice.freeMemory(vulkanStagingBufferMemory);
+	if (isStagingBufferCreated)
+	{
+		vulkanLogicalDevice.destroyBuffer(vulkanStagingBuffer);
+		vulkanLogicalDevice.freeMemory(vulkanStagingBufferMemory);
+	}
+}
+
+vk::Buffer Buffer::createVulkanBuffer(const vk::DeviceSize& contentSize, const vk::BufferUsageFlags& bufferUsage)
+{
+	vulkanBufferCreateInfo = buildBufferCreateInfo(contentSize, bufferUsage);
+	return vulkanLogicalDevice.createBuffer(vulkanBufferCreateInfo);
+}
+
+const vk::BufferCreateInfo Buffer::buildBufferCreateInfo(const vk::DeviceSize& contentSize, const vk::BufferUsageFlags& bufferUsage) const
+{
+	return vk::BufferCreateInfo{
+		.size = contentSize,
+		.usage = bufferUsage,
+		.sharingMode = vk::SharingMode::eExclusive
+	};
 }
 
 vk::DeviceMemory Buffer::createVulkanBufferMemory(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::MemoryPropertyFlags& memoryPropertyFlags)

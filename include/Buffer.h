@@ -11,6 +11,14 @@ class Buffer
 {
 public:
 	const vk::Buffer getVulkanBuffer() const;
+	template <typename T>
+	void copyFromCPUToDeviceMemory(const T* data)
+	{
+		const vk::DeviceSize memoryOffset{ 0 };
+		void* mappedData{ vulkanLogicalDevice.mapMemory(vulkanBufferMemory, memoryOffset, vulkanBufferCreateInfo.size) };
+		std::memcpy(mappedData, data, static_cast<size_t>(vulkanBufferCreateInfo.size));
+		vulkanLogicalDevice.unmapMemory(vulkanBufferMemory);
+	}
 
 protected:
 	Buffer(const vk::Device& vulkanLogicalDevice);
@@ -20,21 +28,16 @@ protected:
 	void createStagingData(const std::vector<T>& content, const vk::PhysicalDevice& vulkanPhysicalDevice)
 	{
 		const vk::BufferUsageFlags stagingBufferUsage{ vk::BufferUsageFlagBits::eTransferSrc };
-		vulkanStagingBuffer = createVulkanBuffer<T>(content, stagingBufferUsage);
+		const vk::DeviceSize contentSize{ sizeof(content[0]) * content.size() };
+		vulkanStagingBuffer = createVulkanBuffer(contentSize, stagingBufferUsage);
 		const vk::MemoryPropertyFlags stagingMemoryPropertyFlags{ vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent };
 		vulkanStagingBufferMemory = createVulkanBufferMemory(vulkanPhysicalDevice, stagingMemoryPropertyFlags);
 		bindBufferMemory(vulkanStagingBuffer, vulkanStagingBufferMemory);
+		isStagingBufferCreated = true;
 	}
 
-	template <typename T>
-	vk::Buffer createVulkanBuffer(const std::vector<T>& content, const vk::BufferUsageFlags& bufferUsage)
-	{
-		vulkanBufferCreateInfo = buildBufferCreateInfo<T>(content, bufferUsage);
-		return vulkanLogicalDevice.createBuffer(vulkanBufferCreateInfo);
-	}
-
+	vk::Buffer createVulkanBuffer(const vk::DeviceSize& contentSize, const vk::BufferUsageFlags& bufferUsage);
 	vk::DeviceMemory createVulkanBufferMemory(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::MemoryPropertyFlags& memoryPropertyFlags);
-
 	void bindBufferMemory(vk::Buffer& buffer, vk::DeviceMemory& memory);
 	
 	template <typename T>
@@ -53,21 +56,13 @@ protected:
 	
 private:
 
+	const vk::BufferCreateInfo buildBufferCreateInfo(const vk::DeviceSize& contentSize, const vk::BufferUsageFlags& bufferUsage) const;
 	const vk::MemoryAllocateInfo buildMemoryAllocateInfo(const vk::MemoryRequirements& memoryRequirements, const uint32_t memoryTypeIndex) const;
-
-	template <typename T>
-	const vk::BufferCreateInfo buildBufferCreateInfo(const std::vector<T>& content, const vk::BufferUsageFlags& bufferUsage) const
-	{
-		return vk::BufferCreateInfo{
-			.size = sizeof(content[0]) * content.size(),
-			.usage = bufferUsage,
-			.sharingMode = vk::SharingMode::eExclusive
-		};
-	}
 
 	vk::Buffer vulkanStagingBuffer;
 	vk::DeviceMemory vulkanStagingBufferMemory;
 	vk::BufferCreateInfo vulkanBufferCreateInfo;
 	const vk::Device vulkanLogicalDevice;
+	bool isStagingBufferCreated = false;
 
 };

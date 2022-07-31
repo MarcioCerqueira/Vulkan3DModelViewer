@@ -14,7 +14,7 @@ GraphicsPipeline::GraphicsPipeline(const GraphicsPipelineCreateInfo& graphicsPip
 	const vk::PipelineColorBlendAttachmentState colorBlendAttachmentState{ buildPipelineColorBlendAttachmentState() };
 	const vk::PipelineColorBlendStateCreateInfo  colorBlendState{ buildPipelineColorBlendStateCreateInfo(colorBlendAttachmentState) };
 	const vk::PipelineDynamicStateCreateInfo  dynamicState{ buildPipelineDynamicStateCreateInfo() };
-	const vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{ buildPipelineLayoutCreateInfo() };
+	const vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{ buildPipelineLayoutCreateInfo(graphicsPipelineCreateInfo.vulkanDescriptorSetLayout) };
 	pipelineLayout = vulkanLogicalDevice.createPipelineLayout(pipelineLayoutCreateInfo);
 	const vk::GraphicsPipelineCreateInfo vulkanGraphicsPipelineCreateInfo{
 		.stageCount = 2,
@@ -154,11 +154,11 @@ const vk::PipelineDynamicStateCreateInfo GraphicsPipeline::buildPipelineDynamicS
 	};
 }
 
-const vk::PipelineLayoutCreateInfo GraphicsPipeline::buildPipelineLayoutCreateInfo() const
+const vk::PipelineLayoutCreateInfo GraphicsPipeline::buildPipelineLayoutCreateInfo(const vk::DescriptorSetLayout& vulkanDescriptorSetLayout) const
 {
 	return vk::PipelineLayoutCreateInfo{
-		.setLayoutCount = 0,
-		.pSetLayouts = nullptr,
+		.setLayoutCount = 1,
+		.pSetLayouts = &vulkanDescriptorSetLayout,
 		.pushConstantRangeCount = 0,
 		.pPushConstantRanges = nullptr
 	};

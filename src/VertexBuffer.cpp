@@ -12,7 +12,8 @@ VertexBuffer::VertexBuffer(const ContentBufferCreateInfo<Vertex>& contentBufferC
 void VertexBuffer::createVertexData(const std::vector<Vertex>& vertices, const vk::PhysicalDevice& vulkanPhysicalDevice)
 {
 	const vk::BufferUsageFlags vertexBufferUsage{ vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eVertexBuffer };
-	vulkanBuffer = Buffer::createVulkanBuffer<Vertex>(vertices, vertexBufferUsage);
+	const vk::DeviceSize contentSize{ sizeof(vertices[0]) * vertices.size() };
+	vulkanBuffer = Buffer::createVulkanBuffer(contentSize, vertexBufferUsage);
 	const vk::MemoryPropertyFlags vertexMemoryPropertyFlags{ vk::MemoryPropertyFlagBits::eDeviceLocal };
 	vulkanBufferMemory = Buffer::createVulkanBufferMemory(vulkanPhysicalDevice, vertexMemoryPropertyFlags);
 	Buffer::bindBufferMemory(vulkanBuffer, vulkanBufferMemory);
