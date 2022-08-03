@@ -11,14 +11,14 @@ class AmbientOcclusionApplication
 
 public:
 	AmbientOcclusionApplication(const int windowWidth, const int windowHeight);
-	~AmbientOcclusionApplication();
 	void run();
 
 private:
 	const std::vector<std::shared_ptr<Shader>> loadShaders(const vk::Device& vulkanLogicalDevice) const;
 
-	std::shared_ptr<Window> window;
-	std::shared_ptr<GraphicsInstance> graphicsInstance;
+	const std::string applicationName{ "Ambient Occlusion Application" };
+	Window window;
+	GraphicsInstance graphicsInstance;
 	const std::vector<Vertex> vertices = {
 		{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
 		{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},

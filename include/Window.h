@@ -4,7 +4,7 @@
 #include <string>
 #include <functional>
 
-#include "WindowSize.h"
+#include "structs/WindowSize.h"
 
 class Window
 {

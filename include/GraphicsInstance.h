@@ -31,9 +31,9 @@ private:
 	const vk::ApplicationInfo createApplicationInfo(const std::string& applicationName) const;
 	const vk::InstanceCreateInfo createVulkanInstanceInfo(const vk::ApplicationInfo& applicationInfo) const;
 
+	const ValidationLayer validationLayer; 
 	vk::Instance vulkanInstance;
 	PhysicalDevice physicalDevice;
 	std::unique_ptr<LogicalDevice> logicalDevice;
 	std::unique_ptr<WindowSurface> windowSurface;
-	const ValidationLayer validationLayer;
 };
