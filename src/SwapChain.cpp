@@ -133,27 +133,27 @@ vk::Result SwapChain::acquireNextImage(vk::Semaphore& imageAvailable, const vk::
     return swapChainCreateInfo.vulkanLogicalDevice.acquireNextImageKHR(vulkanSwapChain, timeout, imageAvailable, nullptr, &imageIndex);
 }
 
-void SwapChain::recreateIfResultIsOutOfDateOrSuboptimalKHR(vk::Result& result, const SwapChainRecreateInfo& swapChainRecreateInfo)
+void SwapChain::recreateIfResultIsOutOfDateOrSuboptimalKHR(vk::Result& result, const vk::RenderPass& vulkanRenderPass, WindowHandler& windowHandler)
 {
     if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR)
     {
-        waitValidFramebufferSize(swapChainRecreateInfo.getFramebufferSize, swapChainRecreateInfo.waitEvents);
+        waitValidFramebufferSize(windowHandler);
         swapChainCreateInfo.vulkanLogicalDevice.waitIdle();
         cleanup();
         buildVulkanSwapChain(swapChainCreateInfo, swapChainCreateInfo.vulkanPhysicalDevice.getSurfaceCapabilitiesKHR(swapChainCreateInfo.vulkanWindowSurface), static_cast<const uint32_t>(images.size()));
         buildSwapChainImageViews(swapChainCreateInfo);
-        buildFramebuffers(swapChainCreateInfo.vulkanLogicalDevice, swapChainRecreateInfo.vulkanRenderPass);
+        buildFramebuffers(swapChainCreateInfo.vulkanLogicalDevice, vulkanRenderPass);
         result = vk::Result::eSuccess;
     }
 }
 
-void SwapChain::waitValidFramebufferSize(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents)
+void SwapChain::waitValidFramebufferSize(WindowHandler& windowHandler)
 {
-    WindowSize framebufferSize = getFramebufferSize();
+    WindowSize framebufferSize = windowHandler.getFramebufferSize();
     while (framebufferSize.width == 0 || framebufferSize.height == 0)
     {
-        framebufferSize = getFramebufferSize();
-        waitEvents();
+        framebufferSize = windowHandler.getFramebufferSize();
+        windowHandler.waitEvents();
     }
 }
 

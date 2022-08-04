@@ -8,10 +8,10 @@
 #include <algorithm>
 
 #include "structs/SwapChainCreateInfo.h"
-#include "structs/SwapChainRecreateInfo.h"
 #include "ExceptionChecker.h"
 #include "Framebuffer.h"
 #include "ImageView.h"
+#include "WindowHandler.h"
 
 class SwapChain
 {
@@ -22,7 +22,7 @@ public:
 	static const bool isValid(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface);
 	vk::Result acquireNextImage(vk::Semaphore& imageAvailable, const vk::RenderPass& vulkanRenderPass, uint32_t& imageIndex);
 	void buildFramebuffers(const vk::Device& vulkanLogicalDevice, const vk::RenderPass& vulkanRenderPass);
-	void recreateIfResultIsOutOfDateOrSuboptimalKHR(vk::Result& result, const SwapChainRecreateInfo& swapChainRecreateInfo);
+	void recreateIfResultIsOutOfDateOrSuboptimalKHR(vk::Result& result, const vk::RenderPass& vulkanRenderPass, WindowHandler& windowHandler);
 
 	const vk::Extent2D getExtent() const;
 	const vk::Framebuffer getVulkanFramebuffer(const int framebufferIndex) const;
@@ -36,7 +36,7 @@ private:
 	const uint32_t estimateImageCount(const vk::SurfaceCapabilitiesKHR& capabilities);
 	void buildVulkanSwapChain(const SwapChainCreateInfo& swapChainCreateInfo, const vk::SurfaceCapabilitiesKHR& capabilities, const uint32_t imageCount);
 	void buildSwapChainImageViews(const SwapChainCreateInfo& swapChainCreateInfo); 
-	void waitValidFramebufferSize(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents);
+	void waitValidFramebufferSize(WindowHandler& windowHandler);
 	void cleanup();
 
 	const SwapChainCreateInfo swapChainCreateInfo;

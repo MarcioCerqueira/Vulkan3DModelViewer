@@ -186,17 +186,17 @@ void LogicalDevice::createGraphicsPipeline(const std::vector<std::shared_ptr<Sha
 	graphicsPipeline = std::make_unique<GraphicsPipeline>(graphicsPipelineCreateInfo);
 }
 
-void LogicalDevice::drawFrame(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents)
+void LogicalDevice::drawFrame(WindowHandler& windowHandler)
 {
 	const uint32_t fenceCount{ 1 };
 	waitForFences(fenceCount);
-	const uint32_t imageIndex{ acquireNextImageFromSwapChain(getFramebufferSize, waitEvents) };
+	const uint32_t imageIndex{ acquireNextImageFromSwapChain(windowHandler) };
 	resetFences(fenceCount);
 	commandBuffers->reset(currentFrame);
 	commandBuffers->record(createCommandBufferRecordInfo(imageIndex));
 	updateUniformBuffer();
 	graphicsQueue->submit(synchronizationObjects[currentFrame], commandBuffers->getVulkanCommandBuffer(currentFrame));
-	presentResult(getFramebufferSize, waitEvents, imageIndex);
+	presentResult(windowHandler, imageIndex);
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
@@ -207,7 +207,7 @@ void LogicalDevice::waitForFences(const uint32_t fenceCount)
 	ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(result, "Failed to wait for fences!");
 }
 
-const uint32_t LogicalDevice::acquireNextImageFromSwapChain(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents)
+const uint32_t LogicalDevice::acquireNextImageFromSwapChain(WindowHandler& windowHandler)
 {
 	uint32_t imageIndex;
 	vk::Result result;
@@ -219,19 +219,9 @@ const uint32_t LogicalDevice::acquireNextImageFromSwapChain(std::function<Window
 	{
 		result = vk::Result::eErrorOutOfDateKHR;
 	}
-	recreateSwapChainIfResultIsOutOfDateOrSuboptimalKHR(result, getFramebufferSize, waitEvents);
+	swapChain->recreateIfResultIsOutOfDateOrSuboptimalKHR(result, renderPass->getVulkanRenderPass(), windowHandler);
 	ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(result, "Failed to acquire next image!");
 	return imageIndex;
-}
-
-void LogicalDevice::recreateSwapChainIfResultIsOutOfDateOrSuboptimalKHR(vk::Result& result, std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents)
-{
-	const SwapChainRecreateInfo swapChainRecreateInfo{
-		.vulkanRenderPass = renderPass->getVulkanRenderPass(),
-		.getFramebufferSize = getFramebufferSize,
-		.waitEvents = waitEvents
-	};
-	swapChain->recreateIfResultIsOutOfDateOrSuboptimalKHR(result, swapChainRecreateInfo);
 }
 
 void LogicalDevice::resetFences(const uint32_t fenceCount)
@@ -268,7 +258,7 @@ void LogicalDevice::updateUniformBuffer()
 	uniformBuffers[currentFrame]->copyFromCPUToDeviceMemory<ModelViewProjectionTransformation>(&MVP);
 }
 
-void LogicalDevice::presentResult(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents, const uint32_t imageIndex)
+void LogicalDevice::presentResult(WindowHandler& windowHandler, const uint32_t imageIndex)
 {
 	vk::Result result;
 	try
@@ -279,7 +269,7 @@ void LogicalDevice::presentResult(std::function<WindowSize()> getFramebufferSize
 	{
 		result = vk::Result::eErrorOutOfDateKHR;
 	}
-	recreateSwapChainIfResultIsOutOfDateOrSuboptimalKHR(result, getFramebufferSize, waitEvents);
+	swapChain->recreateIfResultIsOutOfDateOrSuboptimalKHR(result, renderPass->getVulkanRenderPass(), windowHandler);
 	ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(result, "Failed to present the results!");
 }
 

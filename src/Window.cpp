@@ -41,13 +41,11 @@ void Window::waitEvents() const
 	glfwWaitEvents();
 }
 
-void Window::open(std::function<void(std::function<WindowSize()>, std::function<void()>)> drawFrame)
+void Window::open(std::function<void(WindowHandler&)> drawFrame)
 {
-	std::function<WindowSize()> getFramebufferSize = std::bind(&Window::getFramebufferSize, this);
-	std::function<void()> waitEvents = std::bind(&Window::waitEvents, this);
 	while(!glfwWindowShouldClose(glfwWindow)) 
 	{
 		glfwPollEvents();
-		drawFrame(getFramebufferSize, waitEvents);
+		drawFrame(*this);
 	}
 }

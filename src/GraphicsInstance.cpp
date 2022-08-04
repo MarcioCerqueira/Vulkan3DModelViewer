@@ -73,9 +73,9 @@ void GraphicsInstance::createGraphicsPipeline(const std::vector<std::shared_ptr<
 	logicalDevice->createGraphicsPipeline(shaders);
 }
 
-void GraphicsInstance::drawFrame(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents)
+void GraphicsInstance::drawFrame(WindowHandler& windowHandler)
 {
-	logicalDevice->drawFrame(getFramebufferSize, waitEvents);
+	logicalDevice->drawFrame(windowHandler);
 }
 
 void GraphicsInstance::waitIdle()

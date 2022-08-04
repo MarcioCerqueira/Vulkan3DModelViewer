@@ -25,7 +25,7 @@
 #include "IndexBuffer.h"
 #include "UniformBuffer.h"
 #include "DescriptorSetLayout.h"
- 
+
 class LogicalDevice
 {
 public:
@@ -33,7 +33,7 @@ public:
 	~LogicalDevice();
 
 	void createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders);
-	void drawFrame(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents);
+	void drawFrame(WindowHandler& windowHandler);
 	void waitIdle();
 
 	const vk::Device getVulkanLogicalDevice() const;
@@ -57,12 +57,11 @@ private:
 	void createUniformBuffers(const vk::PhysicalDevice& vulkanPhysicalDevice);
 	void createDescriptorSetLayout();
 	void waitForFences(const uint32_t fenceCount);
-	const uint32_t acquireNextImageFromSwapChain(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents);
-	void recreateSwapChainIfResultIsOutOfDateOrSuboptimalKHR(vk::Result& result, std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents);
+	const uint32_t acquireNextImageFromSwapChain(WindowHandler& windowHandler);
 	void resetFences(const uint32_t fenceCount);
 	const CommandBufferRecordInfo createCommandBufferRecordInfo(const uint32_t imageIndex) const;
 	void updateUniformBuffer();
-	void presentResult(std::function<WindowSize()> getFramebufferSize, std::function<void()> waitEvents, const uint32_t imageIndex);
+	void presentResult(WindowHandler& windowHandler, const uint32_t imageIndex);
 
 	const int MAX_FRAMES_IN_FLIGHT = 2;
 	unsigned int currentFrame = 0;
