@@ -8,17 +8,12 @@ Buffer::~Buffer()
 {
 	vulkanLogicalDevice.destroyBuffer(vulkanBuffer);
 	vulkanLogicalDevice.freeMemory(vulkanBufferMemory);
-	if (isStagingBufferCreated)
-	{
-		vulkanLogicalDevice.destroyBuffer(vulkanStagingBuffer);
-		vulkanLogicalDevice.freeMemory(vulkanStagingBufferMemory);
-	}
 }
 
-vk::Buffer Buffer::createVulkanBuffer(const vk::DeviceSize& contentSize, const vk::BufferUsageFlags& bufferUsage)
+void Buffer::createVulkanBuffer(const vk::DeviceSize& contentSize, const vk::BufferUsageFlags& bufferUsage)
 {
 	vulkanBufferCreateInfo = buildBufferCreateInfo(contentSize, bufferUsage);
-	return vulkanLogicalDevice.createBuffer(vulkanBufferCreateInfo);
+	vulkanBuffer = vulkanLogicalDevice.createBuffer(vulkanBufferCreateInfo);
 }
 
 const vk::BufferCreateInfo Buffer::buildBufferCreateInfo(const vk::DeviceSize& contentSize, const vk::BufferUsageFlags& bufferUsage) const
@@ -30,12 +25,12 @@ const vk::BufferCreateInfo Buffer::buildBufferCreateInfo(const vk::DeviceSize& c
 	};
 }
 
-vk::DeviceMemory Buffer::createVulkanBufferMemory(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::MemoryPropertyFlags& memoryPropertyFlags)
+void Buffer::createVulkanBufferMemory(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::MemoryPropertyFlags& memoryPropertyFlags)
 {
 	const vk::MemoryRequirements memoryRequirements{ vulkanLogicalDevice.getBufferMemoryRequirements(vulkanBuffer) };
 	const uint32_t memoryTypeIndex{ MemoryProperties::findMemoryType(vulkanPhysicalDevice, memoryRequirements.memoryTypeBits, memoryPropertyFlags) };
 	const vk::MemoryAllocateInfo memoryAllocateInfo{ buildMemoryAllocateInfo(memoryRequirements, memoryTypeIndex) };
-	return vulkanLogicalDevice.allocateMemory(memoryAllocateInfo);
+	vulkanBufferMemory = vulkanLogicalDevice.allocateMemory(memoryAllocateInfo);
 }
 
 const vk::MemoryAllocateInfo Buffer::buildMemoryAllocateInfo(const vk::MemoryRequirements& memoryRequirements, const uint32_t memoryTypeIndex) const
@@ -46,25 +41,23 @@ const vk::MemoryAllocateInfo Buffer::buildMemoryAllocateInfo(const vk::MemoryReq
 	};
 }
 
-void Buffer::bindBufferMemory(vk::Buffer& buffer, vk::DeviceMemory& memory)
+void Buffer::bindBufferMemory()
 {
 	const vk::DeviceSize memoryOffset{ 0 };
-	vulkanLogicalDevice.bindBufferMemory(buffer, memory, memoryOffset);
+	vulkanLogicalDevice.bindBufferMemory(vulkanBuffer, vulkanBufferMemory, memoryOffset);
 }
 
-void Buffer::copyFromStagingToDeviceMemory(const vk::CommandPool& vulkanCommandPool, const std::shared_ptr<GraphicsQueue>& graphicsQueue)
+void Buffer::copyFromCPUToDeviceMemory(const void* data)
 {
-	int commandBufferCount = 1;
-	CommandBuffer commandBuffer(vulkanLogicalDevice, vulkanCommandPool, commandBufferCount);
-	const CommandBufferCopyInfo commandBufferCopyInfo{
-		.frameIndex = 0,
-		.srcBuffer = vulkanStagingBuffer,
-		.dstBuffer = vulkanBuffer,
-		.bufferSize = vulkanBufferCreateInfo.size
-	};
-	commandBuffer.copy(commandBufferCopyInfo);
-	graphicsQueue->submit(commandBuffer.getVulkanCommandBuffer(0));
-	graphicsQueue->waitIdle();
+	const vk::DeviceSize memoryOffset{ 0 };
+	void* mappedData{ vulkanLogicalDevice.mapMemory(vulkanBufferMemory, memoryOffset, vulkanBufferCreateInfo.size) };
+	std::memcpy(mappedData, data, static_cast<size_t>(vulkanBufferCreateInfo.size));
+	vulkanLogicalDevice.unmapMemory(vulkanBufferMemory);
+}
+
+vk::BufferCreateInfo Buffer::getBufferCreateInfo() const
+{
+	return vulkanBufferCreateInfo;
 }
 
 const vk::Buffer Buffer::getVulkanBuffer() const

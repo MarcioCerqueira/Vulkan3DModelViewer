@@ -1,15 +1,18 @@
 #pragma once
 
-#include "Buffer.h"
+#include "StagingBuffer.h"
 #include "structs/ContentBufferCreateInfo.h"
 
-class IndexBuffer : public Buffer
+class IndexBuffer
 {
 public:
 	IndexBuffer(const ContentBufferCreateInfo<uint16_t>& contentBufferCreateInfo);
 	const size_t getIndexCount() const;
+	const vk::Buffer getVulkanBuffer() const;
 
 private:
 	void createIndexData(const std::vector<uint16_t>& indices, const vk::PhysicalDevice& vulkanPhysicalDevice);
 	size_t indexCount;
+	Buffer buffer;
+	StagingBuffer stagingBuffer;
 };

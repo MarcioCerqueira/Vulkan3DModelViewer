@@ -255,7 +255,7 @@ void LogicalDevice::updateUniformBuffer()
 		.projection = glm::perspective(glm::radians(45.0f), swapChainExtent.width / static_cast<float>(swapChainExtent.height), 0.1f, 10.0f)
 	};
 	MVP.projection[1][1] *= -1;
-	uniformBuffers[currentFrame]->copyFromCPUToDeviceMemory<ModelViewProjectionTransformation>(&MVP);
+	uniformBuffers[currentFrame]->copyFromCPUToDeviceMemory(&MVP);
 }
 
 void LogicalDevice::presentResult(WindowHandler& windowHandler, const uint32_t imageIndex)
