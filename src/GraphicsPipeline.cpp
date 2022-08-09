@@ -97,7 +97,7 @@ const vk::PipelineRasterizationStateCreateInfo GraphicsPipeline::buildPipelineRa
 		.rasterizerDiscardEnable = vk::Bool32(0),
 		.polygonMode = vk::PolygonMode::eFill,
 		.cullMode = vk::CullModeFlagBits::eBack,
-		.frontFace = vk::FrontFace::eClockwise,
+		.frontFace = vk::FrontFace::eCounterClockwise,
 		.depthBiasEnable = vk::Bool32(0),
 		.depthBiasConstantFactor = 0.0f,
 		.depthBiasClamp = 0.0f,
@@ -169,3 +169,7 @@ const vk::Pipeline GraphicsPipeline::getVulkanPipeline() const
 	return pipeline;
 }
 
+const vk::PipelineLayout GraphicsPipeline::getVulkanPipelineLayout() const
+{
+	return pipelineLayout;
+}

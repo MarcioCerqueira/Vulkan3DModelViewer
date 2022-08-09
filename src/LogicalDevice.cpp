@@ -16,7 +16,9 @@ LogicalDevice::LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateI
 	createVertexBuffer(logicalDeviceCreateInfo.vertices, logicalDeviceCreateInfo.vulkanPhysicalDevice);
 	createIndexBuffer(logicalDeviceCreateInfo.indices, logicalDeviceCreateInfo.vulkanPhysicalDevice);
 	createUniformBuffers(logicalDeviceCreateInfo.vulkanPhysicalDevice);
+	createDescriptorPool();
 	createDescriptorSetLayout();
+	createDescriptorSet();
 }
 
 LogicalDevice::~LogicalDevice()
@@ -31,6 +33,7 @@ LogicalDevice::~LogicalDevice()
 	{
 		uniformBuffer.reset();
 	}
+	descriptorPool.reset();
 	descriptorSetLayout.reset();
 	graphicsPipeline.reset();
 	renderPass.reset();
@@ -162,9 +165,25 @@ void LogicalDevice::createUniformBuffers(const vk::PhysicalDevice& vulkanPhysica
 	}
 }
 
+void LogicalDevice::createDescriptorPool()
+{
+	descriptorPool = std::make_unique<DescriptorPool>(vulkanLogicalDevice, MAX_FRAMES_IN_FLIGHT);
+}
+
 void LogicalDevice::createDescriptorSetLayout()
 {
 	descriptorSetLayout = std::make_unique<DescriptorSetLayout>(vulkanLogicalDevice);
+}
+
+void LogicalDevice::createDescriptorSet()
+{
+	const DescriptorSetCreateInfo descriptorSetCreateInfo{
+		.vulkanLogicalDevice = this->vulkanLogicalDevice,
+		.vulkanDescriptorPool = descriptorPool->getVulkanDescriptorPool(),
+		.vulkanDescriptorSetLayout = descriptorSetLayout->getVulkanDescriptorSetLayout(),
+		.maxFramesInFlight = MAX_FRAMES_IN_FLIGHT
+	};
+	descriptorSet = std::make_unique<DescriptorSet>(descriptorSetCreateInfo);
 }
 
 const vk::Device LogicalDevice::getVulkanLogicalDevice() const
@@ -193,8 +212,9 @@ void LogicalDevice::drawFrame(WindowHandler& windowHandler)
 	const uint32_t imageIndex{ acquireNextImageFromSwapChain(windowHandler) };
 	resetFences(fenceCount);
 	commandBuffers->reset(currentFrame);
-	commandBuffers->record(createCommandBufferRecordInfo(imageIndex));
 	updateUniformBuffer();
+	descriptorSet->write(uniformBuffers[currentFrame]->getVulkanBuffer(), currentFrame);
+	commandBuffers->record(createCommandBufferRecordInfo(imageIndex));
 	graphicsQueue->submit(synchronizationObjects[currentFrame], commandBuffers->getVulkanCommandBuffer(currentFrame));
 	presentResult(windowHandler, imageIndex);
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
@@ -235,8 +255,10 @@ const CommandBufferRecordInfo LogicalDevice::createCommandBufferRecordInfo(const
 	return CommandBufferRecordInfo{
 		.renderPassBeginInfo = renderPass->createRenderPassBeginInfo(swapChain->getVulkanFramebuffer(imageIndex), swapChain->getExtent()),
 		.graphicsPipeline = graphicsPipeline->getVulkanPipeline(),
+		.vulkanPipelineLayout = graphicsPipeline->getVulkanPipelineLayout(),
 		.vulkanVertexBuffer = vertexBuffer->getVulkanBuffer(),
 		.vulkanIndexBuffer = indexBuffer->getVulkanBuffer(),
+		.vulkanDescriptorSet = descriptorSet->getVulkanDescriptorSet(currentFrame),
 		.frameIndex = currentFrame,
 		.indexCount = indexBuffer->getIndexCount(),
 		.indexType = vk::IndexType::eUint16

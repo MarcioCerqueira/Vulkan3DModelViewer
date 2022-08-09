@@ -13,6 +13,7 @@ public:
 	~GraphicsPipeline();
 
 	const vk::Pipeline getVulkanPipeline() const;
+	const vk::PipelineLayout getVulkanPipelineLayout() const;
 
 private:
 	const vk::PipelineVertexInputStateCreateInfo buildPipelineVertexInputStateCreateInfo(const vk::VertexInputBindingDescription& vertexBindingDescription, const std::array<vk::VertexInputAttributeDescription, 2>&  vertexAttributeDescriptions) const;

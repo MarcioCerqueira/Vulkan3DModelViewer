@@ -33,7 +33,7 @@ const vk::ImageSubresourceRange ImageView::createImageSubresourceRange() const
     };
 }
 
-vk::ImageView ImageView::getVulkanImageView() const
+const vk::ImageView ImageView::getVulkanImageView() const
 {
     return vulkanImageView;
 }

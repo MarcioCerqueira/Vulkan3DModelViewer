@@ -36,6 +36,7 @@ void CommandBuffer::record(const CommandBufferRecordInfo& commandBufferRecordInf
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, commandBufferRecordInfo.graphicsPipeline);
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].bindVertexBuffers(commandBufferRecordInfo.firstBinding, commandBufferRecordInfo.bindingCount, vulkanVertexBuffers, offsets);
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].bindIndexBuffer(commandBufferRecordInfo.vulkanIndexBuffer, commandBufferRecordInfo.offset, commandBufferRecordInfo.indexType);
+	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].bindDescriptorSets(vk::PipelineBindPoint::eGraphics, commandBufferRecordInfo.vulkanPipelineLayout, commandBufferRecordInfo.firstDescriptorSet, commandBufferRecordInfo.descriptorSetCount, &commandBufferRecordInfo.vulkanDescriptorSet, commandBufferRecordInfo.descriptorDynamicOffsetCount, commandBufferRecordInfo.descriptorDynamicOffset);
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].drawIndexed(static_cast<uint32_t>(commandBufferRecordInfo.indexCount), commandBufferRecordInfo.instanceCount, commandBufferRecordInfo.firstIndex, commandBufferRecordInfo.vertexOffset, commandBufferRecordInfo.firstInstance);
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].endRenderPass();
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].end();

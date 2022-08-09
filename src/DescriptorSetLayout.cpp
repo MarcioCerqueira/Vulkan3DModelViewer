@@ -30,7 +30,7 @@ const vk::DescriptorSetLayoutCreateInfo DescriptorSetLayout::buildDescriptorSetL
 	};
 }
 
-vk::DescriptorSetLayout DescriptorSetLayout::getVulkanDescriptorSetLayout() const
+const vk::DescriptorSetLayout DescriptorSetLayout::getVulkanDescriptorSetLayout() const
 {
 	return vulkanDescriptorSetLayout;
 }

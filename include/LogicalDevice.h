@@ -25,6 +25,8 @@
 #include "IndexBuffer.h"
 #include "UniformBuffer.h"
 #include "DescriptorSetLayout.h"
+#include "DescriptorPool.h"
+#include "DescriptorSet.h"
 
 class LogicalDevice
 {
@@ -55,7 +57,9 @@ private:
 	const ContentBufferCreateInfo<T> buildContentBufferCreateInfo(const std::vector<T>& content, const vk::PhysicalDevice& vulkanPhysicalDevice) const;
 	void createIndexBuffer(const std::vector<uint16_t>& indices, const vk::PhysicalDevice& vulkanPhysicalDevice);
 	void createUniformBuffers(const vk::PhysicalDevice& vulkanPhysicalDevice);
+	void createDescriptorPool();
 	void createDescriptorSetLayout();
+	void createDescriptorSet();
 	void waitForFences(const uint32_t fenceCount);
 	const uint32_t acquireNextImageFromSwapChain(WindowHandler& windowHandler);
 	void resetFences(const uint32_t fenceCount);
@@ -74,6 +78,8 @@ private:
 	std::unique_ptr<VertexBuffer> vertexBuffer;
 	std::unique_ptr<IndexBuffer> indexBuffer;
 	std::vector<std::unique_ptr<UniformBuffer>> uniformBuffers;
+	std::unique_ptr<DescriptorPool> descriptorPool;
+	std::unique_ptr<DescriptorSet> descriptorSet;
 	std::unique_ptr<CommandBuffer> commandBuffers;
 	std::shared_ptr<GraphicsQueue> graphicsQueue;
 	std::unique_ptr<PresentQueue> presentQueue;

@@ -9,7 +9,7 @@ public:
 	explicit DescriptorSetLayout(const vk::Device& vulkanLogicalDevice);
 	~DescriptorSetLayout();
 
-	vk::DescriptorSetLayout getVulkanDescriptorSetLayout() const;
+	const vk::DescriptorSetLayout getVulkanDescriptorSetLayout() const;
 private:
 	const vk::DescriptorSetLayoutBinding createDescriptorSetLayoutBinding() const;
 	const vk::DescriptorSetLayoutCreateInfo buildDescriptorSetLayoutCreateInfo(const vk::DescriptorSetLayoutBinding& descriptorSetLayoutBinding) const;

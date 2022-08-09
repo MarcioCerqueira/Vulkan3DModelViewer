@@ -55,7 +55,7 @@ void Buffer::copyFromCPUToDeviceMemory(const void* data)
 	vulkanLogicalDevice.unmapMemory(vulkanBufferMemory);
 }
 
-vk::BufferCreateInfo Buffer::getBufferCreateInfo() const
+const vk::BufferCreateInfo Buffer::getBufferCreateInfo() const
 {
 	return vulkanBufferCreateInfo;
 }

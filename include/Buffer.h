@@ -16,7 +16,8 @@ public:
 	void createVulkanBufferMemory(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::MemoryPropertyFlags& memoryPropertyFlags);
 	void bindBufferMemory();
 	void copyFromCPUToDeviceMemory(const void* data);
-	vk::BufferCreateInfo getBufferCreateInfo() const;
+
+	const vk::BufferCreateInfo getBufferCreateInfo() const;
 	const vk::Buffer getVulkanBuffer() const;
 	
 private:

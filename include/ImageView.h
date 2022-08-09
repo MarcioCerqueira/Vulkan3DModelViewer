@@ -9,7 +9,7 @@ class ImageView
 public:
 	ImageView(const vk::Device& vulkanLogicalDevice, const vk::Image& image, const vk::SurfaceFormatKHR& surfaceFormat);
 	~ImageView();
-	vk::ImageView getVulkanImageView() const;
+	const vk::ImageView getVulkanImageView() const;
 
 private:
 	const vk::ImageViewCreateInfo buildImageViewCreateInfo(const vk::Image& image, const vk::SurfaceFormatKHR& surfaceFormat) const;
