@@ -55,15 +55,14 @@ void GraphicsInstance::selectPhysicalDevice()
 	physicalDevice.pick(vulkanPhysicalDevices, windowSurface->getVulkanWindowSurface());
 }
 
-void GraphicsInstance::createLogicalDevice(const WindowSize& framebufferSize, const std::vector<Vertex>& vertices, const std::vector<uint16_t>& indices)
+void GraphicsInstance::createLogicalDevice(const WindowSize& framebufferSize, const Model& model)
 {
 	const LogicalDevicePartialCreateInfo logicalDevicePartialCreateInfo{
 		.vulkanWindowSurface = windowSurface->getVulkanWindowSurface(),
 		.framebufferSize = framebufferSize,
 		.enabledLayerCount = validationLayer.getEnabledLayerCount(),
 		.enabledLayerNames = validationLayer.getEnabledLayerNames(),
-		.vertices = vertices,
-		.indices = indices
+		.model = model
 	};
 	logicalDevice = physicalDevice.createLogicalDevice(logicalDevicePartialCreateInfo);
 }

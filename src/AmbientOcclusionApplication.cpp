@@ -4,7 +4,7 @@ AmbientOcclusionApplication::AmbientOcclusionApplication(const int windowWidth, 
 {
 	graphicsInstance.createWindowSurface(window.getGLFWWindow());
 	graphicsInstance.selectPhysicalDevice();
-	graphicsInstance.createLogicalDevice(window.getFramebufferSize(), vertices, indices);
+	graphicsInstance.createLogicalDevice(window.getFramebufferSize(), model);
 	graphicsInstance.createGraphicsPipeline(loadShaders(graphicsInstance.getVulkanLogicalDevice()));
 }
 

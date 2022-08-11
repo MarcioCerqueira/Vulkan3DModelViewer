@@ -3,7 +3,7 @@
 #define VULKAN_HPP_NO_CONSTRUCTORS
 #include <vulkan/vulkan.hpp>
 
-struct CommandBufferCopyInfo
+struct CommandBufferBufferToBufferCopyInfo
 {
 	int frameIndex;
 	vk::Buffer srcBuffer;

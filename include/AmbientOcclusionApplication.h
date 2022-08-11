@@ -4,7 +4,7 @@
 #include "Window.h"
 #include "GraphicsInstance.h"
 #include "Shader.h"
-#include "Vertex.h"
+#include "Model.h"
 
 class AmbientOcclusionApplication
 {
@@ -19,13 +19,5 @@ private:
 	const std::string applicationName{ "Ambient Occlusion Application" };
 	Window window;
 	GraphicsInstance graphicsInstance;
-	const std::vector<Vertex> vertices = {
-		{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-		{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-		{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-		{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
-	};
-	const std::vector<uint16_t> indices = {
-		0, 1, 2, 2, 3, 0
-	};
+	Model model;
 };

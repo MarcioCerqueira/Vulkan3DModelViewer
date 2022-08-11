@@ -16,14 +16,39 @@ const vk::CommandBufferAllocateInfo CommandBuffer::buildCommandBufferAllocateInf
 	};
 }
 
-void CommandBuffer::copy(const CommandBufferCopyInfo& commandBufferCopyInfo)
+void CommandBuffer::copy(const CommandBufferBufferToBufferCopyInfo& commandBufferBufferToBufferCopyInfo)
 {
-	ExceptionChecker::throwExceptionIfIndexIsOutOfBounds(commandBufferCopyInfo.frameIndex, vulkanCommandBuffers.size(), "Error in CommandBuffer! Index is out of bounds");
+	ExceptionChecker::throwExceptionIfIndexIsOutOfBounds(commandBufferBufferToBufferCopyInfo.frameIndex, vulkanCommandBuffers.size(), "Error in CommandBuffer! Index is out of bounds");
 	const vk::CommandBufferBeginInfo commandBufferBeginInfo{ .flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit };
-	const vk::BufferCopy bufferCopyRegion{ .size = commandBufferCopyInfo.bufferSize };
-	vulkanCommandBuffers[commandBufferCopyInfo.frameIndex].begin(commandBufferBeginInfo);
-	vulkanCommandBuffers[commandBufferCopyInfo.frameIndex].copyBuffer(commandBufferCopyInfo.srcBuffer, commandBufferCopyInfo.dstBuffer, 1, &bufferCopyRegion);
-	vulkanCommandBuffers[commandBufferCopyInfo.frameIndex].end();
+	const vk::BufferCopy bufferCopyRegion{ .size = commandBufferBufferToBufferCopyInfo.bufferSize };
+	vulkanCommandBuffers[commandBufferBufferToBufferCopyInfo.frameIndex].begin(commandBufferBeginInfo);
+	vulkanCommandBuffers[commandBufferBufferToBufferCopyInfo.frameIndex].copyBuffer(commandBufferBufferToBufferCopyInfo.srcBuffer, commandBufferBufferToBufferCopyInfo.dstBuffer, 1, &bufferCopyRegion);
+	vulkanCommandBuffers[commandBufferBufferToBufferCopyInfo.frameIndex].end();
+}
+
+void CommandBuffer::copy(const CommandBufferBufferToImageCopyInfo& commandBufferBufferToImageCopyInfo)
+{
+	ExceptionChecker::throwExceptionIfIndexIsOutOfBounds(commandBufferBufferToImageCopyInfo.frameIndex, vulkanCommandBuffers.size(), "Error in CommandBuffer! Index is out of bounds");
+	const vk::CommandBufferBeginInfo commandBufferBeginInfo{ .flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit };
+	const uint32_t regionCount{ 1 };
+	vulkanCommandBuffers[commandBufferBufferToImageCopyInfo.frameIndex].begin(commandBufferBeginInfo);
+	vulkanCommandBuffers[commandBufferBufferToImageCopyInfo.frameIndex].copyBufferToImage(commandBufferBufferToImageCopyInfo.srcBuffer, commandBufferBufferToImageCopyInfo.dstImage, vk::ImageLayout::eTransferDstOptimal, regionCount, &commandBufferBufferToImageCopyInfo.bufferImageCopy);
+	vulkanCommandBuffers[commandBufferBufferToImageCopyInfo.frameIndex].end();
+}
+
+void CommandBuffer::pipelineBarrier(const CommandBufferPipelineBarrierInfo& commandBufferPipelineBarrierInfo)
+{
+	ExceptionChecker::throwExceptionIfIndexIsOutOfBounds(commandBufferPipelineBarrierInfo.frameIndex, vulkanCommandBuffers.size(), "Error in CommandBuffer! Index is out of bounds");
+	const vk::CommandBufferBeginInfo commandBufferBeginInfo{ .flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit };
+	const vk::DependencyFlags dependencyFlags;
+	const uint32_t memoryBarrierCount = 0;
+	const vk::MemoryBarrier* memoryBarrier = nullptr;
+	const uint32_t bufferMemoryBarrierCount = 0;
+	const vk::BufferMemoryBarrier* bufferMemoryBarrier = nullptr;
+	const uint32_t imageMemoryBarrierCount = 1;
+	vulkanCommandBuffers[commandBufferPipelineBarrierInfo.frameIndex].begin(commandBufferBeginInfo);
+	vulkanCommandBuffers[commandBufferPipelineBarrierInfo.frameIndex].pipelineBarrier(commandBufferPipelineBarrierInfo.srcStage, commandBufferPipelineBarrierInfo.dstStage, dependencyFlags, memoryBarrierCount, memoryBarrier, bufferMemoryBarrierCount, bufferMemoryBarrier, imageMemoryBarrierCount, &commandBufferPipelineBarrierInfo.imageMemoryBarrier);
+	vulkanCommandBuffers[commandBufferPipelineBarrierInfo.frameIndex].end();
 }
 
 void CommandBuffer::record(const CommandBufferRecordInfo& commandBufferRecordInfo)

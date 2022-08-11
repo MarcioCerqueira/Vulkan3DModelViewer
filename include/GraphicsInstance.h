@@ -10,6 +10,7 @@
 #include "LogicalDevice.h"
 #include "ValidationLayer.h"
 #include "WindowSurface.h"
+#include "Model.h"
 
 class GraphicsInstance
 {
@@ -19,7 +20,7 @@ public:
 
 	void createWindowSurface(GLFWwindow* glfwWindow);
 	void selectPhysicalDevice();
-	void createLogicalDevice(const WindowSize& framebufferSize, const std::vector<Vertex>& vertices, const std::vector<uint16_t>& indices);
+	void createLogicalDevice(const WindowSize& framebufferSize, const Model& model);
 	void createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders);
 	void drawFrame(WindowHandler& windowHandler);
 	void waitIdle();

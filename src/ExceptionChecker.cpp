@@ -24,3 +24,11 @@ void ExceptionChecker::throwExceptionIfIndexIsOutOfBounds(const int index, const
 		throw std::runtime_error(errorMessage);
 	}
 }
+
+void ExceptionChecker::throwExceptionIfPointerIsNull(const void* data, const std::string& errorMessage)
+{
+	if (!data)
+	{
+		throw std::runtime_error(errorMessage);
+	}
+}

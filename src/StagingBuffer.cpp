@@ -20,15 +20,30 @@ void StagingBuffer::copyFromCPUToStagingMemory(const void* data)
 
 void StagingBuffer::copyFromStagingToDeviceMemory(const vk::CommandPool& vulkanCommandPool, const std::shared_ptr<GraphicsQueue>& graphicsQueue, const vk::Buffer& dstBuffer)
 {
-	int commandBufferCount = 1;
+	const int commandBufferCount{ 1 };
 	CommandBuffer commandBuffer(vulkanLogicalDevice, vulkanCommandPool, commandBufferCount);
-	const CommandBufferCopyInfo commandBufferCopyInfo{
+	const CommandBufferBufferToBufferCopyInfo commandBufferBufferToBufferCopyInfo{
 		.frameIndex = 0,
 		.srcBuffer = buffer.getVulkanBuffer(),
 		.dstBuffer = dstBuffer,
 		.bufferSize = buffer.getBufferCreateInfo().size
 	};
-	commandBuffer.copy(commandBufferCopyInfo);
+	commandBuffer.copy(commandBufferBufferToBufferCopyInfo);
+	graphicsQueue->submit(commandBuffer.getVulkanCommandBuffer(0));
+	graphicsQueue->waitIdle();
+}
+
+void StagingBuffer::copyFromStagingToDeviceMemory(const vk::CommandPool& vulkanCommandPool, const std::shared_ptr<GraphicsQueue>& graphicsQueue, const std::shared_ptr<Image>& dstImage)
+{
+	const int commandBufferCount{ 1 };
+	CommandBuffer commandBuffer(vulkanLogicalDevice, vulkanCommandPool, commandBufferCount);
+	const CommandBufferBufferToImageCopyInfo commandBufferBufferToImageCopyInfo{
+		.frameIndex = 0,
+		.srcBuffer = buffer.getVulkanBuffer(),
+		.dstImage = dstImage->getVulkanImage(),
+		.bufferImageCopy = dstImage->buildBufferImageCopy()
+	};
+	commandBuffer.copy(commandBufferBufferToImageCopyInfo);
 	graphicsQueue->submit(commandBuffer.getVulkanCommandBuffer(0));
 	graphicsQueue->waitIdle();
 }

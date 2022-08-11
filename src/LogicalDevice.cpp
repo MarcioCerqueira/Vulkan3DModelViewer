@@ -13,9 +13,11 @@ LogicalDevice::LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateI
 	createCommandBuffers();
 	createSynchronizationObjects();
 	createQueues(logicalDeviceCreateInfo.queueFamilyIndices);
-	createVertexBuffer(logicalDeviceCreateInfo.vertices, logicalDeviceCreateInfo.vulkanPhysicalDevice);
-	createIndexBuffer(logicalDeviceCreateInfo.indices, logicalDeviceCreateInfo.vulkanPhysicalDevice);
+	createVertexBuffer(logicalDeviceCreateInfo.model.getVertices(), logicalDeviceCreateInfo.vulkanPhysicalDevice);
+	createIndexBuffer(logicalDeviceCreateInfo.model.getIndices(), logicalDeviceCreateInfo.vulkanPhysicalDevice);
 	createUniformBuffers(logicalDeviceCreateInfo.vulkanPhysicalDevice);
+	createTextureBuffer(logicalDeviceCreateInfo.model.getTextureImage(), logicalDeviceCreateInfo.vulkanPhysicalDevice);
+	createTextureImage(logicalDeviceCreateInfo.model.getTextureImage(), logicalDeviceCreateInfo.vulkanPhysicalDevice);
 	createDescriptorPool();
 	createDescriptorSetLayout();
 	createDescriptorSet();
@@ -34,11 +36,13 @@ LogicalDevice::~LogicalDevice()
 		uniformBuffer.reset();
 	}
 	descriptorPool.reset();
+	vulkanTextureImage.reset();
 	descriptorSetLayout.reset();
 	graphicsPipeline.reset();
 	renderPass.reset();
 	vertexBuffer.reset();
 	indexBuffer.reset();
+	textureBuffer.reset();
 	vulkanLogicalDevice.destroy();
 }
 
@@ -163,6 +167,44 @@ void LogicalDevice::createUniformBuffers(const vk::PhysicalDevice& vulkanPhysica
 	{
 		uniformBuffer = std::make_unique<UniformBuffer>(vulkanLogicalDevice, vulkanPhysicalDevice, bufferSize);
 	}
+}
+
+void LogicalDevice::createTextureBuffer(const TextureImage& textureImage, const vk::PhysicalDevice& vulkanPhysicalDevice)
+{
+	textureBuffer = std::make_unique<StagingBuffer>(vulkanLogicalDevice);
+	textureBuffer->createStagingData(textureImage.getSize(), vulkanPhysicalDevice);
+	textureBuffer->copyFromCPUToStagingMemory(textureImage.getPixels());
+}
+
+void LogicalDevice::createTextureImage(const TextureImage& textureImage, const vk::PhysicalDevice& vulkanPhysicalDevice)
+{
+	const ImageInfo imageInfo{ createImageInfo(textureImage, vulkanPhysicalDevice) };
+	vulkanTextureImage = std::make_shared<Image>(imageInfo);
+	const TransitionLayoutInfo firstTransitionLayoutInfo{ createTransitionLayoutInfo(vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal) };
+	vulkanTextureImage->transitionLayout(firstTransitionLayoutInfo);
+	textureBuffer->copyFromStagingToDeviceMemory(commandPool->getVulkanCommandPool(), graphicsQueue, vulkanTextureImage);
+	const TransitionLayoutInfo secondTransitionLayoutInfo{ createTransitionLayoutInfo(vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal) };
+	vulkanTextureImage->transitionLayout(secondTransitionLayoutInfo);
+}
+
+const ImageInfo LogicalDevice::createImageInfo(const TextureImage& textureImage, const vk::PhysicalDevice& vulkanPhysicalDevice) const
+{
+	return ImageInfo{
+		.vulkanLogicalDevice = vulkanLogicalDevice,
+		.vulkanPhysicalDevice = vulkanPhysicalDevice,
+		.width = textureImage.getWidth(),
+		.height = textureImage.getHeight()
+	};
+}
+
+const TransitionLayoutInfo LogicalDevice::createTransitionLayoutInfo(const vk::ImageLayout& oldLayout, const vk::ImageLayout& newLayout) const
+{
+	return TransitionLayoutInfo{
+		.oldLayout = oldLayout,
+		.newLayout = newLayout,
+		.vulkanCommandPool = commandPool->getVulkanCommandPool(),
+		.graphicsQueue = graphicsQueue
+	};
 }
 
 void LogicalDevice::createDescriptorPool()
