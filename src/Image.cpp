@@ -43,17 +43,13 @@ const vk::MemoryAllocateInfo Image::buildMemoryAllocateInfo(const vk::MemoryRequ
 	};
 }
 
-void Image::transitionLayout(const TransitionLayoutInfo& transitionLayoutInfo)
+void Image::transitionLayout(const vk::ImageLayout& oldLayout, const vk::ImageLayout& newLayout, std::shared_ptr<CommandBuffer>& commandBuffers)
 {
-	const int commandBufferCount{ 1 };
-	CommandBuffer commandBuffer(vulkanLogicalDevice, transitionLayoutInfo.vulkanCommandPool, commandBufferCount);
-	const vk::ImageMemoryBarrier imageMemoryBarrier{ buildImageMemoryBarrier(transitionLayoutInfo.oldLayout, transitionLayoutInfo.newLayout) };
+	const vk::ImageMemoryBarrier imageMemoryBarrier{ buildImageMemoryBarrier(oldLayout, newLayout) };
 	vk::PipelineStageFlags srcPipelineStage, dstPipelineStage;
-	std::tie(srcPipelineStage, dstPipelineStage) = determinePipelineStages(transitionLayoutInfo.oldLayout, transitionLayoutInfo.newLayout);
+	std::tie(srcPipelineStage, dstPipelineStage) = determinePipelineStages(oldLayout, newLayout);
 	const CommandBufferPipelineBarrierInfo commandBufferPipelineBarrierInfo{ buildCommandBufferPipelineBarrierInfo(srcPipelineStage, dstPipelineStage, imageMemoryBarrier) };
-	commandBuffer.pipelineBarrier(commandBufferPipelineBarrierInfo);
-	transitionLayoutInfo.graphicsQueue->submit(commandBuffer.getVulkanCommandBuffer(0));
-	transitionLayoutInfo.graphicsQueue->waitIdle();
+	commandBuffers->pipelineBarrier(commandBufferPipelineBarrierInfo);
 }
 
 void Image::createImageView()

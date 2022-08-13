@@ -10,10 +10,9 @@ LogicalDevice::LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateI
 	createSwapChain(logicalDeviceCreateInfo);
 	createRenderPass();
 	createFramebuffers();
-	createCommandPool(logicalDeviceCreateInfo.queueFamilyIndices.getGraphicsFamilyIndex());
-	createCommandBuffers();
+	createPresentQueue(logicalDeviceCreateInfo.queueFamilyIndices);
+	createCommandBuffers(logicalDeviceCreateInfo.queueFamilyIndices);
 	createSynchronizationObjects();
-	createQueues(logicalDeviceCreateInfo.queueFamilyIndices);
 	createVertexBuffer(logicalDeviceCreateInfo.model.getVertices(), logicalDeviceCreateInfo.vulkanPhysicalDevice);
 	createIndexBuffer(logicalDeviceCreateInfo.model.getIndices(), logicalDeviceCreateInfo.vulkanPhysicalDevice);
 	createUniformBuffers(logicalDeviceCreateInfo.vulkanPhysicalDevice);
@@ -31,7 +30,7 @@ LogicalDevice::~LogicalDevice()
 		synchronizationObject.reset();
 	}
 	swapChain.reset();
-	commandPool.reset();
+	commandBuffers.reset();
 	for (auto& uniformBuffer : uniformBuffers)
 	{
 		uniformBuffer.reset();
@@ -111,14 +110,14 @@ void LogicalDevice::createFramebuffers()
 	swapChain->buildFramebuffers(vulkanLogicalDevice, renderPass->getVulkanRenderPass());
 }
 
-void LogicalDevice::createCommandPool(const std::optional<uint32_t> graphicsFamilyIndex)
+void LogicalDevice::createPresentQueue(const QueueFamilyIndices& queueFamilyIndices)
 {
-	commandPool = std::make_unique<CommandPool>(vulkanLogicalDevice, graphicsFamilyIndex);
+	presentQueue = std::make_unique<PresentQueue>(vulkanLogicalDevice, queueFamilyIndices.getPresentFamilyIndex());
 }
 
-void LogicalDevice::createCommandBuffers()
+void LogicalDevice::createCommandBuffers(const QueueFamilyIndices& queueFamilyIndices)
 {
-	commandBuffers = std::make_unique<CommandBuffer>(vulkanLogicalDevice, commandPool->getVulkanCommandPool(), MAX_FRAMES_IN_FLIGHT);
+	commandBuffers = std::make_unique<CommandBuffer>(vulkanLogicalDevice, queueFamilyIndices.getGraphicsFamilyIndex(), MAX_FRAMES_IN_FLIGHT);
 }
 
 void LogicalDevice::createSynchronizationObjects()
@@ -128,12 +127,6 @@ void LogicalDevice::createSynchronizationObjects()
 	{
 		synchronizationObject = std::make_shared<SynchronizationObjects>(vulkanLogicalDevice);
 	}
-}
-
-void LogicalDevice::createQueues(const QueueFamilyIndices& queueFamilyIndices)
-{
-	graphicsQueue = std::make_shared<GraphicsQueue>(vulkanLogicalDevice, queueFamilyIndices.getGraphicsFamilyIndex());
-	presentQueue = std::make_unique<PresentQueue>(vulkanLogicalDevice, queueFamilyIndices.getPresentFamilyIndex());
 }
 
 void LogicalDevice::createVertexBuffer(const std::vector<Vertex>& vertices, const vk::PhysicalDevice& vulkanPhysicalDevice)
@@ -149,8 +142,7 @@ const ContentBufferCreateInfo<T> LogicalDevice::buildContentBufferCreateInfo(con
 		.vulkanLogicalDevice = vulkanLogicalDevice,
 		.content = content,
 		.vulkanPhysicalDevice = vulkanPhysicalDevice,
-		.vulkanCommandPool = commandPool->getVulkanCommandPool(),
-		.graphicsQueue = graphicsQueue
+		.commandBuffers = commandBuffers
 	};
 }
 
@@ -181,11 +173,9 @@ void LogicalDevice::createTextureImage(const TextureImage& textureImage, const v
 {
 	const ImageInfo imageInfo{ createImageInfo(textureImage, vulkanPhysicalDevice) };
 	vulkanTextureImage = std::make_shared<Image>(imageInfo);
-	const TransitionLayoutInfo firstTransitionLayoutInfo{ createTransitionLayoutInfo(vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal) };
-	vulkanTextureImage->transitionLayout(firstTransitionLayoutInfo);
-	textureBuffer->copyFromStagingToDeviceMemory(commandPool->getVulkanCommandPool(), graphicsQueue, vulkanTextureImage);
-	const TransitionLayoutInfo secondTransitionLayoutInfo{ createTransitionLayoutInfo(vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal) };
-	vulkanTextureImage->transitionLayout(secondTransitionLayoutInfo);
+	vulkanTextureImage->transitionLayout(vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal, commandBuffers);
+	textureBuffer->copyFromStagingToDeviceMemory(commandBuffers, vulkanTextureImage);
+	vulkanTextureImage->transitionLayout(vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal, commandBuffers);
 	vulkanTextureImage->createImageView();
 }
 
@@ -196,16 +186,6 @@ const ImageInfo LogicalDevice::createImageInfo(const TextureImage& textureImage,
 		.vulkanPhysicalDevice = vulkanPhysicalDevice,
 		.width = textureImage.getWidth(),
 		.height = textureImage.getHeight()
-	};
-}
-
-const TransitionLayoutInfo LogicalDevice::createTransitionLayoutInfo(const vk::ImageLayout& oldLayout, const vk::ImageLayout& newLayout) const
-{
-	return TransitionLayoutInfo{
-		.oldLayout = oldLayout,
-		.newLayout = newLayout,
-		.vulkanCommandPool = commandPool->getVulkanCommandPool(),
-		.graphicsQueue = graphicsQueue
 	};
 }
 
@@ -259,7 +239,7 @@ void LogicalDevice::drawFrame(WindowHandler& windowHandler)
 	updateUniformBuffer();
 	descriptorSet->write(uniformBuffers[currentFrame]->getVulkanBuffer(), currentFrame);
 	commandBuffers->record(createCommandBufferRecordInfo(imageIndex));
-	graphicsQueue->submit(synchronizationObjects[currentFrame], commandBuffers->getVulkanCommandBuffer(currentFrame));
+	commandBuffers->submit(synchronizationObjects[currentFrame], currentFrame);
 	presentResult(windowHandler, imageIndex);
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }

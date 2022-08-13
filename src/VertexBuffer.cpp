@@ -7,7 +7,7 @@ VertexBuffer::VertexBuffer(const ContentBufferCreateInfo<Vertex>& contentBufferC
 	const vk::DeviceSize contentSize{ sizeof(contentBufferCreateInfo.content[0]) * contentBufferCreateInfo.content.size() };
 	stagingBuffer.createStagingData(contentSize, contentBufferCreateInfo.vulkanPhysicalDevice);
 	stagingBuffer.copyFromCPUToStagingMemory(contentBufferCreateInfo.content.data());
-	stagingBuffer.copyFromStagingToDeviceMemory(contentBufferCreateInfo.vulkanCommandPool, contentBufferCreateInfo.graphicsQueue, buffer.getVulkanBuffer());
+	stagingBuffer.copyFromStagingToDeviceMemory(contentBufferCreateInfo.commandBuffers, buffer.getVulkanBuffer());
 }
 
 void VertexBuffer::createVertexData(const std::vector<Vertex>& vertices, const vk::PhysicalDevice& vulkanPhysicalDevice)

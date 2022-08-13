@@ -6,11 +6,9 @@
 #include <tuple>
 #include "MemoryProperties.h"
 #include "CommandBuffer.h"
-#include "GraphicsQueue.h"
 #include "ImageView.h"
 #include "Sampler.h"
 #include "structs/ImageInfo.h"
-#include "structs/TransitionLayoutInfo.h"
 
 class Image
 {
@@ -18,7 +16,7 @@ public:
 	Image(const ImageInfo& imageInfo);
 	~Image();
 
-	void transitionLayout(const TransitionLayoutInfo& transitionLayoutInfo);
+	void transitionLayout(const vk::ImageLayout& oldLayout, const vk::ImageLayout& newLayout, std::shared_ptr<CommandBuffer>& commandBuffers);
 	void createImageView();
 	const vk::Image getVulkanImage() const;
 	const vk::BufferImageCopy buildBufferImageCopy() const;

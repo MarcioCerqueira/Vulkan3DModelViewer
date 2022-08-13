@@ -7,7 +7,7 @@ IndexBuffer::IndexBuffer(const ContentBufferCreateInfo<uint16_t>& contentBufferC
 	const vk::DeviceSize contentSize{ sizeof(contentBufferCreateInfo.content[0]) * contentBufferCreateInfo.content.size() };
 	stagingBuffer.createStagingData(contentSize, contentBufferCreateInfo.vulkanPhysicalDevice);
 	stagingBuffer.copyFromCPUToStagingMemory(contentBufferCreateInfo.content.data());
-	stagingBuffer.copyFromStagingToDeviceMemory(contentBufferCreateInfo.vulkanCommandPool, contentBufferCreateInfo.graphicsQueue, buffer.getVulkanBuffer());
+	stagingBuffer.copyFromStagingToDeviceMemory(contentBufferCreateInfo.commandBuffers, buffer.getVulkanBuffer());
 }
 
 void IndexBuffer::createIndexData(const std::vector<uint16_t>& indices, const vk::PhysicalDevice& vulkanPhysicalDevice)

@@ -2,7 +2,7 @@
 
 #define VULKAN_HPP_NO_CONSTRUCTORS
 #include <vulkan/vulkan.hpp>
-#include "GraphicsQueue.h"
+#include "CommandBuffer.h"
 
 template<typename T>
 struct ContentBufferCreateInfo
@@ -10,6 +10,5 @@ struct ContentBufferCreateInfo
 	vk::Device vulkanLogicalDevice;
 	std::vector<T> content;
 	vk::PhysicalDevice vulkanPhysicalDevice;
-	vk::CommandPool vulkanCommandPool;
-	std::shared_ptr<GraphicsQueue> graphicsQueue;
+	std::shared_ptr<CommandBuffer> commandBuffers;
 };

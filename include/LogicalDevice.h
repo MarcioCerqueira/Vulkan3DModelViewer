@@ -14,12 +14,10 @@
 #include "structs/ModelViewProjectionTransformation.h"
 #include "SwapChain.h"
 #include "RenderPass.h"
-#include "CommandPool.h"
 #include "CommandBuffer.h"
 #include "GraphicsPipeline.h"
 #include "Shader.h"
 #include "SynchronizationObjects.h"
-#include "GraphicsQueue.h"
 #include "PresentQueue.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
@@ -49,10 +47,9 @@ private:
 	void createSwapChain(const LogicalDeviceCreateInfo& logicalDeviceCreateInfo);
 	void createRenderPass();
 	void createFramebuffers();
-	void createCommandPool(const std::optional<uint32_t> graphicsFamilyIndex);
-	void createCommandBuffers();
+	void createPresentQueue(const QueueFamilyIndices& queueFamilyIndices);
+	void createCommandBuffers(const QueueFamilyIndices& queueFamilyIndices);
 	void createSynchronizationObjects();
-	void createQueues(const QueueFamilyIndices& queueFamilyIndices);
 	void createVertexBuffer(const std::vector<Vertex>& vertices, const vk::PhysicalDevice& vulkanPhysicalDevice);
 	template<typename T>
 	const ContentBufferCreateInfo<T> buildContentBufferCreateInfo(const std::vector<T>& content, const vk::PhysicalDevice& vulkanPhysicalDevice) const;
@@ -61,7 +58,6 @@ private:
 	void createTextureBuffer(const TextureImage& textureImage, const vk::PhysicalDevice& vulkanPhysicalDevice);
 	void createTextureImage(const TextureImage& textureImage, const vk::PhysicalDevice& vulkanPhysicalDevice);
 	const ImageInfo createImageInfo(const TextureImage& textureImage, const vk::PhysicalDevice& vulkanPhysicalDevice) const;
-	const TransitionLayoutInfo createTransitionLayoutInfo(const vk::ImageLayout& oldLayout, const vk::ImageLayout& newLayout) const;
 	void createDescriptorPool();
 	void createDescriptorSetLayout();
 	void createDescriptorSet();
@@ -79,7 +75,6 @@ private:
 	std::unique_ptr<RenderPass> renderPass;
 	std::unique_ptr<DescriptorSetLayout> descriptorSetLayout;
 	std::unique_ptr<GraphicsPipeline> graphicsPipeline;
-	std::unique_ptr<CommandPool> commandPool;
 	std::unique_ptr<VertexBuffer> vertexBuffer;
 	std::unique_ptr<IndexBuffer> indexBuffer;
 	std::vector<std::unique_ptr<UniformBuffer>> uniformBuffers;
@@ -87,8 +82,7 @@ private:
 	std::shared_ptr<Image> vulkanTextureImage;
 	std::unique_ptr<DescriptorPool> descriptorPool;
 	std::unique_ptr<DescriptorSet> descriptorSet;
-	std::unique_ptr<CommandBuffer> commandBuffers;
-	std::shared_ptr<GraphicsQueue> graphicsQueue;
+	std::shared_ptr<CommandBuffer> commandBuffers;
 	std::unique_ptr<PresentQueue> presentQueue;
 	std::vector<std::shared_ptr<SynchronizationObjects>> synchronizationObjects;
 	vk::PhysicalDeviceFeatures physicalDeviceFeatures;

@@ -9,8 +9,8 @@ public:
 	explicit StagingBuffer(const vk::Device& vulkanLogicalDevice);
 	void createStagingData(const vk::DeviceSize& contentSize, const vk::PhysicalDevice& vulkanPhysicalDevice);
 	void copyFromCPUToStagingMemory(const void* data);
-	void copyFromStagingToDeviceMemory(const vk::CommandPool& vulkanCommandPool, const std::shared_ptr<GraphicsQueue>& graphicsQueue, const vk::Buffer& dstBuffer);
-	void copyFromStagingToDeviceMemory(const vk::CommandPool& vulkanCommandPool, const std::shared_ptr<GraphicsQueue>& graphicsQueue, const std::shared_ptr<Image>& dstImage);
+	void copyFromStagingToDeviceMemory(const std::shared_ptr<CommandBuffer>& commandBuffers, const vk::Buffer& dstBuffer);
+	void copyFromStagingToDeviceMemory(const std::shared_ptr<CommandBuffer>& commandBuffers, const std::shared_ptr<Image>& dstImage);
 
 private:
 
