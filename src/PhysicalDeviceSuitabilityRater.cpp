@@ -7,6 +7,7 @@ const int PhysicalDeviceSuitabilityRater::rate(const PhysicalDeviceSuitabilityRa
 	score += rateByQueueFamilyProperties(physicalDeviceSuitabilityRaterInfo);
 	score *= rateByDeviceExtensionSupport(physicalDeviceSuitabilityRaterInfo);
 	score *= rateBySwapChainProperties(physicalDeviceSuitabilityRaterInfo);
+	score *= rateByDeviceSupportedFeatures(physicalDeviceSuitabilityRaterInfo);
 	return score;
 }
 
@@ -57,4 +58,10 @@ const int PhysicalDeviceSuitabilityRater::rateByDeviceExtensionSupport(const Phy
 const int PhysicalDeviceSuitabilityRater::rateBySwapChainProperties(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
 {
 	return SwapChain::isValid(physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice, physicalDeviceSuitabilityRaterInfo.vulkanWindowSurface);
+}
+
+const int PhysicalDeviceSuitabilityRater::rateByDeviceSupportedFeatures(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
+{
+	const vk::PhysicalDeviceFeatures physicalDeviceFeatures{ physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice.getFeatures() };
+	return static_cast<int>(physicalDeviceFeatures.samplerAnisotropy);
 }

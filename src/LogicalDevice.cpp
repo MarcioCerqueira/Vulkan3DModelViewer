@@ -2,6 +2,7 @@
 
 LogicalDevice::LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateInfo)
 {
+	physicalDeviceFeatures.samplerAnisotropy = vk::Bool32{ true };
 	const std::set<uint32_t> uniqueQueueFamilies = createUniqueQueueFamilies(logicalDeviceCreateInfo.queueFamilyIndices);
 	const std::vector<vk::DeviceQueueCreateInfo> deviceQueueCreateInfos{ buildDeviceQueueCreateInfos(uniqueQueueFamilies) };
 	const vk::DeviceCreateInfo vulkanLogicalDeviceCreateInfo{ buildVulkanLogicalDeviceCreateInfo(deviceQueueCreateInfos, logicalDeviceCreateInfo) };
@@ -185,6 +186,7 @@ void LogicalDevice::createTextureImage(const TextureImage& textureImage, const v
 	textureBuffer->copyFromStagingToDeviceMemory(commandPool->getVulkanCommandPool(), graphicsQueue, vulkanTextureImage);
 	const TransitionLayoutInfo secondTransitionLayoutInfo{ createTransitionLayoutInfo(vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal) };
 	vulkanTextureImage->transitionLayout(secondTransitionLayoutInfo);
+	vulkanTextureImage->createImageView();
 }
 
 const ImageInfo LogicalDevice::createImageInfo(const TextureImage& textureImage, const vk::PhysicalDevice& vulkanPhysicalDevice) const

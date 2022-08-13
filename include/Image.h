@@ -7,6 +7,8 @@
 #include "MemoryProperties.h"
 #include "CommandBuffer.h"
 #include "GraphicsQueue.h"
+#include "ImageView.h"
+#include "Sampler.h"
 #include "structs/ImageInfo.h"
 #include "structs/TransitionLayoutInfo.h"
 
@@ -17,6 +19,7 @@ public:
 	~Image();
 
 	void transitionLayout(const TransitionLayoutInfo& transitionLayoutInfo);
+	void createImageView();
 	const vk::Image getVulkanImage() const;
 	const vk::BufferImageCopy buildBufferImageCopy() const;
 
@@ -32,7 +35,10 @@ private:
 	const vk::Device vulkanLogicalDevice; 
 	const int width;
 	const int height;
+	const vk::Format format;
 	vk::Image vulkanImage;
+	std::unique_ptr<ImageView> imageView;
 	vk::DeviceMemory vulkanImageMemory;
+	const Sampler sampler;
 	
 };

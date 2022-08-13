@@ -7,12 +7,12 @@ class ImageView
 {
 
 public:
-	ImageView(const vk::Device& vulkanLogicalDevice, const vk::Image& image, const vk::SurfaceFormatKHR& surfaceFormat);
+	ImageView(const vk::Device& vulkanLogicalDevice, const vk::Image& image, const vk::Format& format);
 	~ImageView();
 	const vk::ImageView getVulkanImageView() const;
 
 private:
-	const vk::ImageViewCreateInfo buildImageViewCreateInfo(const vk::Image& image, const vk::SurfaceFormatKHR& surfaceFormat) const;
+	const vk::ImageViewCreateInfo buildImageViewCreateInfo(const vk::Image& image, const vk::Format& format) const;
 	const vk::ImageSubresourceRange createImageSubresourceRange() const;
 
 	const vk::Device vulkanLogicalDevice;

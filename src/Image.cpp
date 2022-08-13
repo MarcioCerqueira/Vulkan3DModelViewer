@@ -1,6 +1,6 @@
 #include "Image.h"
 
-Image::Image(const ImageInfo& imageInfo) : vulkanLogicalDevice(imageInfo.vulkanLogicalDevice), width(imageInfo.width), height(imageInfo.height)
+Image::Image(const ImageInfo& imageInfo) : vulkanLogicalDevice(imageInfo.vulkanLogicalDevice), width(imageInfo.width), height(imageInfo.height), format(vk::Format::eR8G8B8A8Srgb), sampler(vulkanLogicalDevice, imageInfo.vulkanPhysicalDevice.getProperties())
 {
 	const vk::ImageCreateInfo imageCreateInfo{ buildImageCreateInfo() };
 	vulkanImage = vulkanLogicalDevice.createImage(imageCreateInfo);
@@ -14,6 +14,7 @@ Image::Image(const ImageInfo& imageInfo) : vulkanLogicalDevice(imageInfo.vulkanL
 
 Image::~Image()
 {
+	imageView.reset();
 	vulkanLogicalDevice.destroyImage(vulkanImage);
 	vulkanLogicalDevice.freeMemory(vulkanImageMemory);
 }
@@ -22,7 +23,7 @@ const vk::ImageCreateInfo Image::buildImageCreateInfo() const
 {
 	return vk::ImageCreateInfo{
 		.imageType = vk::ImageType::e2D,
-		.format = vk::Format::eR8G8B8A8Srgb,
+		.format = format,
 		.extent = vk::Extent3D(static_cast<uint32_t>(width), static_cast<uint32_t>(height), 1),
 		.mipLevels = 1,
 		.arrayLayers = 1,
@@ -53,6 +54,11 @@ void Image::transitionLayout(const TransitionLayoutInfo& transitionLayoutInfo)
 	commandBuffer.pipelineBarrier(commandBufferPipelineBarrierInfo);
 	transitionLayoutInfo.graphicsQueue->submit(commandBuffer.getVulkanCommandBuffer(0));
 	transitionLayoutInfo.graphicsQueue->waitIdle();
+}
+
+void Image::createImageView()
+{
+	imageView = std::make_unique<ImageView>(vulkanLogicalDevice, vulkanImage, format);
 }
 
 const vk::ImageMemoryBarrier Image::buildImageMemoryBarrier(const vk::ImageLayout& oldLayout, const vk::ImageLayout& newLayout) const

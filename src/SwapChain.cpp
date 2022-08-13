@@ -114,7 +114,7 @@ void SwapChain::buildSwapChainImageViews(const SwapChainCreateInfo& swapChainCre
     imageViews.resize(images.size());
     for (int imageIndex = 0; imageIndex < images.size(); ++imageIndex)
     {
-        imageViews[imageIndex] = std::make_unique<ImageView>(swapChainCreateInfo.vulkanLogicalDevice, images[imageIndex], surfaceFormat);
+        imageViews[imageIndex] = std::make_unique<ImageView>(swapChainCreateInfo.vulkanLogicalDevice, images[imageIndex], surfaceFormat.format);
     }
 }
 

@@ -1,8 +1,8 @@
 #include "ImageView.h"
 
-ImageView::ImageView(const vk::Device& vulkanLogicalDevice, const vk::Image& image, const vk::SurfaceFormatKHR& surfaceFormat) : vulkanLogicalDevice(vulkanLogicalDevice)
+ImageView::ImageView(const vk::Device& vulkanLogicalDevice, const vk::Image& image, const vk::Format& format) : vulkanLogicalDevice(vulkanLogicalDevice)
 {
-    vk::ImageViewCreateInfo imageViewCreateInfo{ buildImageViewCreateInfo(image, surfaceFormat) };
+    vk::ImageViewCreateInfo imageViewCreateInfo{ buildImageViewCreateInfo(image, format) };
     vulkanImageView = vulkanLogicalDevice.createImageView(imageViewCreateInfo);
 }
 
@@ -11,12 +11,12 @@ ImageView::~ImageView()
     vulkanLogicalDevice.destroyImageView(vulkanImageView);
 }
 
-const vk::ImageViewCreateInfo ImageView::buildImageViewCreateInfo(const vk::Image& image, const vk::SurfaceFormatKHR& surfaceFormat) const
+const vk::ImageViewCreateInfo ImageView::buildImageViewCreateInfo(const vk::Image& image, const vk::Format& format) const
 {
     return vk::ImageViewCreateInfo{
         .image = image,
         .viewType = vk::ImageViewType::e2D,
-        .format = surfaceFormat.format,
+        .format = format,
         .components = vk::ComponentSwizzle::eIdentity,
         .subresourceRange = createImageSubresourceRange()
     };
