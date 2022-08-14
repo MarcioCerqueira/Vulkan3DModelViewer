@@ -18,8 +18,6 @@ LogicalDevice::LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateI
 	createUniformBuffers(logicalDeviceCreateInfo.vulkanPhysicalDevice);
 	createTextureBuffer(logicalDeviceCreateInfo.model.getTextureImage(), logicalDeviceCreateInfo.vulkanPhysicalDevice);
 	createTextureImage(logicalDeviceCreateInfo.model.getTextureImage(), logicalDeviceCreateInfo.vulkanPhysicalDevice);
-	createDescriptorPool();
-	createDescriptorSetLayout();
 	createDescriptorSet();
 }
 
@@ -35,9 +33,8 @@ LogicalDevice::~LogicalDevice()
 	{
 		uniformBuffer.reset();
 	}
-	descriptorPool.reset();
+	descriptorSet.reset();
 	vulkanTextureImage.reset();
-	descriptorSetLayout.reset();
 	graphicsPipeline.reset();
 	renderPass.reset();
 	vertexBuffer.reset();
@@ -158,7 +155,7 @@ void LogicalDevice::createUniformBuffers(const vk::PhysicalDevice& vulkanPhysica
 	uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 	for (auto& uniformBuffer : uniformBuffers)
 	{
-		uniformBuffer = std::make_unique<UniformBuffer>(vulkanLogicalDevice, vulkanPhysicalDevice, bufferSize);
+		uniformBuffer = std::make_shared<UniformBuffer>(vulkanLogicalDevice, vulkanPhysicalDevice, bufferSize);
 	}
 }
 
@@ -189,25 +186,9 @@ const ImageInfo LogicalDevice::createImageInfo(const TextureImage& textureImage,
 	};
 }
 
-void LogicalDevice::createDescriptorPool()
-{
-	descriptorPool = std::make_unique<DescriptorPool>(vulkanLogicalDevice, MAX_FRAMES_IN_FLIGHT);
-}
-
-void LogicalDevice::createDescriptorSetLayout()
-{
-	descriptorSetLayout = std::make_unique<DescriptorSetLayout>(vulkanLogicalDevice);
-}
-
 void LogicalDevice::createDescriptorSet()
 {
-	const DescriptorSetCreateInfo descriptorSetCreateInfo{
-		.vulkanLogicalDevice = this->vulkanLogicalDevice,
-		.vulkanDescriptorPool = descriptorPool->getVulkanDescriptorPool(),
-		.vulkanDescriptorSetLayout = descriptorSetLayout->getVulkanDescriptorSetLayout(),
-		.maxFramesInFlight = MAX_FRAMES_IN_FLIGHT
-	};
-	descriptorSet = std::make_unique<DescriptorSet>(descriptorSetCreateInfo);
+	descriptorSet = std::make_unique<DescriptorSet>(vulkanLogicalDevice, MAX_FRAMES_IN_FLIGHT);
 }
 
 const vk::Device LogicalDevice::getVulkanLogicalDevice() const
@@ -225,7 +206,7 @@ void LogicalDevice::createGraphicsPipeline(const std::vector<std::shared_ptr<Sha
 		graphicsPipelineCreateInfo.shaderStages.push_back(shader->buildPipelineShaderStageCreateInfo());
 	}
 	graphicsPipelineCreateInfo.vulkanRenderPass = renderPass->getVulkanRenderPass();
-	graphicsPipelineCreateInfo.vulkanDescriptorSetLayout = descriptorSetLayout->getVulkanDescriptorSetLayout();
+	graphicsPipelineCreateInfo.vulkanDescriptorSetLayout = descriptorSet->getVulkanDescriptorSetLayout();
 	graphicsPipeline = std::make_unique<GraphicsPipeline>(graphicsPipelineCreateInfo);
 }
 
@@ -237,7 +218,7 @@ void LogicalDevice::drawFrame(WindowHandler& windowHandler)
 	resetFences(fenceCount);
 	commandBuffers->reset(currentFrame);
 	updateUniformBuffer();
-	descriptorSet->write(uniformBuffers[currentFrame]->getVulkanBuffer(), currentFrame);
+	descriptorSet->write(uniformBuffers[currentFrame], vulkanTextureImage, currentFrame);
 	commandBuffers->record(createCommandBufferRecordInfo(imageIndex));
 	commandBuffers->submit(synchronizationObjects[currentFrame], currentFrame);
 	presentResult(windowHandler, imageIndex);

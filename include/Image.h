@@ -19,6 +19,9 @@ public:
 	void transitionLayout(const vk::ImageLayout& oldLayout, const vk::ImageLayout& newLayout, std::shared_ptr<CommandBuffer>& commandBuffers);
 	void createImageView();
 	const vk::Image getVulkanImage() const;
+	const vk::ImageView getVulkanImageView() const;
+	const vk::Sampler getVulkanSampler() const;
+	const vk::ImageLayout getImageLayout() const;
 	const vk::BufferImageCopy buildBufferImageCopy() const;
 
 private:
@@ -38,5 +41,5 @@ private:
 	std::unique_ptr<ImageView> imageView;
 	vk::DeviceMemory vulkanImageMemory;
 	const Sampler sampler;
-	
+	vk::ImageLayout imageLayout;
 };

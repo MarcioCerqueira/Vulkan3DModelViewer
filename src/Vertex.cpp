@@ -9,11 +9,12 @@ const vk::VertexInputBindingDescription Vertex::getBindingDescription()
 	};
 }
 
-const std::array<vk::VertexInputAttributeDescription, 2> Vertex::getAttributeDescriptions()
+const std::array<vk::VertexInputAttributeDescription, 3> Vertex::getAttributeDescriptions()
 {
-	std::array<vk::VertexInputAttributeDescription, 2> attributeDescriptions{};
+	std::array<vk::VertexInputAttributeDescription, 3> attributeDescriptions{};
 	attributeDescriptions[0] = getPositionAttributeDescription();
 	attributeDescriptions[1] = getColorAttributeDescription();
+	attributeDescriptions[2] = getTexCoordAttributeDescription();
 	return attributeDescriptions;
 }
 
@@ -34,5 +35,15 @@ const vk::VertexInputAttributeDescription Vertex::getColorAttributeDescription()
 		.binding = 0,
 		.format = vk::Format::eR32G32B32Sfloat,
 		.offset = offsetof(Vertex, color)
+	};
+}
+
+const vk::VertexInputAttributeDescription Vertex::getTexCoordAttributeDescription()
+{
+	return vk::VertexInputAttributeDescription{
+		.location = 2,
+		.binding = 0,
+		.format = vk::Format::eR32G32Sfloat,
+		.offset = offsetof(Vertex, texCoord)
 	};
 }

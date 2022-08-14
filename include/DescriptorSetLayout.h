@@ -11,8 +11,9 @@ public:
 
 	const vk::DescriptorSetLayout getVulkanDescriptorSetLayout() const;
 private:
-	const vk::DescriptorSetLayoutBinding createDescriptorSetLayoutBinding() const;
-	const vk::DescriptorSetLayoutCreateInfo buildDescriptorSetLayoutCreateInfo(const vk::DescriptorSetLayoutBinding& descriptorSetLayoutBinding) const;
+	const vk::DescriptorSetLayoutBinding createUniformBufferDescriptorSetLayoutBinding() const;
+	const vk::DescriptorSetLayoutBinding createSamplerDescriptorSetLayoutBinding() const;
+	const vk::DescriptorSetLayoutCreateInfo buildDescriptorSetLayoutCreateInfo(const std::vector<vk::DescriptorSetLayoutBinding>& descriptorSetLayoutBinding) const;
 
 	vk::DescriptorSetLayout vulkanDescriptorSetLayout;
 	const vk::Device vulkanLogicalDevice;

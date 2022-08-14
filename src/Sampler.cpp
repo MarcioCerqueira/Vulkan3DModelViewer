@@ -31,3 +31,8 @@ const vk::SamplerCreateInfo Sampler::buildSamplerCreateInfo(const vk::PhysicalDe
 		.unnormalizedCoordinates = vk::Bool32{false}
 	};
 }
+
+const vk::Sampler Sampler::getVulkanSampler() const
+{
+	return vulkanSampler;
+}

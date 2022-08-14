@@ -16,7 +16,7 @@ public:
 	const vk::PipelineLayout getVulkanPipelineLayout() const;
 
 private:
-	const vk::PipelineVertexInputStateCreateInfo buildPipelineVertexInputStateCreateInfo(const vk::VertexInputBindingDescription& vertexBindingDescription, const std::array<vk::VertexInputAttributeDescription, 2>&  vertexAttributeDescriptions) const;
+	const vk::PipelineVertexInputStateCreateInfo buildPipelineVertexInputStateCreateInfo(const vk::VertexInputBindingDescription& vertexBindingDescription, const std::array<vk::VertexInputAttributeDescription, 3>&  vertexAttributeDescriptions) const;
 	const vk::PipelineInputAssemblyStateCreateInfo buildPipelineInputAssemblyStateCreateInfo() const;
 	const vk::Viewport buildViewport(const vk::Extent2D& swapChainExtent) const;
 	const vk::Rect2D buildScissor(const vk::Extent2D& swapChainExtent) const;

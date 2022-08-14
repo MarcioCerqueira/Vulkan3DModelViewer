@@ -9,6 +9,8 @@ public:
 	Sampler(const vk::Device& vulkanLogicalDevice, const vk::PhysicalDeviceProperties& physicalDeviceProperties);
 	~Sampler();
 
+	const vk::Sampler getVulkanSampler() const;
+
 private:
 	const vk::SamplerCreateInfo buildSamplerCreateInfo(const vk::PhysicalDeviceProperties& physicalDeviceProperties) const;
 

@@ -22,8 +22,6 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "UniformBuffer.h"
-#include "DescriptorSetLayout.h"
-#include "DescriptorPool.h"
 #include "DescriptorSet.h"
 #include "Image.h"
 
@@ -58,8 +56,6 @@ private:
 	void createTextureBuffer(const TextureImage& textureImage, const vk::PhysicalDevice& vulkanPhysicalDevice);
 	void createTextureImage(const TextureImage& textureImage, const vk::PhysicalDevice& vulkanPhysicalDevice);
 	const ImageInfo createImageInfo(const TextureImage& textureImage, const vk::PhysicalDevice& vulkanPhysicalDevice) const;
-	void createDescriptorPool();
-	void createDescriptorSetLayout();
 	void createDescriptorSet();
 	void waitForFences(const uint32_t fenceCount);
 	const uint32_t acquireNextImageFromSwapChain(WindowHandler& windowHandler);
@@ -73,14 +69,12 @@ private:
 	vk::Device vulkanLogicalDevice; 
 	std::unique_ptr<SwapChain> swapChain;
 	std::unique_ptr<RenderPass> renderPass;
-	std::unique_ptr<DescriptorSetLayout> descriptorSetLayout;
 	std::unique_ptr<GraphicsPipeline> graphicsPipeline;
 	std::unique_ptr<VertexBuffer> vertexBuffer;
 	std::unique_ptr<IndexBuffer> indexBuffer;
-	std::vector<std::unique_ptr<UniformBuffer>> uniformBuffers;
+	std::vector<std::shared_ptr<UniformBuffer>> uniformBuffers;
 	std::unique_ptr<StagingBuffer> textureBuffer;
 	std::shared_ptr<Image> vulkanTextureImage;
-	std::unique_ptr<DescriptorPool> descriptorPool;
 	std::unique_ptr<DescriptorSet> descriptorSet;
 	std::shared_ptr<CommandBuffer> commandBuffers;
 	std::unique_ptr<PresentQueue> presentQueue;

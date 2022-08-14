@@ -2,6 +2,7 @@
 
 Image::Image(const ImageInfo& imageInfo) : vulkanLogicalDevice(imageInfo.vulkanLogicalDevice), width(imageInfo.width), height(imageInfo.height), format(vk::Format::eR8G8B8A8Srgb), sampler(vulkanLogicalDevice, imageInfo.vulkanPhysicalDevice.getProperties())
 {
+	imageLayout = vk::ImageLayout::eUndefined;
 	const vk::ImageCreateInfo imageCreateInfo{ buildImageCreateInfo() };
 	vulkanImage = vulkanLogicalDevice.createImage(imageCreateInfo);
 	const vk::MemoryRequirements memoryRequirements{ vulkanLogicalDevice.getImageMemoryRequirements(vulkanImage) };
@@ -31,7 +32,7 @@ const vk::ImageCreateInfo Image::buildImageCreateInfo() const
 		.tiling = vk::ImageTiling::eOptimal,
 		.usage = vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled,
 		.sharingMode = vk::SharingMode::eExclusive,
-		.initialLayout = vk::ImageLayout::eUndefined
+		.initialLayout = imageLayout
 	};
 }
 
@@ -50,6 +51,7 @@ void Image::transitionLayout(const vk::ImageLayout& oldLayout, const vk::ImageLa
 	std::tie(srcPipelineStage, dstPipelineStage) = determinePipelineStages(oldLayout, newLayout);
 	const CommandBufferPipelineBarrierInfo commandBufferPipelineBarrierInfo{ buildCommandBufferPipelineBarrierInfo(srcPipelineStage, dstPipelineStage, imageMemoryBarrier) };
 	commandBuffers->pipelineBarrier(commandBufferPipelineBarrierInfo);
+	imageLayout = newLayout;
 }
 
 void Image::createImageView()
@@ -111,6 +113,21 @@ const CommandBufferPipelineBarrierInfo Image::buildCommandBufferPipelineBarrierI
 const vk::Image Image::getVulkanImage() const
 {
 	return vulkanImage;
+}
+
+const vk::ImageView Image::getVulkanImageView() const
+{
+	return imageView->getVulkanImageView();
+}
+
+const vk::Sampler Image::getVulkanSampler() const
+{
+	return sampler.getVulkanSampler();
+}
+
+const vk::ImageLayout Image::getImageLayout() const
+{
+	return imageLayout;
 }
 
 const vk::BufferImageCopy Image::buildBufferImageCopy() const

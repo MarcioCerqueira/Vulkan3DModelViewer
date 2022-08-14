@@ -2,8 +2,10 @@
 
 DescriptorSetLayout::DescriptorSetLayout(const vk::Device& vulkanLogicalDevice) : vulkanLogicalDevice(vulkanLogicalDevice)
 {
-	const vk::DescriptorSetLayoutBinding descriptorSetLayoutBinding{ createDescriptorSetLayoutBinding() };
-	const vk::DescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo{ buildDescriptorSetLayoutCreateInfo(descriptorSetLayoutBinding) };
+	const vk::DescriptorSetLayoutBinding uniformBufferDescriptorSetLayoutBinding{ createUniformBufferDescriptorSetLayoutBinding() };
+	const vk::DescriptorSetLayoutBinding samplerDescriptorSetLayoutBinding{ createSamplerDescriptorSetLayoutBinding() };
+	const std::vector<vk::DescriptorSetLayoutBinding> descriptorSetLayoutBindings = { uniformBufferDescriptorSetLayoutBinding, samplerDescriptorSetLayoutBinding };
+	const vk::DescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo{ buildDescriptorSetLayoutCreateInfo(descriptorSetLayoutBindings) };
 	vulkanDescriptorSetLayout = vulkanLogicalDevice.createDescriptorSetLayout(descriptorSetLayoutCreateInfo);
 }
 
@@ -12,7 +14,7 @@ DescriptorSetLayout::~DescriptorSetLayout()
 	vulkanLogicalDevice.destroyDescriptorSetLayout(vulkanDescriptorSetLayout);
 }
 
-const vk::DescriptorSetLayoutBinding DescriptorSetLayout::createDescriptorSetLayoutBinding() const
+const vk::DescriptorSetLayoutBinding DescriptorSetLayout::createUniformBufferDescriptorSetLayoutBinding() const
 {
 	return vk::DescriptorSetLayoutBinding{
 		.binding = 0,
@@ -22,11 +24,21 @@ const vk::DescriptorSetLayoutBinding DescriptorSetLayout::createDescriptorSetLay
 	};
 }
 
-const vk::DescriptorSetLayoutCreateInfo DescriptorSetLayout::buildDescriptorSetLayoutCreateInfo(const vk::DescriptorSetLayoutBinding& descriptorSetLayoutBinding) const
+const vk::DescriptorSetLayoutBinding DescriptorSetLayout::createSamplerDescriptorSetLayoutBinding() const
+{
+	return vk::DescriptorSetLayoutBinding{
+		.binding = 1,
+		.descriptorType = vk::DescriptorType::eCombinedImageSampler,
+		.descriptorCount = 1,
+		.stageFlags = vk::ShaderStageFlagBits::eFragment
+	};
+}
+
+const vk::DescriptorSetLayoutCreateInfo DescriptorSetLayout::buildDescriptorSetLayoutCreateInfo(const std::vector<vk::DescriptorSetLayoutBinding>& descriptorSetLayoutBindings) const
 {
 	return vk::DescriptorSetLayoutCreateInfo{
-		.bindingCount = 1,
-		.pBindings = &descriptorSetLayoutBinding
+		.bindingCount = static_cast<uint32_t>(descriptorSetLayoutBindings.size()),
+		.pBindings = descriptorSetLayoutBindings.data()
 	};
 }
 
