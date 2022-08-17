@@ -3,6 +3,7 @@
 #define VULKAN_HPP_NO_CONSTRUCTORS
 #include <vulkan/vulkan.hpp>
 #define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <optional>
@@ -42,20 +43,21 @@ private:
 	const std::vector<vk::DeviceQueueCreateInfo> buildDeviceQueueCreateInfos(const std::set<uint32_t>& uniqueQueueFamilies) const;
 	const vk::DeviceQueueCreateInfo buildDeviceQueueCreateInfo(uint32_t queueFamilyIndex) const;
 	const vk::DeviceCreateInfo buildVulkanLogicalDeviceCreateInfo(const std::vector<vk::DeviceQueueCreateInfo>& deviceQueueCreateInfos, const LogicalDeviceCreateInfo& logicalDeviceCreateInfo) const;
-	void createSwapChain(const LogicalDeviceCreateInfo& logicalDeviceCreateInfo);
-	void createRenderPass();
-	void createFramebuffers();
+	const vk::Format getDepthImageFormat(const PhysicalDeviceProperties& physicalDeviceProperties) const;
+	void createSwapChain(const LogicalDeviceCreateInfo& logicalDeviceCreateInfo, const vk::Format& depthImageFormat);
+	void createRenderPass(const vk::Format& depthImageFormat);
 	void createPresentQueue(const QueueFamilyIndices& queueFamilyIndices);
 	void createCommandBuffers(const QueueFamilyIndices& queueFamilyIndices);
 	void createSynchronizationObjects();
-	void createVertexBuffer(const std::vector<Vertex>& vertices, const vk::PhysicalDevice& vulkanPhysicalDevice);
+	void createVertexBuffer(const std::vector<Vertex>& vertices, const PhysicalDeviceProperties& physicalDeviceProperties);
 	template<typename T>
-	const ContentBufferCreateInfo<T> buildContentBufferCreateInfo(const std::vector<T>& content, const vk::PhysicalDevice& vulkanPhysicalDevice) const;
-	void createIndexBuffer(const std::vector<uint16_t>& indices, const vk::PhysicalDevice& vulkanPhysicalDevice);
-	void createUniformBuffers(const vk::PhysicalDevice& vulkanPhysicalDevice);
-	void createTextureBuffer(const TextureImage& textureImage, const vk::PhysicalDevice& vulkanPhysicalDevice);
-	void createTextureImage(const TextureImage& textureImage, const vk::PhysicalDevice& vulkanPhysicalDevice);
-	const ImageInfo createImageInfo(const TextureImage& textureImage, const vk::PhysicalDevice& vulkanPhysicalDevice) const;
+	const ContentBufferCreateInfo<T> buildContentBufferCreateInfo(const std::vector<T>& content, const PhysicalDeviceProperties& physicalDeviceProperties) const;
+	void createIndexBuffer(const std::vector<uint16_t>& indices, const PhysicalDeviceProperties& physicalDeviceProperties);
+	void createUniformBuffers(const PhysicalDeviceProperties& physicalDeviceProperties);
+	void createTextureBuffer(const TextureImage& textureImage, const PhysicalDeviceProperties& physicalDeviceProperties);
+	void createTextureImage(const TextureImage& textureImage, const PhysicalDeviceProperties& physicalDeviceProperties);
+	const ImageInfo createImageInfo(const TextureImage& textureImage, const PhysicalDeviceProperties& physicalDeviceProperties) const;
+	void createFramebuffers();
 	void createDescriptorSet();
 	void waitForFences(const uint32_t fenceCount);
 	const uint32_t acquireNextImageFromSwapChain(WindowHandler& windowHandler);

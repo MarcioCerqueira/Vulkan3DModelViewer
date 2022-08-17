@@ -23,7 +23,7 @@ const vk::VertexInputAttributeDescription Vertex::getPositionAttributeDescriptio
 	return vk::VertexInputAttributeDescription{
 		.location = 0,
 		.binding = 0,
-		.format = vk::Format::eR32G32Sfloat,
+		.format = vk::Format::eR32G32B32Sfloat,
 		.offset = offsetof(Vertex, position)
 	};
 }

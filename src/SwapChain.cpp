@@ -2,14 +2,16 @@
 
 SwapChain::SwapChain(const SwapChainCreateInfo& swapChainCreateInfo) : swapChainCreateInfo(swapChainCreateInfo)
 {
-    vk::SurfaceCapabilitiesKHR capabilities{ swapChainCreateInfo.vulkanPhysicalDevice.getSurfaceCapabilitiesKHR(swapChainCreateInfo.vulkanWindowSurface) };
-    const std::vector<vk::SurfaceFormatKHR> availableFormats{ swapChainCreateInfo.vulkanPhysicalDevice.getSurfaceFormatsKHR(swapChainCreateInfo.vulkanWindowSurface) };
-    std::vector<vk::PresentModeKHR> availablePresentModes{ swapChainCreateInfo.vulkanPhysicalDevice.getSurfacePresentModesKHR(swapChainCreateInfo.vulkanWindowSurface) };
+    const vk::PhysicalDevice vulkanPhysicalDevice{ swapChainCreateInfo.physicalDeviceProperties.getVulkanPhysicalDevice() };
+    vk::SurfaceCapabilitiesKHR capabilities{ vulkanPhysicalDevice.getSurfaceCapabilitiesKHR(swapChainCreateInfo.vulkanWindowSurface) };
+    const std::vector<vk::SurfaceFormatKHR> availableFormats{ vulkanPhysicalDevice.getSurfaceFormatsKHR(swapChainCreateInfo.vulkanWindowSurface) };
+    std::vector<vk::PresentModeKHR> availablePresentModes{ vulkanPhysicalDevice.getSurfacePresentModesKHR(swapChainCreateInfo.vulkanWindowSurface) };
     chooseSwapSurfaceFormat(availableFormats);
     chooseSwapPresentMode(availablePresentModes);
     chooseSwapExtent(capabilities, swapChainCreateInfo.framebufferSize);
     buildVulkanSwapChain(swapChainCreateInfo, capabilities, estimateImageCount(capabilities));
     buildSwapChainImageViews(swapChainCreateInfo);
+    buildDepthImage();
 }
 
 SwapChain::~SwapChain()
@@ -24,6 +26,7 @@ void SwapChain::cleanup()
         framebuffers[imageIndex].reset();
         imageViews[imageIndex].reset();
     }
+    depthImage.reset();
     swapChainCreateInfo.vulkanLogicalDevice.destroySwapchainKHR(vulkanSwapChain);
 }
 
@@ -114,8 +117,33 @@ void SwapChain::buildSwapChainImageViews(const SwapChainCreateInfo& swapChainCre
     imageViews.resize(images.size());
     for (int imageIndex = 0; imageIndex < images.size(); ++imageIndex)
     {
-        imageViews[imageIndex] = std::make_unique<ImageView>(swapChainCreateInfo.vulkanLogicalDevice, images[imageIndex], surfaceFormat.format);
+        const ImageViewInfo imageViewInfo{
+            .vulkanLogicalDevice = swapChainCreateInfo.vulkanLogicalDevice,
+            .image = images[imageIndex],
+            .format = surfaceFormat.format,
+            .aspectMask = vk::ImageAspectFlagBits::eColor
+        };
+        imageViews[imageIndex] = std::make_unique<ImageView>(imageViewInfo);
     }
+}
+
+void SwapChain::buildDepthImage()
+{
+    const ImageInfo depthImageInfo{ buildDepthImageInfo() };
+    depthImage = std::make_unique<Image>(depthImageInfo);
+    depthImage->createImageView(vk::ImageAspectFlagBits::eDepth);
+}
+
+const ImageInfo SwapChain::buildDepthImageInfo() const
+{
+    return ImageInfo{
+        .vulkanLogicalDevice = swapChainCreateInfo.vulkanLogicalDevice,
+        .physicalDeviceProperties = swapChainCreateInfo.physicalDeviceProperties,
+        .width = static_cast<int>(extent.width),
+        .height = static_cast<int>(extent.height),
+        .format = swapChainCreateInfo.depthImageFormat,
+        .usageFlags = vk::ImageUsageFlagBits::eDepthStencilAttachment
+    };
 }
 
 void SwapChain::buildFramebuffers(const vk::Device& vulkanLogicalDevice, const vk::RenderPass& vulkanRenderPass)
@@ -123,7 +151,8 @@ void SwapChain::buildFramebuffers(const vk::Device& vulkanLogicalDevice, const v
     framebuffers.resize(imageViews.size());
     for (int framebufferIndex = 0; framebufferIndex < framebuffers.size(); framebufferIndex++)
     {
-        framebuffers[framebufferIndex] = std::make_unique<Framebuffer>(vulkanLogicalDevice, vulkanRenderPass, imageViews[framebufferIndex]->getVulkanImageView(), extent);
+        const std::vector<vk::ImageView> attachments = { imageViews[framebufferIndex]->getVulkanImageView(), depthImage->getVulkanImageView() };
+        framebuffers[framebufferIndex] = std::make_unique<Framebuffer>(vulkanLogicalDevice, vulkanRenderPass, attachments, extent);
     }
 }
 
@@ -140,8 +169,9 @@ void SwapChain::recreateIfResultIsOutOfDateOrSuboptimalKHR(vk::Result& result, c
         waitValidFramebufferSize(windowHandler);
         swapChainCreateInfo.vulkanLogicalDevice.waitIdle();
         cleanup();
-        buildVulkanSwapChain(swapChainCreateInfo, swapChainCreateInfo.vulkanPhysicalDevice.getSurfaceCapabilitiesKHR(swapChainCreateInfo.vulkanWindowSurface), static_cast<const uint32_t>(images.size()));
+        buildVulkanSwapChain(swapChainCreateInfo, swapChainCreateInfo.physicalDeviceProperties.getVulkanPhysicalDevice().getSurfaceCapabilitiesKHR(swapChainCreateInfo.vulkanWindowSurface), static_cast<const uint32_t>(images.size()));
         buildSwapChainImageViews(swapChainCreateInfo);
+        buildDepthImage();
         buildFramebuffers(swapChainCreateInfo.vulkanLogicalDevice, vulkanRenderPass);
         result = vk::Result::eSuccess;
     }

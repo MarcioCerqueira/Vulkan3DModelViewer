@@ -4,8 +4,8 @@
 #include <vulkan/vulkan.hpp>
 
 #include "CommandBuffer.h"
-#include "MemoryProperties.h"
 #include "GraphicsQueue.h"
+#include "PhysicalDeviceProperties.h"
 
 class Buffer
 {
@@ -13,7 +13,7 @@ public:
 	explicit Buffer(const vk::Device& vulkanLogicalDevice);
 	~Buffer();
 	void createVulkanBuffer(const vk::DeviceSize& contentSize, const vk::BufferUsageFlags& bufferUsage);
-	void createVulkanBufferMemory(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::MemoryPropertyFlags& memoryPropertyFlags);
+	void createVulkanBufferMemory(const PhysicalDeviceProperties& physicalDeviceProperties, const vk::MemoryPropertyFlags& memoryPropertyFlags);
 	void bindBufferMemory();
 	void copyFromCPUToDeviceMemory(const void* data);
 

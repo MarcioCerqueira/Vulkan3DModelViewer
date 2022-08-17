@@ -1,8 +1,8 @@
 #include "ImageView.h"
 
-ImageView::ImageView(const vk::Device& vulkanLogicalDevice, const vk::Image& image, const vk::Format& format) : vulkanLogicalDevice(vulkanLogicalDevice)
+ImageView::ImageView(const ImageViewInfo& imageViewInfo) : vulkanLogicalDevice(imageViewInfo.vulkanLogicalDevice)
 {
-    vk::ImageViewCreateInfo imageViewCreateInfo{ buildImageViewCreateInfo(image, format) };
+    vk::ImageViewCreateInfo imageViewCreateInfo{ buildImageViewCreateInfo(imageViewInfo.image, imageViewInfo.format, imageViewInfo.aspectMask) };
     vulkanImageView = vulkanLogicalDevice.createImageView(imageViewCreateInfo);
 }
 
@@ -11,21 +11,21 @@ ImageView::~ImageView()
     vulkanLogicalDevice.destroyImageView(vulkanImageView);
 }
 
-const vk::ImageViewCreateInfo ImageView::buildImageViewCreateInfo(const vk::Image& image, const vk::Format& format) const
+const vk::ImageViewCreateInfo ImageView::buildImageViewCreateInfo(const vk::Image& image, const vk::Format& format, const vk::ImageAspectFlags& aspectMask) const
 {
     return vk::ImageViewCreateInfo{
         .image = image,
         .viewType = vk::ImageViewType::e2D,
         .format = format,
         .components = vk::ComponentSwizzle::eIdentity,
-        .subresourceRange = createImageSubresourceRange()
+        .subresourceRange = createImageSubresourceRange(aspectMask)
     };
 }
 
-const vk::ImageSubresourceRange ImageView::createImageSubresourceRange() const
+const vk::ImageSubresourceRange ImageView::createImageSubresourceRange(const vk::ImageAspectFlags& aspectMask) const
 {
     return vk::ImageSubresourceRange{
-        .aspectMask = vk::ImageAspectFlagBits::eColor,
+        .aspectMask = aspectMask,
         .baseMipLevel = 0,
         .levelCount = 1,
         .baseArrayLayer = 0,

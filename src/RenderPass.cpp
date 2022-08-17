@@ -1,12 +1,17 @@
 #include "RenderPass.h"
 
-RenderPass::RenderPass(const vk::Device& vulkanLogicalDevice, const vk::SurfaceFormatKHR& swapChainSurfaceFormat) : vulkanLogicalDevice(vulkanLogicalDevice)
+RenderPass::RenderPass(const vk::Device& vulkanLogicalDevice, const vk::Format& colorImageFormat, const vk::Format& depthImageFormat) : vulkanLogicalDevice(vulkanLogicalDevice)
 {
-	const vk::AttachmentDescription attachmentDescription{ createAttachmentDescription(swapChainSurfaceFormat) };
-	const vk::AttachmentReference attachmentReference{ createAttachmentReference() };
-	const vk::SubpassDescription subpassDescription{ createSubpassDescription(attachmentReference) };
+	const vk::AttachmentDescription colorAttachmentDescription{ createColorAttachmentDescription(colorImageFormat) };
+	const vk::AttachmentDescription depthAttachmentDescription{ createDepthAttachmentDescription(depthImageFormat) };
+	const vk::AttachmentReference colorAttachmentReference{ createColorAttachmentReference() };
+	const vk::AttachmentReference depthAttachmentReference{ createDepthAttachmentReference() };
+	const vk::SubpassDescription subpassDescription{ createSubpassDescription(colorAttachmentReference, depthAttachmentReference) };
 	const vk::SubpassDependency subpassDependency{ createSubpassDependency() };
-	const vk::RenderPassCreateInfo renderPassInfo { createRenderPassCreateInfo(attachmentDescription, subpassDescription, subpassDependency)};
+	const std::vector<vk::AttachmentDescription> attachmentDescriptions = { colorAttachmentDescription,
+		depthAttachmentDescription
+	};
+	const vk::RenderPassCreateInfo renderPassInfo { createRenderPassCreateInfo(attachmentDescriptions, subpassDescription, subpassDependency)};
 	vulkanRenderPass = vulkanLogicalDevice.createRenderPass(renderPassInfo);
 }
 
@@ -15,11 +20,11 @@ RenderPass::~RenderPass()
 	vulkanLogicalDevice.destroyRenderPass(vulkanRenderPass);
 }
 
-const vk::RenderPassCreateInfo RenderPass::createRenderPassCreateInfo(const vk::AttachmentDescription& attachmentDescription, const vk::SubpassDescription& subpassDescription, const vk::SubpassDependency& subpassDependency) const
+const vk::RenderPassCreateInfo RenderPass::createRenderPassCreateInfo(const std::vector<vk::AttachmentDescription>& attachmentDescriptions, const vk::SubpassDescription& subpassDescription, const vk::SubpassDependency& subpassDependency) const
 {
 	return vk::RenderPassCreateInfo{
-		.attachmentCount = 1,
-		.pAttachments = &attachmentDescription,
+		.attachmentCount = static_cast<uint32_t>(attachmentDescriptions.size()),
+		.pAttachments = attachmentDescriptions.data(),
 		.subpassCount = 1,
 		.pSubpasses = &subpassDescription,
 		.dependencyCount = 1,
@@ -27,10 +32,10 @@ const vk::RenderPassCreateInfo RenderPass::createRenderPassCreateInfo(const vk::
 	};
 }
 
-const vk::AttachmentDescription RenderPass::createAttachmentDescription(const vk::SurfaceFormatKHR& swapChainSurfaceFormat) const
+const vk::AttachmentDescription RenderPass::createColorAttachmentDescription(const vk::Format& colorImageFormat) const
 {
 	return vk::AttachmentDescription{
-		.format = swapChainSurfaceFormat.format,
+		.format = colorImageFormat,
 		.samples = vk::SampleCountFlagBits::e1,
 		.loadOp = vk::AttachmentLoadOp::eClear,
 		.storeOp = vk::AttachmentStoreOp::eStore,
@@ -41,20 +46,43 @@ const vk::AttachmentDescription RenderPass::createAttachmentDescription(const vk
 	};
 }
 
-const vk::SubpassDescription RenderPass::createSubpassDescription(const vk::AttachmentReference& attachmentReference) const
+const vk::AttachmentDescription RenderPass::createDepthAttachmentDescription(const vk::Format& depthImageFormat) const
+{
+	return vk::AttachmentDescription{
+		.format = depthImageFormat,
+		.samples = vk::SampleCountFlagBits::e1,
+		.loadOp = vk::AttachmentLoadOp::eClear,
+		.storeOp = vk::AttachmentStoreOp::eDontCare,
+		.stencilLoadOp = vk::AttachmentLoadOp::eDontCare,
+		.stencilStoreOp = vk::AttachmentStoreOp::eDontCare,
+		.initialLayout = vk::ImageLayout::eUndefined,
+		.finalLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal
+	};
+}
+
+const vk::SubpassDescription RenderPass::createSubpassDescription(const vk::AttachmentReference& colorAttachmentReference, const vk::AttachmentReference& depthAttachmentReference) const
 {
 	return vk::SubpassDescription{
 		.pipelineBindPoint = vk::PipelineBindPoint::eGraphics,
 		.colorAttachmentCount = 1,
-		.pColorAttachments = &attachmentReference
+		.pColorAttachments = &colorAttachmentReference,
+		.pDepthStencilAttachment = &depthAttachmentReference
 	};
 }
 
-const vk::AttachmentReference RenderPass::createAttachmentReference() const
+const vk::AttachmentReference RenderPass::createColorAttachmentReference() const
 {
 	return vk::AttachmentReference{
 		.attachment = 0,
 		.layout = vk::ImageLayout::eColorAttachmentOptimal
+	};
+}
+
+const vk::AttachmentReference RenderPass::createDepthAttachmentReference() const
+{
+	return vk::AttachmentReference{
+		.attachment = 1,
+		.layout = vk::ImageLayout::eDepthStencilAttachmentOptimal
 	};
 }
 
@@ -63,17 +91,17 @@ const vk::SubpassDependency RenderPass::createSubpassDependency() const
 	return vk::SubpassDependency{
 		.srcSubpass = VK_SUBPASS_EXTERNAL,
 		.dstSubpass = 0,
-		.srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput,
-		.dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput,
-		.dstAccessMask = vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite
+		.srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests,
+		.dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests,
+		.dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eDepthStencilAttachmentWrite
 	};
 }
 
 const vk::RenderPassBeginInfo RenderPass::createRenderPassBeginInfo(const vk::Framebuffer& vulkanFramebuffer, const vk::Extent2D& swapChainExtent) const
 {
-	vk::ClearValue clearColor{
-		.color = vk::ClearColorValue(std::array<float, 4>{ 0.0f, 0.0f, 0.0f, 1.0f })
-	};
+	std::array<vk::ClearValue, 2> clearValues{};
+	clearValues[0].color = vk::ClearColorValue(std::array<float, 4>{ 0.0f, 0.0f, 0.0f, 1.0f });
+	clearValues[1].depthStencil = vk::ClearDepthStencilValue(1.0f, 0);
 	vk::Rect2D renderArea{
 		.offset = {0, 0},
 		.extent = swapChainExtent
@@ -82,8 +110,8 @@ const vk::RenderPassBeginInfo RenderPass::createRenderPassBeginInfo(const vk::Fr
 		.renderPass = vulkanRenderPass,
 		.framebuffer = vulkanFramebuffer,
 		.renderArea = renderArea,
-		.clearValueCount = 1,
-		.pClearValues = &clearColor
+		.clearValueCount = static_cast<uint32_t>(clearValues.size()),
+		.pClearValues = clearValues.data()
 	};
 }
 

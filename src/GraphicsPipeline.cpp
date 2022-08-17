@@ -14,6 +14,7 @@ GraphicsPipeline::GraphicsPipeline(const GraphicsPipelineCreateInfo& graphicsPip
 	const vk::PipelineColorBlendAttachmentState colorBlendAttachmentState{ buildPipelineColorBlendAttachmentState() };
 	const vk::PipelineColorBlendStateCreateInfo  colorBlendState{ buildPipelineColorBlendStateCreateInfo(colorBlendAttachmentState) };
 	const vk::PipelineDynamicStateCreateInfo  dynamicState{ buildPipelineDynamicStateCreateInfo() };
+	const vk::PipelineDepthStencilStateCreateInfo depthStencilState{ buildPipelineDepthStencilStateCreateInfo() };
 	const vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{ buildPipelineLayoutCreateInfo(graphicsPipelineCreateInfo.vulkanDescriptorSetLayout) };
 	pipelineLayout = vulkanLogicalDevice.createPipelineLayout(pipelineLayoutCreateInfo);
 	const vk::GraphicsPipelineCreateInfo vulkanGraphicsPipelineCreateInfo{
@@ -24,6 +25,7 @@ GraphicsPipeline::GraphicsPipeline(const GraphicsPipelineCreateInfo& graphicsPip
 		.pViewportState = &viewportState,
 		.pRasterizationState = &rasterizationState,
 		.pMultisampleState = &multisampleState,
+		.pDepthStencilState = &depthStencilState,
 		.pColorBlendState = &colorBlendState,
 		.layout = pipelineLayout,
 		.renderPass = graphicsPipelineCreateInfo.vulkanRenderPass,
@@ -151,6 +153,18 @@ const vk::PipelineDynamicStateCreateInfo GraphicsPipeline::buildPipelineDynamicS
 	return vk::PipelineDynamicStateCreateInfo{
 		.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()),
 		.pDynamicStates = dynamicStates.data()
+	};
+}
+
+const vk::PipelineDepthStencilStateCreateInfo GraphicsPipeline::buildPipelineDepthStencilStateCreateInfo() const
+{
+	return vk::PipelineDepthStencilStateCreateInfo{
+		.depthTestEnable = vk::Bool32(1),
+		.depthWriteEnable = vk::Bool32(1),
+		.depthCompareOp = vk::CompareOp::eLess,
+		.depthBoundsTestEnable = vk::Bool32(0),
+		.minDepthBounds = 0.0f,
+		.maxDepthBounds = 1.0f
 	};
 }
 

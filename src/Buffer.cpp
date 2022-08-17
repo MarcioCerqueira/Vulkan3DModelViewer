@@ -25,10 +25,10 @@ const vk::BufferCreateInfo Buffer::buildBufferCreateInfo(const vk::DeviceSize& c
 	};
 }
 
-void Buffer::createVulkanBufferMemory(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::MemoryPropertyFlags& memoryPropertyFlags)
+void Buffer::createVulkanBufferMemory(const PhysicalDeviceProperties& physicalDeviceProperties, const vk::MemoryPropertyFlags& memoryPropertyFlags)
 {
 	const vk::MemoryRequirements memoryRequirements{ vulkanLogicalDevice.getBufferMemoryRequirements(vulkanBuffer) };
-	const uint32_t memoryTypeIndex{ MemoryProperties::findMemoryType(vulkanPhysicalDevice, memoryRequirements.memoryTypeBits, memoryPropertyFlags) };
+	const uint32_t memoryTypeIndex{ physicalDeviceProperties.findMemoryType(memoryRequirements.memoryTypeBits, memoryPropertyFlags) };
 	const vk::MemoryAllocateInfo memoryAllocateInfo{ buildMemoryAllocateInfo(memoryRequirements, memoryTypeIndex) };
 	vulkanBufferMemory = vulkanLogicalDevice.allocateMemory(memoryAllocateInfo);
 }

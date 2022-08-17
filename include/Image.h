@@ -4,7 +4,6 @@
 #include <vulkan/vulkan.hpp>
 #include <stdexcept>
 #include <tuple>
-#include "MemoryProperties.h"
 #include "CommandBuffer.h"
 #include "ImageView.h"
 #include "Sampler.h"
@@ -17,7 +16,7 @@ public:
 	~Image();
 
 	void transitionLayout(const vk::ImageLayout& oldLayout, const vk::ImageLayout& newLayout, std::shared_ptr<CommandBuffer>& commandBuffers);
-	void createImageView();
+	void createImageView(const vk::ImageAspectFlags& aspectMask);
 	const vk::Image getVulkanImage() const;
 	const vk::ImageView getVulkanImageView() const;
 	const vk::Sampler getVulkanSampler() const;
@@ -25,7 +24,7 @@ public:
 	const vk::BufferImageCopy buildBufferImageCopy() const;
 
 private:
-	const vk::ImageCreateInfo buildImageCreateInfo() const;
+	const vk::ImageCreateInfo buildImageCreateInfo(const vk::ImageUsageFlags& imageUsageFlags) const;
 	const vk::MemoryAllocateInfo buildMemoryAllocateInfo(const vk::MemoryRequirements& memoryRequirements, const uint32_t memoryTypeIndex) const;
 	const vk::ImageMemoryBarrier buildImageMemoryBarrier(const vk::ImageLayout& oldLayout, const vk::ImageLayout& newLayout) const;
 	const vk::ImageSubresourceRange buildImageSubresourceRange() const;

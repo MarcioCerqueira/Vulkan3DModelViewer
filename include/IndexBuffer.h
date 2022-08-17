@@ -11,7 +11,7 @@ public:
 	const vk::Buffer getVulkanBuffer() const;
 
 private:
-	void createIndexData(const std::vector<uint16_t>& indices, const vk::PhysicalDevice& vulkanPhysicalDevice);
+	void createIndexData(const std::vector<uint16_t>& indices, const PhysicalDeviceProperties& physicalDeviceProperties);
 	size_t indexCount;
 	Buffer buffer;
 	StagingBuffer stagingBuffer;

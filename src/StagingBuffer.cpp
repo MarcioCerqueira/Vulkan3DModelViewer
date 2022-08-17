@@ -4,12 +4,12 @@ StagingBuffer::StagingBuffer(const vk::Device& vulkanLogicalDevice) : buffer(vul
 {
 }
 
-void StagingBuffer::createStagingData(const vk::DeviceSize& contentSize, const vk::PhysicalDevice& vulkanPhysicalDevice)
+void StagingBuffer::createStagingData(const vk::DeviceSize& contentSize, const PhysicalDeviceProperties& physicalDeviceProperties)
 {
 	const vk::BufferUsageFlags stagingBufferUsage{ vk::BufferUsageFlagBits::eTransferSrc };
 	buffer.createVulkanBuffer(contentSize, stagingBufferUsage);
 	const vk::MemoryPropertyFlags stagingMemoryPropertyFlags{ vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent };
-	buffer.createVulkanBufferMemory(vulkanPhysicalDevice, stagingMemoryPropertyFlags);
+	buffer.createVulkanBufferMemory(physicalDeviceProperties, stagingMemoryPropertyFlags);
 	buffer.bindBufferMemory();
 }
 

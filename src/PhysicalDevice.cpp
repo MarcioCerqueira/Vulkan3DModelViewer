@@ -48,7 +48,7 @@ std::unique_ptr<LogicalDevice> PhysicalDevice::createLogicalDevice(const Logical
 {
 	const LogicalDeviceCreateInfo logicalDeviceCreateInfo{
 		.queueFamilyIndices = QueueFamilyIndices(vulkanPhysicalDevice, logicalDevicePartialCreateInfo.vulkanWindowSurface),
-		.vulkanPhysicalDevice = vulkanPhysicalDevice,
+		.physicalDeviceProperties = *this,
 		.vulkanWindowSurface = logicalDevicePartialCreateInfo.vulkanWindowSurface,
 		.vulkanDeviceExtensions = vulkanDeviceExtensions,
 		.framebufferSize = logicalDevicePartialCreateInfo.framebufferSize,
@@ -57,4 +57,42 @@ std::unique_ptr<LogicalDevice> PhysicalDevice::createLogicalDevice(const Logical
 		.model = logicalDevicePartialCreateInfo.model
 	};
 	return std::make_unique<LogicalDevice>(logicalDeviceCreateInfo);
+}
+
+const uint32_t PhysicalDevice::findMemoryType(uint32_t memoryTypeFilter, vk::MemoryPropertyFlags memoryPropertyFlags) const
+{
+	const vk::PhysicalDeviceMemoryProperties physicalDeviceMemoryProperties{ vulkanPhysicalDevice.getMemoryProperties() };
+	for (uint32_t i = 0; i < physicalDeviceMemoryProperties.memoryTypeCount; i++)
+	{
+		if (memoryTypeFilter & (1 << i))
+		{
+			if ((physicalDeviceMemoryProperties.memoryTypes[i].propertyFlags & memoryPropertyFlags) == memoryPropertyFlags)
+			{
+				return i;
+			}
+		}
+	}
+	throw std::runtime_error("Failed to find suitable memory type!");
+}
+
+const vk::Format PhysicalDevice::findSupportedFormat(const std::vector<vk::Format>& candidates, const vk::ImageTiling& tiling, const vk::FormatFeatureFlags& features) const
+{
+	for (const auto& format : candidates)
+	{
+		const vk::FormatProperties formatProperties{ vulkanPhysicalDevice.getFormatProperties(format) };
+		if (tiling == vk::ImageTiling::eLinear && (formatProperties.linearTilingFeatures & features) == features)
+		{
+			return format;
+		}
+		if (tiling == vk::ImageTiling::eOptimal && (formatProperties.optimalTilingFeatures & features) == features)
+		{
+			return format;
+		}
+	}
+	throw std::runtime_error("Failed to find supported features!");
+}
+
+const vk::PhysicalDevice PhysicalDevice::getVulkanPhysicalDevice() const
+{
+	return vulkanPhysicalDevice;
 }

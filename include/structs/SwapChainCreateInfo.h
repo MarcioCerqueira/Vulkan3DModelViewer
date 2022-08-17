@@ -6,12 +6,14 @@
 
 #include "WindowSize.h"
 #include "QueueFamilyIndices.h"
+#include "PhysicalDeviceProperties.h"
 
 struct SwapChainCreateInfo
 {
-	vk::PhysicalDevice vulkanPhysicalDevice; 
+	PhysicalDeviceProperties& physicalDeviceProperties;
 	vk::SurfaceKHR vulkanWindowSurface;
 	WindowSize framebufferSize;
 	QueueFamilyIndices queueFamilyIndices;
 	vk::Device vulkanLogicalDevice;
+	vk::Format depthImageFormat;
 };

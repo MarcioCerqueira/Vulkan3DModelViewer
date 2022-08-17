@@ -6,18 +6,19 @@ LogicalDevice::LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateI
 	const std::set<uint32_t> uniqueQueueFamilies = createUniqueQueueFamilies(logicalDeviceCreateInfo.queueFamilyIndices);
 	const std::vector<vk::DeviceQueueCreateInfo> deviceQueueCreateInfos{ buildDeviceQueueCreateInfos(uniqueQueueFamilies) };
 	const vk::DeviceCreateInfo vulkanLogicalDeviceCreateInfo{ buildVulkanLogicalDeviceCreateInfo(deviceQueueCreateInfos, logicalDeviceCreateInfo) };
-	vulkanLogicalDevice = logicalDeviceCreateInfo.vulkanPhysicalDevice.createDevice(vulkanLogicalDeviceCreateInfo);
-	createSwapChain(logicalDeviceCreateInfo);
-	createRenderPass();
-	createFramebuffers();
+	vulkanLogicalDevice = logicalDeviceCreateInfo.physicalDeviceProperties.getVulkanPhysicalDevice().createDevice(vulkanLogicalDeviceCreateInfo);
+	const vk::Format depthImageFormat{ getDepthImageFormat(logicalDeviceCreateInfo.physicalDeviceProperties) };
+	createSwapChain(logicalDeviceCreateInfo, depthImageFormat);
+	createRenderPass(depthImageFormat);
 	createPresentQueue(logicalDeviceCreateInfo.queueFamilyIndices);
 	createCommandBuffers(logicalDeviceCreateInfo.queueFamilyIndices);
 	createSynchronizationObjects();
-	createVertexBuffer(logicalDeviceCreateInfo.model.getVertices(), logicalDeviceCreateInfo.vulkanPhysicalDevice);
-	createIndexBuffer(logicalDeviceCreateInfo.model.getIndices(), logicalDeviceCreateInfo.vulkanPhysicalDevice);
-	createUniformBuffers(logicalDeviceCreateInfo.vulkanPhysicalDevice);
-	createTextureBuffer(logicalDeviceCreateInfo.model.getTextureImage(), logicalDeviceCreateInfo.vulkanPhysicalDevice);
-	createTextureImage(logicalDeviceCreateInfo.model.getTextureImage(), logicalDeviceCreateInfo.vulkanPhysicalDevice);
+	createVertexBuffer(logicalDeviceCreateInfo.model.getVertices(), logicalDeviceCreateInfo.physicalDeviceProperties);
+	createIndexBuffer(logicalDeviceCreateInfo.model.getIndices(), logicalDeviceCreateInfo.physicalDeviceProperties);
+	createUniformBuffers(logicalDeviceCreateInfo.physicalDeviceProperties);
+	createTextureBuffer(logicalDeviceCreateInfo.model.getTextureImage(), logicalDeviceCreateInfo.physicalDeviceProperties);
+	createTextureImage(logicalDeviceCreateInfo.model.getTextureImage(), logicalDeviceCreateInfo.physicalDeviceProperties);
+	createFramebuffers();
 	createDescriptorSet();
 }
 
@@ -85,26 +86,30 @@ const vk::DeviceCreateInfo LogicalDevice::buildVulkanLogicalDeviceCreateInfo(con
 	};
 }
 
-void LogicalDevice::createSwapChain(const LogicalDeviceCreateInfo& logicalDeviceCreateInfo)
+const vk::Format LogicalDevice::getDepthImageFormat(const PhysicalDeviceProperties& physicalDeviceProperties) const
+{
+	const std::vector<vk::Format> depthImageCandidateFormats = { vk::Format::eD32Sfloat, vk::Format::eD32SfloatS8Uint, vk::Format::eD24UnormS8Uint };
+	const vk::ImageTiling depthImageTiling{ vk::ImageTiling::eOptimal };
+	const vk::FormatFeatureFlags depthFormatFeatureFlags{ vk::FormatFeatureFlagBits::eDepthStencilAttachment };
+	return physicalDeviceProperties.findSupportedFormat(depthImageCandidateFormats, depthImageTiling, depthFormatFeatureFlags);
+}
+
+void LogicalDevice::createSwapChain(const LogicalDeviceCreateInfo& logicalDeviceCreateInfo, const vk::Format& depthImageFormat)
 {
 	const SwapChainCreateInfo swapChainCreateInfo{
-		.vulkanPhysicalDevice = logicalDeviceCreateInfo.vulkanPhysicalDevice,
+		.physicalDeviceProperties = logicalDeviceCreateInfo.physicalDeviceProperties,
 		.vulkanWindowSurface = logicalDeviceCreateInfo.vulkanWindowSurface,
 		.framebufferSize = logicalDeviceCreateInfo.framebufferSize,
 		.queueFamilyIndices = logicalDeviceCreateInfo.queueFamilyIndices,
-		.vulkanLogicalDevice = this->vulkanLogicalDevice
+		.vulkanLogicalDevice = this->vulkanLogicalDevice,
+		.depthImageFormat = depthImageFormat
 	};
 	swapChain = std::make_unique<SwapChain>(swapChainCreateInfo);
 }
 
-void LogicalDevice::createRenderPass()
+void LogicalDevice::createRenderPass(const vk::Format& depthImageFormat)
 {
-	renderPass = std::make_unique<RenderPass>(vulkanLogicalDevice, swapChain->getSurfaceFormat());
-}
-
-void LogicalDevice::createFramebuffers()
-{
-	swapChain->buildFramebuffers(vulkanLogicalDevice, renderPass->getVulkanRenderPass());
+	renderPass = std::make_unique<RenderPass>(vulkanLogicalDevice, swapChain->getSurfaceFormat().format, depthImageFormat);
 }
 
 void LogicalDevice::createPresentQueue(const QueueFamilyIndices& queueFamilyIndices)
@@ -126,64 +131,71 @@ void LogicalDevice::createSynchronizationObjects()
 	}
 }
 
-void LogicalDevice::createVertexBuffer(const std::vector<Vertex>& vertices, const vk::PhysicalDevice& vulkanPhysicalDevice)
+void LogicalDevice::createVertexBuffer(const std::vector<Vertex>& vertices, const PhysicalDeviceProperties& physicalDeviceProperties)
 {
-	const ContentBufferCreateInfo<Vertex> contentBufferCreateInfo{ buildContentBufferCreateInfo<Vertex>(vertices, vulkanPhysicalDevice) };
+	const ContentBufferCreateInfo<Vertex> contentBufferCreateInfo{ buildContentBufferCreateInfo<Vertex>(vertices, physicalDeviceProperties) };
 	vertexBuffer = std::make_unique<VertexBuffer>(contentBufferCreateInfo);
 }
 
 template<typename T>
-const ContentBufferCreateInfo<T> LogicalDevice::buildContentBufferCreateInfo(const std::vector<T>& content, const vk::PhysicalDevice& vulkanPhysicalDevice) const
+const ContentBufferCreateInfo<T> LogicalDevice::buildContentBufferCreateInfo(const std::vector<T>& content, const PhysicalDeviceProperties& physicalDeviceProperties) const
 {
 	return ContentBufferCreateInfo<T>{
 		.vulkanLogicalDevice = vulkanLogicalDevice,
 		.content = content,
-		.vulkanPhysicalDevice = vulkanPhysicalDevice,
+		.physicalDeviceProperties = physicalDeviceProperties,
 		.commandBuffers = commandBuffers
 	};
 }
 
-void LogicalDevice::createIndexBuffer(const std::vector<uint16_t>& indices, const vk::PhysicalDevice& vulkanPhysicalDevice)
+void LogicalDevice::createIndexBuffer(const std::vector<uint16_t>& indices, const PhysicalDeviceProperties& physicalDeviceProperties)
 {
-	const ContentBufferCreateInfo<uint16_t> contentBufferCreateInfo{ buildContentBufferCreateInfo<uint16_t>(indices, vulkanPhysicalDevice) };
+	const ContentBufferCreateInfo<uint16_t> contentBufferCreateInfo{ buildContentBufferCreateInfo<uint16_t>(indices, physicalDeviceProperties) };
 	indexBuffer = std::make_unique<IndexBuffer>(contentBufferCreateInfo);
 }
 
-void LogicalDevice::createUniformBuffers(const vk::PhysicalDevice& vulkanPhysicalDevice)
+void LogicalDevice::createUniformBuffers(const PhysicalDeviceProperties& physicalDeviceProperties)
 {
 	const vk::DeviceSize bufferSize{ sizeof(ModelViewProjectionTransformation) };
 	uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 	for (auto& uniformBuffer : uniformBuffers)
 	{
-		uniformBuffer = std::make_shared<UniformBuffer>(vulkanLogicalDevice, vulkanPhysicalDevice, bufferSize);
+		uniformBuffer = std::make_shared<UniformBuffer>(vulkanLogicalDevice, physicalDeviceProperties, bufferSize);
 	}
 }
 
-void LogicalDevice::createTextureBuffer(const TextureImage& textureImage, const vk::PhysicalDevice& vulkanPhysicalDevice)
+void LogicalDevice::createTextureBuffer(const TextureImage& textureImage, const PhysicalDeviceProperties& physicalDeviceProperties)
 {
 	textureBuffer = std::make_unique<StagingBuffer>(vulkanLogicalDevice);
-	textureBuffer->createStagingData(textureImage.getSize(), vulkanPhysicalDevice);
+	textureBuffer->createStagingData(textureImage.getSize(), physicalDeviceProperties);
 	textureBuffer->copyFromCPUToStagingMemory(textureImage.getPixels());
 }
 
-void LogicalDevice::createTextureImage(const TextureImage& textureImage, const vk::PhysicalDevice& vulkanPhysicalDevice)
+void LogicalDevice::createTextureImage(const TextureImage& textureImage, const PhysicalDeviceProperties& physicalDeviceProperties)
 {
-	const ImageInfo imageInfo{ createImageInfo(textureImage, vulkanPhysicalDevice) };
+	const ImageInfo imageInfo{ createImageInfo(textureImage, physicalDeviceProperties) };
 	vulkanTextureImage = std::make_shared<Image>(imageInfo);
 	vulkanTextureImage->transitionLayout(vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal, commandBuffers);
 	textureBuffer->copyFromStagingToDeviceMemory(commandBuffers, vulkanTextureImage);
 	vulkanTextureImage->transitionLayout(vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal, commandBuffers);
-	vulkanTextureImage->createImageView();
+	vulkanTextureImage->createImageView(vk::ImageAspectFlagBits::eColor);
 }
 
-const ImageInfo LogicalDevice::createImageInfo(const TextureImage& textureImage, const vk::PhysicalDevice& vulkanPhysicalDevice) const
+const ImageInfo LogicalDevice::createImageInfo(const TextureImage& textureImage, const PhysicalDeviceProperties& physicalDeviceProperties) const
 {
 	return ImageInfo{
 		.vulkanLogicalDevice = vulkanLogicalDevice,
-		.vulkanPhysicalDevice = vulkanPhysicalDevice,
+		.physicalDeviceProperties = physicalDeviceProperties,
 		.width = textureImage.getWidth(),
-		.height = textureImage.getHeight()
+		.height = textureImage.getHeight(),
+		.format = vk::Format::eR8G8B8A8Srgb,
+		.usageFlags = vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled
 	};
+}
+
+void LogicalDevice::createFramebuffers()
+{
+	swapChain->buildFramebuffers(vulkanLogicalDevice, renderPass->getVulkanRenderPass());
 }
 
 void LogicalDevice::createDescriptorSet()

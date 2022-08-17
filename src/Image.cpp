@@ -1,12 +1,12 @@
 #include "Image.h"
 
-Image::Image(const ImageInfo& imageInfo) : vulkanLogicalDevice(imageInfo.vulkanLogicalDevice), width(imageInfo.width), height(imageInfo.height), format(vk::Format::eR8G8B8A8Srgb), sampler(vulkanLogicalDevice, imageInfo.vulkanPhysicalDevice.getProperties())
+Image::Image(const ImageInfo& imageInfo) : vulkanLogicalDevice(imageInfo.vulkanLogicalDevice), width(imageInfo.width), height(imageInfo.height), format(imageInfo.format), sampler(vulkanLogicalDevice, imageInfo.physicalDeviceProperties.getVulkanPhysicalDevice().getProperties())
 {
 	imageLayout = vk::ImageLayout::eUndefined;
-	const vk::ImageCreateInfo imageCreateInfo{ buildImageCreateInfo() };
+	const vk::ImageCreateInfo imageCreateInfo{ buildImageCreateInfo(imageInfo.usageFlags) };
 	vulkanImage = vulkanLogicalDevice.createImage(imageCreateInfo);
 	const vk::MemoryRequirements memoryRequirements{ vulkanLogicalDevice.getImageMemoryRequirements(vulkanImage) };
-	const uint32_t memoryTypeIndex{ MemoryProperties::findMemoryType(imageInfo.vulkanPhysicalDevice, memoryRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal) };
+	const uint32_t memoryTypeIndex{ imageInfo.physicalDeviceProperties.findMemoryType(memoryRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal) };
 	const vk::MemoryAllocateInfo memoryAllocateInfo{ buildMemoryAllocateInfo(memoryRequirements, memoryTypeIndex) };
 	vulkanImageMemory = vulkanLogicalDevice.allocateMemory(memoryAllocateInfo);
 	const vk::DeviceSize memoryOffset{ 0 };
@@ -20,7 +20,7 @@ Image::~Image()
 	vulkanLogicalDevice.freeMemory(vulkanImageMemory);
 }
 
-const vk::ImageCreateInfo Image::buildImageCreateInfo() const
+const vk::ImageCreateInfo Image::buildImageCreateInfo(const vk::ImageUsageFlags& imageUsageFlags) const
 {
 	return vk::ImageCreateInfo{
 		.imageType = vk::ImageType::e2D,
@@ -28,9 +28,8 @@ const vk::ImageCreateInfo Image::buildImageCreateInfo() const
 		.extent = vk::Extent3D(static_cast<uint32_t>(width), static_cast<uint32_t>(height), 1),
 		.mipLevels = 1,
 		.arrayLayers = 1,
-		.samples = vk::SampleCountFlagBits::e1,
-		.tiling = vk::ImageTiling::eOptimal,
-		.usage = vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled,
+		.samples = vk::SampleCountFlagBits::e1,		.tiling = vk::ImageTiling::eOptimal,
+		.usage = imageUsageFlags,
 		.sharingMode = vk::SharingMode::eExclusive,
 		.initialLayout = imageLayout
 	};
@@ -54,9 +53,15 @@ void Image::transitionLayout(const vk::ImageLayout& oldLayout, const vk::ImageLa
 	imageLayout = newLayout;
 }
 
-void Image::createImageView()
+void Image::createImageView(const vk::ImageAspectFlags& aspectMask)
 {
-	imageView = std::make_unique<ImageView>(vulkanLogicalDevice, vulkanImage, format);
+	const ImageViewInfo imageViewInfo{
+		.vulkanLogicalDevice = vulkanLogicalDevice,
+		.image = vulkanImage,
+		.format = format,
+		.aspectMask = aspectMask
+	};
+	imageView = std::make_unique<ImageView>(imageViewInfo);
 }
 
 const vk::ImageMemoryBarrier Image::buildImageMemoryBarrier(const vk::ImageLayout& oldLayout, const vk::ImageLayout& newLayout) const

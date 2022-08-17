@@ -12,7 +12,7 @@ public:
 	const vk::Buffer getVulkanBuffer() const;
 
 private:
-	void createVertexData(const std::vector<Vertex>& vertices, const vk::PhysicalDevice& vulkanPhysicalDevice);
+	void createVertexData(const std::vector<Vertex>& vertices, const PhysicalDeviceProperties& physicalDeviceProperties);
 	size_t vertexCount;
 	Buffer buffer;
 	StagingBuffer stagingBuffer;

@@ -9,7 +9,7 @@ class Vertex
 public:
 	static const vk::VertexInputBindingDescription getBindingDescription();
 	static const std::array<vk::VertexInputAttributeDescription, 3> getAttributeDescriptions();
-	glm::vec2 position;
+	glm::vec3 position;
 	glm::vec3 color;
 	glm::vec2 texCoord;
 
