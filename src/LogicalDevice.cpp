@@ -148,9 +148,9 @@ const ContentBufferCreateInfo<T> LogicalDevice::buildContentBufferCreateInfo(con
 	};
 }
 
-void LogicalDevice::createIndexBuffer(const std::vector<uint16_t>& indices, const PhysicalDeviceProperties& physicalDeviceProperties)
+void LogicalDevice::createIndexBuffer(const std::vector<uint32_t>& indices, const PhysicalDeviceProperties& physicalDeviceProperties)
 {
-	const ContentBufferCreateInfo<uint16_t> contentBufferCreateInfo{ buildContentBufferCreateInfo<uint16_t>(indices, physicalDeviceProperties) };
+	const ContentBufferCreateInfo<uint32_t> contentBufferCreateInfo{ buildContentBufferCreateInfo<uint32_t>(indices, physicalDeviceProperties) };
 	indexBuffer = std::make_unique<IndexBuffer>(contentBufferCreateInfo);
 }
 
@@ -278,7 +278,7 @@ const CommandBufferRecordInfo LogicalDevice::createCommandBufferRecordInfo(const
 		.vulkanDescriptorSet = descriptorSet->getVulkanDescriptorSet(currentFrame),
 		.frameIndex = currentFrame,
 		.indexCount = indexBuffer->getIndexCount(),
-		.indexType = vk::IndexType::eUint16
+		.indexType = vk::IndexType::eUint32
 	};
 }
 

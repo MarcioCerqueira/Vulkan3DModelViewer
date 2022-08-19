@@ -2,32 +2,28 @@
 
 #include <vector>
 #include <string>
+#include <stdexcept>
+#include <unordered_map>
 #include "Vertex.h"
 #include "TextureImage.h"
+#include "tinyobjloader/tiny_obj_loader.h"
 
 class Model
 {
 public:
 	Model();
 	const std::vector<Vertex> getVertices() const;
-	const std::vector<uint16_t> getIndices() const;
+	const std::vector<uint32_t> getIndices() const;
 	const TextureImage getTextureImage() const;
 
 private:
-	const std::vector<Vertex> vertices = {
-		{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-		{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-		{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-		{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-		{{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-		{{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-		{{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-		{{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
-	};
-	const std::vector<uint16_t> indices = {
-		0, 1, 2, 2, 3, 0,
-		4, 5, 6, 6, 7, 4
-	};
-	const std::string textureFilename{ "texture.jpg" };
+	void buildMesh(const tinyobj::attrib_t& attrib, const std::vector <tinyobj::shape_t>& shapes);
+	const glm::vec3 buildPosition(const tinyobj::attrib_t& attrib, const tinyobj::index_t& index) const;
+	const glm::vec2 buildTexCoord(const tinyobj::attrib_t& attrib, const tinyobj::index_t& index) const;
+
+	std::vector<Vertex> vertices;
+	std::vector<uint32_t> indices;
+	const std::string modelFilename{ "models/viking_room.obj" };
+	const std::string textureFilename{ "textures/viking_room.png" };
 	const TextureImage textureImage;
 };

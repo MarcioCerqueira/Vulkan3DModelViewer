@@ -52,7 +52,7 @@ private:
 	void createVertexBuffer(const std::vector<Vertex>& vertices, const PhysicalDeviceProperties& physicalDeviceProperties);
 	template<typename T>
 	const ContentBufferCreateInfo<T> buildContentBufferCreateInfo(const std::vector<T>& content, const PhysicalDeviceProperties& physicalDeviceProperties) const;
-	void createIndexBuffer(const std::vector<uint16_t>& indices, const PhysicalDeviceProperties& physicalDeviceProperties);
+	void createIndexBuffer(const std::vector<uint32_t>& indices, const PhysicalDeviceProperties& physicalDeviceProperties);
 	void createUniformBuffers(const PhysicalDeviceProperties& physicalDeviceProperties);
 	void createTextureBuffer(const TextureImage& textureImage, const PhysicalDeviceProperties& physicalDeviceProperties);
 	void createTextureImage(const TextureImage& textureImage, const PhysicalDeviceProperties& physicalDeviceProperties);

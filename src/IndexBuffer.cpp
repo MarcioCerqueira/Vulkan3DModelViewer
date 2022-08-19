@@ -1,6 +1,6 @@
 #include "IndexBuffer.h"
 
-IndexBuffer::IndexBuffer(const ContentBufferCreateInfo<uint16_t>& contentBufferCreateInfo) : buffer(contentBufferCreateInfo.vulkanLogicalDevice), stagingBuffer(contentBufferCreateInfo.vulkanLogicalDevice)
+IndexBuffer::IndexBuffer(const ContentBufferCreateInfo<uint32_t>& contentBufferCreateInfo) : buffer(contentBufferCreateInfo.vulkanLogicalDevice), stagingBuffer(contentBufferCreateInfo.vulkanLogicalDevice)
 {
 	indexCount = contentBufferCreateInfo.content.size();
 	createIndexData(contentBufferCreateInfo.content, contentBufferCreateInfo.physicalDeviceProperties);
@@ -10,7 +10,7 @@ IndexBuffer::IndexBuffer(const ContentBufferCreateInfo<uint16_t>& contentBufferC
 	stagingBuffer.copyFromStagingToDeviceMemory(contentBufferCreateInfo.commandBuffers, buffer.getVulkanBuffer());
 }
 
-void IndexBuffer::createIndexData(const std::vector<uint16_t>& indices, const PhysicalDeviceProperties& physicalDeviceProperties)
+void IndexBuffer::createIndexData(const std::vector<uint32_t>& indices, const PhysicalDeviceProperties& physicalDeviceProperties)
 {
 	const vk::BufferUsageFlags indexBufferUsage{ vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eIndexBuffer };
 	const vk::DeviceSize contentSize{ sizeof(indices[0]) * indices.size() };
