@@ -1,18 +1,22 @@
 #include "RenderPass.h"
 
-RenderPass::RenderPass(const vk::Device& vulkanLogicalDevice, const vk::Format& colorImageFormat, const vk::Format& depthImageFormat) : vulkanLogicalDevice(vulkanLogicalDevice)
+RenderPass::RenderPass(const RenderPassInfo& renderPassInfo) : vulkanLogicalDevice(renderPassInfo.vulkanLogicalDevice)
 {
-	const vk::AttachmentDescription colorAttachmentDescription{ createColorAttachmentDescription(colorImageFormat) };
-	const vk::AttachmentDescription depthAttachmentDescription{ createDepthAttachmentDescription(depthImageFormat) };
-	const vk::AttachmentReference colorAttachmentReference{ createColorAttachmentReference() };
-	const vk::AttachmentReference depthAttachmentReference{ createDepthAttachmentReference() };
-	const vk::SubpassDescription subpassDescription{ createSubpassDescription(colorAttachmentReference, depthAttachmentReference) };
+	const vk::AttachmentDescription MSAAColorAttachmentDescription{ createMSAAColorAttachmentDescription(renderPassInfo) };
+	const vk::AttachmentDescription resolveColorAttachmentDescription{ createResolveColorAttachmentDescription(renderPassInfo) };
+	const vk::AttachmentDescription depthAttachmentDescription{ createDepthAttachmentDescription(renderPassInfo) };
+	const vk::AttachmentReference MSAAColorAttachmentReference{ createColorAttachmentReference(0) };
+	const vk::AttachmentReference depthAttachmentReference{ createDepthAttachmentReference(1) };
+	const vk::AttachmentReference resolveColorAttachmentReference{ createColorAttachmentReference(2) };
+	const vk::SubpassDescription subpassDescription{ createSubpassDescription(MSAAColorAttachmentReference, depthAttachmentReference, resolveColorAttachmentReference) };
 	const vk::SubpassDependency subpassDependency{ createSubpassDependency() };
-	const std::vector<vk::AttachmentDescription> attachmentDescriptions = { colorAttachmentDescription,
-		depthAttachmentDescription
+	const std::vector<vk::AttachmentDescription> attachmentDescriptions = { 
+		MSAAColorAttachmentDescription,
+		depthAttachmentDescription,
+		resolveColorAttachmentDescription
 	};
-	const vk::RenderPassCreateInfo renderPassInfo { createRenderPassCreateInfo(attachmentDescriptions, subpassDescription, subpassDependency)};
-	vulkanRenderPass = vulkanLogicalDevice.createRenderPass(renderPassInfo);
+	const vk::RenderPassCreateInfo renderPassCreateInfo { createRenderPassCreateInfo(attachmentDescriptions, subpassDescription, subpassDependency)};
+	vulkanRenderPass = vulkanLogicalDevice.createRenderPass(renderPassCreateInfo);
 }
 
 RenderPass::~RenderPass()
@@ -32,12 +36,26 @@ const vk::RenderPassCreateInfo RenderPass::createRenderPassCreateInfo(const std:
 	};
 }
 
-const vk::AttachmentDescription RenderPass::createColorAttachmentDescription(const vk::Format& colorImageFormat) const
+const vk::AttachmentDescription RenderPass::createMSAAColorAttachmentDescription(const RenderPassInfo& renderPassInfo) const
 {
 	return vk::AttachmentDescription{
-		.format = colorImageFormat,
-		.samples = vk::SampleCountFlagBits::e1,
+		.format = renderPassInfo.colorImageFormat,
+		.samples = renderPassInfo.sampleCount,
 		.loadOp = vk::AttachmentLoadOp::eClear,
+		.storeOp = vk::AttachmentStoreOp::eStore,
+		.stencilLoadOp = vk::AttachmentLoadOp::eDontCare,
+		.stencilStoreOp = vk::AttachmentStoreOp::eDontCare,
+		.initialLayout = vk::ImageLayout::eUndefined,
+		.finalLayout = vk::ImageLayout::eColorAttachmentOptimal
+	};
+}
+
+const vk::AttachmentDescription RenderPass::createResolveColorAttachmentDescription(const RenderPassInfo& renderPassInfo) const
+{
+	return vk::AttachmentDescription{
+		.format = renderPassInfo.colorImageFormat,
+		.samples = vk::SampleCountFlagBits::e1,
+		.loadOp = vk::AttachmentLoadOp::eDontCare,
 		.storeOp = vk::AttachmentStoreOp::eStore,
 		.stencilLoadOp = vk::AttachmentLoadOp::eDontCare,
 		.stencilStoreOp = vk::AttachmentStoreOp::eDontCare,
@@ -46,11 +64,11 @@ const vk::AttachmentDescription RenderPass::createColorAttachmentDescription(con
 	};
 }
 
-const vk::AttachmentDescription RenderPass::createDepthAttachmentDescription(const vk::Format& depthImageFormat) const
+const vk::AttachmentDescription RenderPass::createDepthAttachmentDescription(const RenderPassInfo& renderPassInfo) const
 {
 	return vk::AttachmentDescription{
-		.format = depthImageFormat,
-		.samples = vk::SampleCountFlagBits::e1,
+		.format = renderPassInfo.depthImageFormat,
+		.samples = renderPassInfo.sampleCount,
 		.loadOp = vk::AttachmentLoadOp::eClear,
 		.storeOp = vk::AttachmentStoreOp::eDontCare,
 		.stencilLoadOp = vk::AttachmentLoadOp::eDontCare,
@@ -60,28 +78,29 @@ const vk::AttachmentDescription RenderPass::createDepthAttachmentDescription(con
 	};
 }
 
-const vk::SubpassDescription RenderPass::createSubpassDescription(const vk::AttachmentReference& colorAttachmentReference, const vk::AttachmentReference& depthAttachmentReference) const
+const vk::SubpassDescription RenderPass::createSubpassDescription(const vk::AttachmentReference& colorAttachmentReference, const vk::AttachmentReference& depthAttachmentReference, const vk::AttachmentReference& resolveColorAttachmentReference) const
 {
 	return vk::SubpassDescription{
 		.pipelineBindPoint = vk::PipelineBindPoint::eGraphics,
 		.colorAttachmentCount = 1,
 		.pColorAttachments = &colorAttachmentReference,
+		.pResolveAttachments = &resolveColorAttachmentReference,
 		.pDepthStencilAttachment = &depthAttachmentReference
 	};
 }
 
-const vk::AttachmentReference RenderPass::createColorAttachmentReference() const
+const vk::AttachmentReference RenderPass::createColorAttachmentReference(const uint32_t attachmentIndex) const
 {
 	return vk::AttachmentReference{
-		.attachment = 0,
+		.attachment = attachmentIndex,
 		.layout = vk::ImageLayout::eColorAttachmentOptimal
 	};
 }
 
-const vk::AttachmentReference RenderPass::createDepthAttachmentReference() const
+const vk::AttachmentReference RenderPass::createDepthAttachmentReference(const uint32_t attachmentIndex) const
 {
 	return vk::AttachmentReference{
-		.attachment = 1,
+		.attachment = attachmentIndex,
 		.layout = vk::ImageLayout::eDepthStencilAttachmentOptimal
 	};
 }

@@ -11,6 +11,7 @@ struct ImageInfo
 	int width;
 	int height;
 	uint32_t mipLevels;
+	vk::SampleCountFlagBits sampleCount;
 	vk::Format format;
 	vk::ImageUsageFlags usageFlags;
 };

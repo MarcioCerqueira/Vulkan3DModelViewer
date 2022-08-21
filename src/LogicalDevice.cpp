@@ -9,7 +9,7 @@ LogicalDevice::LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateI
 	vulkanLogicalDevice = logicalDeviceCreateInfo.physicalDeviceProperties.getVulkanPhysicalDevice().createDevice(vulkanLogicalDeviceCreateInfo);
 	const vk::Format depthImageFormat{ getDepthImageFormat(logicalDeviceCreateInfo.physicalDeviceProperties) };
 	createSwapChain(logicalDeviceCreateInfo, depthImageFormat);
-	createRenderPass(depthImageFormat);
+	createRenderPass(depthImageFormat, logicalDeviceCreateInfo.physicalDeviceProperties);
 	createPresentQueue(logicalDeviceCreateInfo.queueFamilyIndices);
 	createCommandBuffers(logicalDeviceCreateInfo.queueFamilyIndices);
 	createSynchronizationObjects();
@@ -107,9 +107,15 @@ void LogicalDevice::createSwapChain(const LogicalDeviceCreateInfo& logicalDevice
 	swapChain = std::make_unique<SwapChain>(swapChainCreateInfo);
 }
 
-void LogicalDevice::createRenderPass(const vk::Format& depthImageFormat)
+void LogicalDevice::createRenderPass(const vk::Format& depthImageFormat, const PhysicalDeviceProperties& physicalDeviceProperties)
 {
-	renderPass = std::make_unique<RenderPass>(vulkanLogicalDevice, swapChain->getSurfaceFormat().format, depthImageFormat);
+	const RenderPassInfo renderPassInfo{
+		.vulkanLogicalDevice = vulkanLogicalDevice,
+		.colorImageFormat = swapChain->getSurfaceFormat().format,
+		.depthImageFormat = depthImageFormat,
+		.sampleCount = physicalDeviceProperties.getMaxUsableSampleCount()
+	};
+	renderPass = std::make_unique<RenderPass>(renderPassInfo);
 }
 
 void LogicalDevice::createPresentQueue(const QueueFamilyIndices& queueFamilyIndices)
@@ -195,6 +201,7 @@ const ImageInfo LogicalDevice::createImageInfo(const TextureImage& textureImage,
 		.width = textureImage.getWidth(),
 		.height = textureImage.getHeight(),
 		.mipLevels = static_cast<uint32_t>(textureImage.getMipLevels()),
+		.sampleCount = vk::SampleCountFlagBits::e1,
 		.format = vk::Format::eR8G8B8A8Srgb,
 		.usageFlags = vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled
 	};
@@ -215,7 +222,7 @@ const vk::Device LogicalDevice::getVulkanLogicalDevice() const
 	return vulkanLogicalDevice;
 }
 
-void LogicalDevice::createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders)
+void LogicalDevice::createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders, const PhysicalDeviceProperties& physicalDeviceProperties)
 {
 	GraphicsPipelineCreateInfo graphicsPipelineCreateInfo;
 	graphicsPipelineCreateInfo.vulkanLogicalDevice = vulkanLogicalDevice;
@@ -226,6 +233,7 @@ void LogicalDevice::createGraphicsPipeline(const std::vector<std::shared_ptr<Sha
 	}
 	graphicsPipelineCreateInfo.vulkanRenderPass = renderPass->getVulkanRenderPass();
 	graphicsPipelineCreateInfo.vulkanDescriptorSetLayout = descriptorSet->getVulkanDescriptorSetLayout();
+	graphicsPipelineCreateInfo.sampleCount = physicalDeviceProperties.getMaxUsableSampleCount();
 	graphicsPipeline = std::make_unique<GraphicsPipeline>(graphicsPipelineCreateInfo);
 }
 

@@ -11,4 +11,5 @@ struct GraphicsPipelineCreateInfo
 	std::vector<vk::PipelineShaderStageCreateInfo> shaderStages;
 	vk::RenderPass vulkanRenderPass;
 	vk::DescriptorSetLayout vulkanDescriptorSetLayout;
+	vk::SampleCountFlagBits sampleCount;
 };

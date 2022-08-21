@@ -26,7 +26,7 @@ public:
 	const vk::BufferImageCopy buildBufferImageCopy() const;
 
 private:
-	const vk::ImageCreateInfo buildImageCreateInfo(const vk::ImageUsageFlags& imageUsageFlags) const;
+	const vk::ImageCreateInfo buildImageCreateInfo(const vk::ImageUsageFlags& imageUsageFlags, const vk::SampleCountFlagBits& sampleCountFlagBits) const;
 	const vk::MemoryAllocateInfo buildMemoryAllocateInfo(const vk::MemoryRequirements& memoryRequirements, const uint32_t memoryTypeIndex) const;
 	vk::ImageMemoryBarrier buildImageMemoryBarrier(const ImageMemoryBarrierInfo& imageMemoryBarrierInfo, const uint32_t baseMipLevel, const uint32_t mipLevels) const;
 	const vk::ImageSubresourceRange buildImageSubresourceRange(const uint32_t baseMipLevel, const uint32_t mipLevels) const;

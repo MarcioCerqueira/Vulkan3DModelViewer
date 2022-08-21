@@ -20,6 +20,7 @@ public:
 	std::unique_ptr<LogicalDevice> createLogicalDevice(const LogicalDevicePartialCreateInfo& logicalDevicePartialCreateInfo);
 	const uint32_t findMemoryType(uint32_t memoryTypeFilter, vk::MemoryPropertyFlags memoryPropertyFlags) const override;
 	const vk::Format findSupportedFormat(const std::vector<vk::Format>& candidates, const vk::ImageTiling& tiling, const vk::FormatFeatureFlags& features) const override;
+	const vk::SampleCountFlagBits getMaxUsableSampleCount() const override;
 	const vk::PhysicalDevice getVulkanPhysicalDevice() const override;
 
 private:

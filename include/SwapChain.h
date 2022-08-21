@@ -39,12 +39,15 @@ private:
 	void buildSwapChainImageViews(const SwapChainCreateInfo& swapChainCreateInfo); 
 	void buildDepthImage();
 	const ImageInfo buildDepthImageInfo() const;
+	void buildColorImage();
+	const ImageInfo buildColorImageInfo() const;
 	void waitValidFramebufferSize(WindowHandler& windowHandler);
 	void cleanup();
 
 	const SwapChainCreateInfo swapChainCreateInfo;
 	vk::SwapchainKHR vulkanSwapChain;
 	std::unique_ptr<Image> depthImage;
+	std::unique_ptr<Image> colorImage;
 	std::vector<vk::Image> images; 
 	std::vector<std::unique_ptr<ImageView>> imageViews;
 	std::vector<std::unique_ptr<Framebuffer>> framebuffers;

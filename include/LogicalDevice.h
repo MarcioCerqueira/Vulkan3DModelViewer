@@ -32,7 +32,7 @@ public:
 	explicit LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateInfo);
 	~LogicalDevice();
 
-	void createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders);
+	void createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders, const PhysicalDeviceProperties& physicalDeviceProperties);
 	void drawFrame(WindowHandler& windowHandler);
 	void waitIdle();
 
@@ -45,7 +45,7 @@ private:
 	const vk::DeviceCreateInfo buildVulkanLogicalDeviceCreateInfo(const std::vector<vk::DeviceQueueCreateInfo>& deviceQueueCreateInfos, const LogicalDeviceCreateInfo& logicalDeviceCreateInfo) const;
 	const vk::Format getDepthImageFormat(const PhysicalDeviceProperties& physicalDeviceProperties) const;
 	void createSwapChain(const LogicalDeviceCreateInfo& logicalDeviceCreateInfo, const vk::Format& depthImageFormat);
-	void createRenderPass(const vk::Format& depthImageFormat);
+	void createRenderPass(const vk::Format& depthImageFormat, const PhysicalDeviceProperties& physicalDeviceProperties);
 	void createPresentQueue(const QueueFamilyIndices& queueFamilyIndices);
 	void createCommandBuffers(const QueueFamilyIndices& queueFamilyIndices);
 	void createSynchronizationObjects();

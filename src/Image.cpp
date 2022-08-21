@@ -3,7 +3,7 @@
 Image::Image(const ImageInfo& imageInfo) : vulkanLogicalDevice(imageInfo.vulkanLogicalDevice), width(imageInfo.width), height(imageInfo.height), mipLevels(imageInfo.mipLevels), format(imageInfo.format), sampler(vulkanLogicalDevice, imageInfo.physicalDeviceProperties.getVulkanPhysicalDevice().getProperties(), mipLevels)
 {
 	imageLayout = vk::ImageLayout::eUndefined;
-	const vk::ImageCreateInfo imageCreateInfo{ buildImageCreateInfo(imageInfo.usageFlags) };
+	const vk::ImageCreateInfo imageCreateInfo{ buildImageCreateInfo(imageInfo.usageFlags, imageInfo.sampleCount) };
 	vulkanImage = vulkanLogicalDevice.createImage(imageCreateInfo);
 	const vk::MemoryRequirements memoryRequirements{ vulkanLogicalDevice.getImageMemoryRequirements(vulkanImage) };
 	const uint32_t memoryTypeIndex{ imageInfo.physicalDeviceProperties.findMemoryType(memoryRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal) };
@@ -20,7 +20,7 @@ Image::~Image()
 	vulkanLogicalDevice.freeMemory(vulkanImageMemory);
 }
 
-const vk::ImageCreateInfo Image::buildImageCreateInfo(const vk::ImageUsageFlags& imageUsageFlags) const
+const vk::ImageCreateInfo Image::buildImageCreateInfo(const vk::ImageUsageFlags& imageUsageFlags, const vk::SampleCountFlagBits& sampleCountFlagBits) const
 {
 	return vk::ImageCreateInfo{
 		.imageType = vk::ImageType::e2D,
@@ -28,7 +28,8 @@ const vk::ImageCreateInfo Image::buildImageCreateInfo(const vk::ImageUsageFlags&
 		.extent = vk::Extent3D(static_cast<uint32_t>(width), static_cast<uint32_t>(height), 1),
 		.mipLevels = mipLevels,
 		.arrayLayers = 1,
-		.samples = vk::SampleCountFlagBits::e1,		.tiling = vk::ImageTiling::eOptimal,
+		.samples = sampleCountFlagBits,
+		.tiling = vk::ImageTiling::eOptimal,
 		.usage = imageUsageFlags,
 		.sharingMode = vk::SharingMode::eExclusive,
 		.initialLayout = imageLayout

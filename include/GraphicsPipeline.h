@@ -22,7 +22,7 @@ private:
 	const vk::Rect2D buildScissor(const vk::Extent2D& swapChainExtent) const;
 	const vk::PipelineViewportStateCreateInfo buildPipelineViewportStateCreateInfo(const vk::Viewport& viewport, const vk::Rect2D& scissor) const;
 	const vk::PipelineRasterizationStateCreateInfo buildPipelineRasterizationStateCreateInfo() const;
-	const vk::PipelineMultisampleStateCreateInfo buildPipelineMultisampleStateCreateInfo() const;
+	const vk::PipelineMultisampleStateCreateInfo buildPipelineMultisampleStateCreateInfo(const vk::SampleCountFlagBits& sampleCount) const;
 	const vk::PipelineColorBlendAttachmentState buildPipelineColorBlendAttachmentState() const;
 	const vk::PipelineColorBlendStateCreateInfo buildPipelineColorBlendStateCreateInfo(const vk::PipelineColorBlendAttachmentState& colorBlendAttachmentState) const;
 	const vk::PipelineDynamicStateCreateInfo buildPipelineDynamicStateCreateInfo() const;

@@ -12,6 +12,7 @@ SwapChain::SwapChain(const SwapChainCreateInfo& swapChainCreateInfo) : swapChain
     buildVulkanSwapChain(swapChainCreateInfo, capabilities, estimateImageCount(capabilities));
     buildSwapChainImageViews(swapChainCreateInfo);
     buildDepthImage();
+    buildColorImage();
 }
 
 SwapChain::~SwapChain()
@@ -27,6 +28,7 @@ void SwapChain::cleanup()
         imageViews[imageIndex].reset();
     }
     depthImage.reset();
+    colorImage.reset();
     swapChainCreateInfo.vulkanLogicalDevice.destroySwapchainKHR(vulkanSwapChain);
 }
 
@@ -143,17 +145,38 @@ const ImageInfo SwapChain::buildDepthImageInfo() const
         .width = static_cast<int>(extent.width),
         .height = static_cast<int>(extent.height),
         .mipLevels = 1,
+        .sampleCount = swapChainCreateInfo.physicalDeviceProperties.getMaxUsableSampleCount(),
         .format = swapChainCreateInfo.depthImageFormat,
         .usageFlags = vk::ImageUsageFlagBits::eDepthStencilAttachment
     };
 }
 
+void SwapChain::buildColorImage()
+{
+    const ImageInfo colorImageInfo{ buildColorImageInfo() };
+    colorImage = std::make_unique<Image>(colorImageInfo);
+    colorImage->createImageView(vk::ImageAspectFlagBits::eColor);
+}
+
+const ImageInfo SwapChain::buildColorImageInfo() const
+{
+    return ImageInfo{
+        .vulkanLogicalDevice = swapChainCreateInfo.vulkanLogicalDevice,
+        .physicalDeviceProperties = swapChainCreateInfo.physicalDeviceProperties,
+        .width = static_cast<int>(extent.width),
+        .height = static_cast<int>(extent.height),
+        .mipLevels = 1,
+        .sampleCount = swapChainCreateInfo.physicalDeviceProperties.getMaxUsableSampleCount(),
+        .format = surfaceFormat.format,
+        .usageFlags = vk::ImageUsageFlagBits::eTransientAttachment | vk::ImageUsageFlagBits::eColorAttachment
+    };
+}
 void SwapChain::buildFramebuffers(const vk::Device& vulkanLogicalDevice, const vk::RenderPass& vulkanRenderPass)
 {
     framebuffers.resize(imageViews.size());
     for (int framebufferIndex = 0; framebufferIndex < framebuffers.size(); framebufferIndex++)
     {
-        const std::vector<vk::ImageView> attachments = { imageViews[framebufferIndex]->getVulkanImageView(), depthImage->getVulkanImageView() };
+        const std::vector<vk::ImageView> attachments = { colorImage->getVulkanImageView(), depthImage->getVulkanImageView(), imageViews[framebufferIndex]->getVulkanImageView() };
         framebuffers[framebufferIndex] = std::make_unique<Framebuffer>(vulkanLogicalDevice, vulkanRenderPass, attachments, extent);
     }
 }
@@ -174,6 +197,7 @@ void SwapChain::recreateIfResultIsOutOfDateOrSuboptimalKHR(vk::Result& result, c
         buildVulkanSwapChain(swapChainCreateInfo, swapChainCreateInfo.physicalDeviceProperties.getVulkanPhysicalDevice().getSurfaceCapabilitiesKHR(swapChainCreateInfo.vulkanWindowSurface), static_cast<const uint32_t>(images.size()));
         buildSwapChainImageViews(swapChainCreateInfo);
         buildDepthImage();
+        buildColorImage();
         buildFramebuffers(swapChainCreateInfo.vulkanLogicalDevice, vulkanRenderPass);
         result = vk::Result::eSuccess;
     }

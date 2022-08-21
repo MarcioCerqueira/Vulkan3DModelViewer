@@ -10,7 +10,7 @@ GraphicsPipeline::GraphicsPipeline(const GraphicsPipelineCreateInfo& graphicsPip
 	const vk::Rect2D scissor{ buildScissor(graphicsPipelineCreateInfo.swapChainExtent) };
 	const vk::PipelineViewportStateCreateInfo viewportState{ buildPipelineViewportStateCreateInfo(viewport, scissor) };
 	const vk::PipelineRasterizationStateCreateInfo rasterizationState{ buildPipelineRasterizationStateCreateInfo() };
-	const vk::PipelineMultisampleStateCreateInfo multisampleState{ buildPipelineMultisampleStateCreateInfo() };
+	const vk::PipelineMultisampleStateCreateInfo multisampleState{ buildPipelineMultisampleStateCreateInfo(graphicsPipelineCreateInfo.sampleCount) };
 	const vk::PipelineColorBlendAttachmentState colorBlendAttachmentState{ buildPipelineColorBlendAttachmentState() };
 	const vk::PipelineColorBlendStateCreateInfo  colorBlendState{ buildPipelineColorBlendStateCreateInfo(colorBlendAttachmentState) };
 	const vk::PipelineDynamicStateCreateInfo  dynamicState{ buildPipelineDynamicStateCreateInfo() };
@@ -108,10 +108,10 @@ const vk::PipelineRasterizationStateCreateInfo GraphicsPipeline::buildPipelineRa
 	};
 }
 
-const vk::PipelineMultisampleStateCreateInfo GraphicsPipeline::buildPipelineMultisampleStateCreateInfo() const
+const vk::PipelineMultisampleStateCreateInfo GraphicsPipeline::buildPipelineMultisampleStateCreateInfo(const vk::SampleCountFlagBits& sampleCount) const
 {
 	return vk::PipelineMultisampleStateCreateInfo{
-		.rasterizationSamples = vk::SampleCountFlagBits::e1,
+		.rasterizationSamples = sampleCount,
 		.sampleShadingEnable = vk::Bool32(0),
 		.minSampleShading = 1.0f,
 		.pSampleMask = nullptr,

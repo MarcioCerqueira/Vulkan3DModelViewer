@@ -69,7 +69,7 @@ void GraphicsInstance::createLogicalDevice(const WindowSize& framebufferSize, co
 
 void GraphicsInstance::createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders)
 {
-	logicalDevice->createGraphicsPipeline(shaders);
+	logicalDevice->createGraphicsPipeline(shaders, physicalDevice);
 }
 
 void GraphicsInstance::drawFrame(WindowHandler& windowHandler)

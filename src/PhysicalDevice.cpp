@@ -92,6 +92,40 @@ const vk::Format PhysicalDevice::findSupportedFormat(const std::vector<vk::Forma
 	throw std::runtime_error("Failed to find supported features!");
 }
 
+const vk::SampleCountFlagBits PhysicalDevice::getMaxUsableSampleCount() const
+{
+	const vk::PhysicalDeviceProperties vulkanPhysicalDeviceProperties{ vulkanPhysicalDevice.getProperties() };
+	const vk::SampleCountFlags sampleCounts{ vulkanPhysicalDeviceProperties.limits.framebufferColorSampleCounts & vulkanPhysicalDeviceProperties.limits.framebufferDepthSampleCounts };
+	if (sampleCounts & vk::SampleCountFlagBits::e64)
+	{
+		return vk::SampleCountFlagBits::e64;
+	}
+	else if (sampleCounts & vk::SampleCountFlagBits::e32)
+	{
+		return vk::SampleCountFlagBits::e32;
+	}
+	else if (sampleCounts & vk::SampleCountFlagBits::e16)
+	{
+		return vk::SampleCountFlagBits::e16;
+	}
+	else if (sampleCounts & vk::SampleCountFlagBits::e8)
+	{
+		return vk::SampleCountFlagBits::e8;
+	}
+	else if (sampleCounts & vk::SampleCountFlagBits::e4)
+	{
+		return vk::SampleCountFlagBits::e4;
+	}
+	else if (sampleCounts & vk::SampleCountFlagBits::e2)
+	{
+		return vk::SampleCountFlagBits::e2;
+	}
+	else
+	{
+		return vk::SampleCountFlagBits::e1;
+	}
+}
+
 const vk::PhysicalDevice PhysicalDevice::getVulkanPhysicalDevice() const
 {
 	return vulkanPhysicalDevice;
