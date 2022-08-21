@@ -8,4 +8,5 @@ struct ImageViewInfo
 	vk::Image image;
 	vk::Format format;
 	vk::ImageAspectFlags aspectMask;
+	uint32_t mipLevels;
 };

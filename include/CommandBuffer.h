@@ -9,18 +9,22 @@
 #include "structs/CommandBufferBufferToImageCopyInfo.h"
 #include "structs/CommandBufferPipelineBarrierInfo.h"
 #include "structs/CommandBufferRecordInfo.h"
+#include "structs/CommandBufferBlitImageInfo.h"
 
 class CommandBuffer
 {
 public:
 	CommandBuffer(const vk::Device& vulkanLogicalDevice, const std::optional<uint32_t>& graphicsFamilyIndex, const int maxFramesInFlight);
+	void beginOneTimeSubmit(const int frameIndex);
+	void endOneTimeSubmit(const int frameIndex);
 	void copy(const CommandBufferBufferToBufferCopyInfo& commandBufferBufferToBufferCopyInfo);
 	void copy(const CommandBufferBufferToImageCopyInfo& commandBufferBufferToImageCopyInfo);
 	void pipelineBarrier(const CommandBufferPipelineBarrierInfo& commandBufferPipelineBarrierInfo);
 	void record(const CommandBufferRecordInfo& commandBufferRecordInfo);
+	void blitImage(const CommandBufferBlitImageInfo& commandBuferBlitImageInfo);
 	void reset(const int frameIndex);
 	void submit(std::shared_ptr<SynchronizationObjects>& synchronizationObjects, const int frameIndex);
-
+	
 	const vk::CommandBuffer getVulkanCommandBuffer(const int frameIndex) const;
 
 private:

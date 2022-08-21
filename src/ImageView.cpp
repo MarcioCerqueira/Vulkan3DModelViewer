@@ -2,7 +2,7 @@
 
 ImageView::ImageView(const ImageViewInfo& imageViewInfo) : vulkanLogicalDevice(imageViewInfo.vulkanLogicalDevice)
 {
-    vk::ImageViewCreateInfo imageViewCreateInfo{ buildImageViewCreateInfo(imageViewInfo.image, imageViewInfo.format, imageViewInfo.aspectMask) };
+    vk::ImageViewCreateInfo imageViewCreateInfo{ buildImageViewCreateInfo(imageViewInfo) };
     vulkanImageView = vulkanLogicalDevice.createImageView(imageViewCreateInfo);
 }
 
@@ -11,23 +11,23 @@ ImageView::~ImageView()
     vulkanLogicalDevice.destroyImageView(vulkanImageView);
 }
 
-const vk::ImageViewCreateInfo ImageView::buildImageViewCreateInfo(const vk::Image& image, const vk::Format& format, const vk::ImageAspectFlags& aspectMask) const
+const vk::ImageViewCreateInfo ImageView::buildImageViewCreateInfo(const ImageViewInfo& imageViewInfo) const
 {
     return vk::ImageViewCreateInfo{
-        .image = image,
+        .image = imageViewInfo.image,
         .viewType = vk::ImageViewType::e2D,
-        .format = format,
+        .format = imageViewInfo.format,
         .components = vk::ComponentSwizzle::eIdentity,
-        .subresourceRange = createImageSubresourceRange(aspectMask)
+        .subresourceRange = createImageSubresourceRange(imageViewInfo)
     };
 }
 
-const vk::ImageSubresourceRange ImageView::createImageSubresourceRange(const vk::ImageAspectFlags& aspectMask) const
+const vk::ImageSubresourceRange ImageView::createImageSubresourceRange(const ImageViewInfo& imageViewInfo) const
 {
     return vk::ImageSubresourceRange{
-        .aspectMask = aspectMask,
+        .aspectMask = imageViewInfo.aspectMask,
         .baseMipLevel = 0,
-        .levelCount = 1,
+        .levelCount = imageViewInfo.mipLevels,
         .baseArrayLayer = 0,
         .layerCount = 1
     };

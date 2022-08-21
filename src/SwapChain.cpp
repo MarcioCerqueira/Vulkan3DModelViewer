@@ -121,7 +121,8 @@ void SwapChain::buildSwapChainImageViews(const SwapChainCreateInfo& swapChainCre
             .vulkanLogicalDevice = swapChainCreateInfo.vulkanLogicalDevice,
             .image = images[imageIndex],
             .format = surfaceFormat.format,
-            .aspectMask = vk::ImageAspectFlagBits::eColor
+            .aspectMask = vk::ImageAspectFlagBits::eColor,
+            .mipLevels = 1
         };
         imageViews[imageIndex] = std::make_unique<ImageView>(imageViewInfo);
     }
@@ -141,6 +142,7 @@ const ImageInfo SwapChain::buildDepthImageInfo() const
         .physicalDeviceProperties = swapChainCreateInfo.physicalDeviceProperties,
         .width = static_cast<int>(extent.width),
         .height = static_cast<int>(extent.height),
+        .mipLevels = 1,
         .format = swapChainCreateInfo.depthImageFormat,
         .usageFlags = vk::ImageUsageFlagBits::eDepthStencilAttachment
     };

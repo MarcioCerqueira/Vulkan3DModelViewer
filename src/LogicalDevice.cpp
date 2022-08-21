@@ -175,9 +175,15 @@ void LogicalDevice::createTextureImage(const TextureImage& textureImage, const P
 {
 	const ImageInfo imageInfo{ createImageInfo(textureImage, physicalDeviceProperties) };
 	vulkanTextureImage = std::make_shared<Image>(imageInfo);
-	vulkanTextureImage->transitionLayout(vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal, commandBuffers);
+	const ImageMemoryBarrierInfo imageMemoryBarrierInfo{
+		.srcAccessMask = vk::AccessFlagBits::eNoneKHR,
+		.dstAccessMask = vk::AccessFlagBits::eTransferWrite,
+		.oldLayout = vk::ImageLayout::eUndefined,
+		.newLayout = vk::ImageLayout::eTransferDstOptimal
+	};
+	vulkanTextureImage->transitionLayout(imageMemoryBarrierInfo, commandBuffers);
 	textureBuffer->copyFromStagingToDeviceMemory(commandBuffers, vulkanTextureImage);
-	vulkanTextureImage->transitionLayout(vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal, commandBuffers);
+	vulkanTextureImage->generateMipmaps(commandBuffers, physicalDeviceProperties);
 	vulkanTextureImage->createImageView(vk::ImageAspectFlagBits::eColor);
 }
 
@@ -188,8 +194,9 @@ const ImageInfo LogicalDevice::createImageInfo(const TextureImage& textureImage,
 		.physicalDeviceProperties = physicalDeviceProperties,
 		.width = textureImage.getWidth(),
 		.height = textureImage.getHeight(),
+		.mipLevels = static_cast<uint32_t>(textureImage.getMipLevels()),
 		.format = vk::Format::eR8G8B8A8Srgb,
-		.usageFlags = vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled
+		.usageFlags = vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled
 	};
 }
 

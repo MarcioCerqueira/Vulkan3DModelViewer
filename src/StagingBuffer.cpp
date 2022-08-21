@@ -26,7 +26,9 @@ void StagingBuffer::copyFromStagingToDeviceMemory(const std::shared_ptr<CommandB
 		.dstBuffer = dstBuffer,
 		.bufferSize = buffer.getBufferCreateInfo().size
 	};
+	commandBuffers->beginOneTimeSubmit(commandBufferBufferToBufferCopyInfo.frameIndex);
 	commandBuffers->copy(commandBufferBufferToBufferCopyInfo);
+	commandBuffers->endOneTimeSubmit(commandBufferBufferToBufferCopyInfo.frameIndex);
 }
 
 void StagingBuffer::copyFromStagingToDeviceMemory(const std::shared_ptr<CommandBuffer>& commandBuffers, const std::shared_ptr<Image>& dstImage)
@@ -37,5 +39,7 @@ void StagingBuffer::copyFromStagingToDeviceMemory(const std::shared_ptr<CommandB
 		.dstImage = dstImage->getVulkanImage(),
 		.bufferImageCopy = dstImage->buildBufferImageCopy()
 	};
+	commandBuffers->beginOneTimeSubmit(commandBufferBufferToImageCopyInfo.frameIndex);
 	commandBuffers->copy(commandBufferBufferToImageCopyInfo);
+	commandBuffers->endOneTimeSubmit(commandBufferBufferToImageCopyInfo.frameIndex);
 }

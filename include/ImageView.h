@@ -13,8 +13,8 @@ public:
 	const vk::ImageView getVulkanImageView() const;
 
 private:
-	const vk::ImageViewCreateInfo buildImageViewCreateInfo(const vk::Image& image, const vk::Format& format, const vk::ImageAspectFlags& aspectMask) const;
-	const vk::ImageSubresourceRange createImageSubresourceRange(const vk::ImageAspectFlags& aspectMask) const;
+	const vk::ImageViewCreateInfo buildImageViewCreateInfo(const ImageViewInfo& imageViewInfo) const;
+	const vk::ImageSubresourceRange createImageSubresourceRange(const ImageViewInfo& imageViewInfo) const;
 
 	const vk::Device vulkanLogicalDevice;
 	vk::ImageView vulkanImageView;

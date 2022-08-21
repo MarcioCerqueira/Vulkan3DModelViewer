@@ -16,45 +16,43 @@ const vk::CommandBufferAllocateInfo CommandBuffer::buildCommandBufferAllocateInf
 	};
 }
 
+void CommandBuffer::beginOneTimeSubmit(const int frameIndex)
+{
+	const vk::CommandBufferBeginInfo commandBufferBeginInfo{ .flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit };
+	vulkanCommandBuffers[frameIndex].begin(commandBufferBeginInfo);
+}
+
+void CommandBuffer::endOneTimeSubmit(const int frameIndex)
+{
+	vulkanCommandBuffers[frameIndex].end();
+	graphicsQueue.submit(vulkanCommandBuffers[frameIndex]);
+	graphicsQueue.waitIdle();
+}
+
 void CommandBuffer::copy(const CommandBufferBufferToBufferCopyInfo& commandBufferBufferToBufferCopyInfo)
 {
 	ExceptionChecker::throwExceptionIfIndexIsOutOfBounds(commandBufferBufferToBufferCopyInfo.frameIndex, vulkanCommandBuffers.size(), "Error in CommandBuffer! Index is out of bounds");
-	const vk::CommandBufferBeginInfo commandBufferBeginInfo{ .flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit };
 	const vk::BufferCopy bufferCopyRegion{ .size = commandBufferBufferToBufferCopyInfo.bufferSize };
-	vulkanCommandBuffers[commandBufferBufferToBufferCopyInfo.frameIndex].begin(commandBufferBeginInfo);
 	vulkanCommandBuffers[commandBufferBufferToBufferCopyInfo.frameIndex].copyBuffer(commandBufferBufferToBufferCopyInfo.srcBuffer, commandBufferBufferToBufferCopyInfo.dstBuffer, 1, &bufferCopyRegion);
-	vulkanCommandBuffers[commandBufferBufferToBufferCopyInfo.frameIndex].end();
-	graphicsQueue.submit(vulkanCommandBuffers[commandBufferBufferToBufferCopyInfo.frameIndex]);
-	graphicsQueue.waitIdle();
 }
 
 void CommandBuffer::copy(const CommandBufferBufferToImageCopyInfo& commandBufferBufferToImageCopyInfo)
 {
 	ExceptionChecker::throwExceptionIfIndexIsOutOfBounds(commandBufferBufferToImageCopyInfo.frameIndex, vulkanCommandBuffers.size(), "Error in CommandBuffer! Index is out of bounds");
-	const vk::CommandBufferBeginInfo commandBufferBeginInfo{ .flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit };
 	const uint32_t regionCount{ 1 };
-	vulkanCommandBuffers[commandBufferBufferToImageCopyInfo.frameIndex].begin(commandBufferBeginInfo);
 	vulkanCommandBuffers[commandBufferBufferToImageCopyInfo.frameIndex].copyBufferToImage(commandBufferBufferToImageCopyInfo.srcBuffer, commandBufferBufferToImageCopyInfo.dstImage, vk::ImageLayout::eTransferDstOptimal, regionCount, &commandBufferBufferToImageCopyInfo.bufferImageCopy);
-	vulkanCommandBuffers[commandBufferBufferToImageCopyInfo.frameIndex].end();
-	graphicsQueue.submit(vulkanCommandBuffers[commandBufferBufferToImageCopyInfo.frameIndex]);
-	graphicsQueue.waitIdle();
 }
 
 void CommandBuffer::pipelineBarrier(const CommandBufferPipelineBarrierInfo& commandBufferPipelineBarrierInfo)
 {
 	ExceptionChecker::throwExceptionIfIndexIsOutOfBounds(commandBufferPipelineBarrierInfo.frameIndex, vulkanCommandBuffers.size(), "Error in CommandBuffer! Index is out of bounds");
-	const vk::CommandBufferBeginInfo commandBufferBeginInfo{ .flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit };
 	const vk::DependencyFlags dependencyFlags;
 	const uint32_t memoryBarrierCount = 0;
 	const vk::MemoryBarrier* memoryBarrier = nullptr;
 	const uint32_t bufferMemoryBarrierCount = 0;
 	const vk::BufferMemoryBarrier* bufferMemoryBarrier = nullptr;
 	const uint32_t imageMemoryBarrierCount = 1;
-	vulkanCommandBuffers[commandBufferPipelineBarrierInfo.frameIndex].begin(commandBufferBeginInfo);
 	vulkanCommandBuffers[commandBufferPipelineBarrierInfo.frameIndex].pipelineBarrier(commandBufferPipelineBarrierInfo.srcStage, commandBufferPipelineBarrierInfo.dstStage, dependencyFlags, memoryBarrierCount, memoryBarrier, bufferMemoryBarrierCount, bufferMemoryBarrier, imageMemoryBarrierCount, &commandBufferPipelineBarrierInfo.imageMemoryBarrier);
-	vulkanCommandBuffers[commandBufferPipelineBarrierInfo.frameIndex].end();	
-	graphicsQueue.submit(vulkanCommandBuffers[commandBufferPipelineBarrierInfo.frameIndex]);
-	graphicsQueue.waitIdle();
 }
 
 void CommandBuffer::record(const CommandBufferRecordInfo& commandBufferRecordInfo)
@@ -71,6 +69,13 @@ void CommandBuffer::record(const CommandBufferRecordInfo& commandBufferRecordInf
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].drawIndexed(static_cast<uint32_t>(commandBufferRecordInfo.indexCount), commandBufferRecordInfo.instanceCount, commandBufferRecordInfo.firstIndex, commandBufferRecordInfo.vertexOffset, commandBufferRecordInfo.firstInstance);
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].endRenderPass();
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].end();
+}
+
+void CommandBuffer::blitImage(const CommandBufferBlitImageInfo& commandBuferBlitImageInfo)
+{
+	ExceptionChecker::throwExceptionIfIndexIsOutOfBounds(commandBuferBlitImageInfo.frameIndex, vulkanCommandBuffers.size(), "Error in CommandBuffer! Index is out of bounds");
+	const uint32_t regionCount{ 1 };
+	vulkanCommandBuffers[commandBuferBlitImageInfo.frameIndex].blitImage(commandBuferBlitImageInfo.image, commandBuferBlitImageInfo.srcLayout, commandBuferBlitImageInfo.image, commandBuferBlitImageInfo.dstLayout, regionCount, &commandBuferBlitImageInfo.blit, vk::Filter::eLinear);
 }
 
 void CommandBuffer::reset(const int frameIndex)

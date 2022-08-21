@@ -3,11 +3,12 @@
 #define VULKAN_HPP_NO_CONSTRUCTORS
 #include <vulkan/vulkan.hpp>
 #include <stdexcept>
-#include <tuple>
 #include "CommandBuffer.h"
 #include "ImageView.h"
 #include "Sampler.h"
 #include "structs/ImageInfo.h"
+#include "structs/ImageMemoryBarrierInfo.h"
+#include "PhysicalDeviceProperties.h"
 
 class Image
 {
@@ -15,8 +16,9 @@ public:
 	Image(const ImageInfo& imageInfo);
 	~Image();
 
-	void transitionLayout(const vk::ImageLayout& oldLayout, const vk::ImageLayout& newLayout, std::shared_ptr<CommandBuffer>& commandBuffers);
+	void transitionLayout(const ImageMemoryBarrierInfo& imageMemoryBarrierInfo, std::shared_ptr<CommandBuffer>& commandBuffers);
 	void createImageView(const vk::ImageAspectFlags& aspectMask);
+	void generateMipmaps(std::shared_ptr<CommandBuffer>& commandBuffers, const PhysicalDeviceProperties& physicalDeviceProperties);
 	const vk::Image getVulkanImage() const;
 	const vk::ImageView getVulkanImageView() const;
 	const vk::Sampler getVulkanSampler() const;
@@ -26,16 +28,23 @@ public:
 private:
 	const vk::ImageCreateInfo buildImageCreateInfo(const vk::ImageUsageFlags& imageUsageFlags) const;
 	const vk::MemoryAllocateInfo buildMemoryAllocateInfo(const vk::MemoryRequirements& memoryRequirements, const uint32_t memoryTypeIndex) const;
-	const vk::ImageMemoryBarrier buildImageMemoryBarrier(const vk::ImageLayout& oldLayout, const vk::ImageLayout& newLayout) const;
-	const vk::ImageSubresourceRange buildImageSubresourceRange() const;
-	std::tuple<vk::PipelineStageFlags, vk::PipelineStageFlags> determinePipelineStages(const vk::ImageLayout& oldLayout, const vk::ImageLayout& newLayout) const;
-	const CommandBufferPipelineBarrierInfo buildCommandBufferPipelineBarrierInfo(const vk::PipelineStageFlags& srcStage, const vk::PipelineStageFlags& dstStage, const vk::ImageMemoryBarrier& imageMemoryBarrier) const;
-	const vk::ImageSubresourceLayers buildImageSubresourceLayers() const;
+	vk::ImageMemoryBarrier buildImageMemoryBarrier(const ImageMemoryBarrierInfo& imageMemoryBarrierInfo, const uint32_t baseMipLevel, const uint32_t mipLevels) const;
+	const vk::ImageSubresourceRange buildImageSubresourceRange(const uint32_t baseMipLevel, const uint32_t mipLevels) const;
+	const vk::PipelineStageFlags determinePipelineStage(const vk::ImageLayout& layout) const;
+	const CommandBufferPipelineBarrierInfo buildCommandBufferPipelineBarrierInfo(const ImageMemoryBarrierInfo& imageMemoryBarrierInfo, const vk::ImageMemoryBarrier& imageMemoryBarrier) const;
+	void checkLinearBlittingSupport(const PhysicalDeviceProperties& physicalDeviceProperties) const;
+	const vk::ImageBlit buildImageBlit(const uint32_t level, const int32_t mipWidth, const int32_t mipHeight) const;
+	const vk::ImageSubresourceLayers buildImageSubresourceLayers(const uint32_t mipLevel) const;
+	const CommandBufferBlitImageInfo buildCommandBufferBlitImageInfo(const vk::ImageLayout& srcLayout, const vk::ImageLayout& dstLayout, const vk::ImageBlit& imageBlit) const;
+	const ImageMemoryBarrierInfo prepareMipLevelForBlit(std::shared_ptr<CommandBuffer>& commandBuffers, const int level);
+	void transferMipLevelToShaderLayout(std::shared_ptr<CommandBuffer>& commandBuffers, const int level);
+	void transferLastMipLevelToShaderLayout(std::shared_ptr<CommandBuffer>& commandBuffers);
 
 	const vk::Device vulkanLogicalDevice; 
 	const int width;
 	const int height;
 	const vk::Format format;
+	const uint32_t mipLevels;
 	vk::Image vulkanImage;
 	std::unique_ptr<ImageView> imageView;
 	vk::DeviceMemory vulkanImageMemory;

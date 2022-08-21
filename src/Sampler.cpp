@@ -1,8 +1,8 @@
 #include "Sampler.h"
 
-Sampler::Sampler(const vk::Device& vulkanLogicalDevice, const vk::PhysicalDeviceProperties& physicalDeviceProperties) : vulkanLogicalDevice(vulkanLogicalDevice)
+Sampler::Sampler(const vk::Device& vulkanLogicalDevice, const vk::PhysicalDeviceProperties& physicalDeviceProperties, const uint32_t mipLevels) : vulkanLogicalDevice(vulkanLogicalDevice)
 {
-	const vk::SamplerCreateInfo samplerCreateInfo{ buildSamplerCreateInfo(physicalDeviceProperties) };
+	const vk::SamplerCreateInfo samplerCreateInfo{ buildSamplerCreateInfo(physicalDeviceProperties, mipLevels) };
 	vulkanSampler = vulkanLogicalDevice.createSampler(samplerCreateInfo);
 }
 
@@ -11,7 +11,7 @@ Sampler::~Sampler()
 	vulkanLogicalDevice.destroySampler(vulkanSampler);
 }
 
-const vk::SamplerCreateInfo Sampler::buildSamplerCreateInfo(const vk::PhysicalDeviceProperties& physicalDeviceProperties) const
+const vk::SamplerCreateInfo Sampler::buildSamplerCreateInfo(const vk::PhysicalDeviceProperties& physicalDeviceProperties, const uint32_t mipLevels) const
 {
 	return vk::SamplerCreateInfo{
 		.magFilter = vk::Filter::eLinear,
@@ -26,7 +26,7 @@ const vk::SamplerCreateInfo Sampler::buildSamplerCreateInfo(const vk::PhysicalDe
 		.compareEnable = vk::Bool32{false},
 		.compareOp = vk::CompareOp::eAlways,
 		.minLod = 0.0f,
-		.maxLod = 0.0f,
+		.maxLod = static_cast<float>(mipLevels),
 		.borderColor = vk::BorderColor::eIntOpaqueBlack,
 		.unnormalizedCoordinates = vk::Bool32{false}
 	};

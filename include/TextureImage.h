@@ -14,10 +14,12 @@ public:
 	const int getSize() const;
 	const int getWidth() const;
 	const int getHeight() const;
+	const int getMipLevels() const;
 
 private:
 	stbi_uc* pixels;
 	int width;
 	int height;
+	int mipLevels;
 	int channels;
 };

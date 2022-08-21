@@ -10,6 +10,7 @@ struct ImageInfo
 	const PhysicalDeviceProperties& physicalDeviceProperties;
 	int width;
 	int height;
+	uint32_t mipLevels;
 	vk::Format format;
 	vk::ImageUsageFlags usageFlags;
 };
