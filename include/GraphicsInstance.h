@@ -22,7 +22,7 @@ public:
 	void selectPhysicalDevice();
 	void createLogicalDevice(const WindowSize& framebufferSize, const Model& model);
 	void createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders);
-	void drawFrame(WindowHandler& windowHandler);
+	void drawFrame(WindowHandler& windowHandler, const Camera& camera);
 	void waitIdle();
 
 	const vk::Device getVulkanLogicalDevice() const;

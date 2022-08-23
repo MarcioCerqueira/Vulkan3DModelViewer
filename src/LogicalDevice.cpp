@@ -237,14 +237,14 @@ void LogicalDevice::createGraphicsPipeline(const std::vector<std::shared_ptr<Sha
 	graphicsPipeline = std::make_unique<GraphicsPipeline>(graphicsPipelineCreateInfo);
 }
 
-void LogicalDevice::drawFrame(WindowHandler& windowHandler)
+void LogicalDevice::drawFrame(WindowHandler& windowHandler, const Camera& camera)
 {
 	const uint32_t fenceCount{ 1 };
 	waitForFences(fenceCount);
 	const uint32_t imageIndex{ acquireNextImageFromSwapChain(windowHandler) };
 	resetFences(fenceCount);
 	commandBuffers->reset(currentFrame);
-	updateUniformBuffer();
+	updateMVP(camera);
 	descriptorSet->write(uniformBuffers[currentFrame], vulkanTextureImage, currentFrame);
 	commandBuffers->record(createCommandBufferRecordInfo(imageIndex));
 	commandBuffers->submit(synchronizationObjects[currentFrame], currentFrame);
@@ -297,7 +297,7 @@ const CommandBufferRecordInfo LogicalDevice::createCommandBufferRecordInfo(const
 	};
 }
 
-void LogicalDevice::updateUniformBuffer()
+void LogicalDevice::updateMVP(const Camera& camera)
 {
 	const vk::Extent2D swapChainExtent{ swapChain->getExtent() };
 	static std::chrono::steady_clock::time_point startTime{ std::chrono::high_resolution_clock::now() };
@@ -305,7 +305,7 @@ void LogicalDevice::updateUniformBuffer()
 	const float time{ std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count() };
 	ModelViewProjectionTransformation MVP{
 		.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
-		.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+		.view = camera.getViewMatrix(),
 		.projection = glm::perspective(glm::radians(45.0f), swapChainExtent.width / static_cast<float>(swapChainExtent.height), 0.1f, 10.0f)
 	};
 	MVP.projection[1][1] *= -1;
