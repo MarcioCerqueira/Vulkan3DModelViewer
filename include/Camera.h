@@ -7,35 +7,32 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 
-enum CameraMovement {
-    FORWARD,
-    BACKWARD,
-    LEFT,
-    RIGHT
-};
+#include "CameraHandler.h"
+#include "structs/CameraCreateInfo.h"
 
-class Camera
+class Camera : public CameraHandler
 {
 public:
-    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = -90.0f, float pitch = 270.0f);
-    Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
-    const glm::mat4 getViewMatrix() const;
-    void processKeyboard(CameraMovement direction, float deltaTime);
-    void processMouseMovement(float xoffset, float yoffset, bool shouldConstrainPitch = true);
-    void processMouseScroll(float yoffset);
+    Camera();
+    Camera(const CameraCreateInfo& cameraCreateInfo);
+    const glm::mat4 getViewMatrix() const override;
+    const float getZoom() const override;
+    void processKeyboard(CameraMovement direction, float deltaTime) override;
+    void processMouseMovement(float xoffset, float yoffset, bool shouldConstrainPitch) override;
+    void processMouseScroll(float yoffset) override;
 
 private:
 
     void updateCameraVectors();
     void constrainPitch();
-    glm::vec3 position;
+    glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 front;
     glm::vec3 up;
     glm::vec3 right;
-    glm::vec3 worldUp;
-    float yaw;
-    float pitch;
-    float movementSpeed;
-    float mouseSensitivity;
-    float zoom;
+    glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+    float yaw = -89.0f;
+    float pitch = 89.0f;
+    float movementSpeed = 2.5f;
+    float mouseSensitivity = 0.1f;
+    float zoom = 45.0f;
 };

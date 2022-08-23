@@ -1,20 +1,12 @@
 #include "Camera.h"
 
-Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) : front(glm::vec3(-2.0f, -2.0f, -2.0f)), movementSpeed(2.5f), mouseSensitivity(0.1f), zoom(45.0f)
+Camera::Camera()
 {
-    this->position = position;
-    this->worldUp = up;
-    this->yaw = yaw;
-    this->pitch = pitch;
     updateCameraVectors();
 }
 
-Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : front(glm::vec3(-2.0f, -2.0f, -2.0f)), movementSpeed(2.5f), mouseSensitivity(0.1f), zoom(45.0f)
+Camera::Camera(const CameraCreateInfo& cameraCreateInfo) : position(cameraCreateInfo.position), worldUp(cameraCreateInfo.up), yaw(cameraCreateInfo.yaw), pitch(cameraCreateInfo.pitch)
 {
-    this->position = glm::vec3(posX, posY, posZ);
-    this->worldUp = glm::vec3(upX, upY, upZ);
-    this->yaw = yaw;
-    this->pitch = pitch;
     updateCameraVectors();
 }
 
@@ -34,21 +26,26 @@ const glm::mat4 Camera::getViewMatrix() const
     return glm::lookAt(position, position + front, up);
 }
 
+const float Camera::getZoom() const
+{
+    return zoom;
+}
+
 void Camera::processKeyboard(CameraMovement direction, float deltaTime)
 {
     const float velocity{ movementSpeed * deltaTime };
     switch (direction)
     {
-    case FORWARD:
+    case CameraMovement::FORWARD:
         position += front * velocity;
         break;
-    case BACKWARD:
+    case CameraMovement::BACKWARD:
         position -= front * velocity;
         break;
-    case LEFT:
+    case CameraMovement::LEFT:
         position -= right * velocity;
         break;
-    case RIGHT:
+    case CameraMovement::RIGHT:
         position += right * velocity;
         break;
     }

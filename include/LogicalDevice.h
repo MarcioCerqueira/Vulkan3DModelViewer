@@ -25,7 +25,7 @@
 #include "UniformBuffer.h"
 #include "DescriptorSet.h"
 #include "Image.h"
-#include "Camera.h"
+#include "CameraHandler.h"
 
 class LogicalDevice
 {
@@ -34,7 +34,7 @@ public:
 	~LogicalDevice();
 
 	void createGraphicsPipeline(const std::vector<std::shared_ptr<Shader>>& shaders, const PhysicalDeviceProperties& physicalDeviceProperties);
-	void drawFrame(WindowHandler& windowHandler, const Camera& camera);
+	void drawFrame(WindowHandler& windowHandler, CameraHandler& camera);
 	void waitIdle();
 
 	const vk::Device getVulkanLogicalDevice() const;
@@ -64,7 +64,7 @@ private:
 	const uint32_t acquireNextImageFromSwapChain(WindowHandler& windowHandler);
 	void resetFences(const uint32_t fenceCount);
 	const CommandBufferRecordInfo createCommandBufferRecordInfo(const uint32_t imageIndex) const;
-	void updateMVP(const Camera& camera);
+	void updateMVP(CameraHandler& cameraHandler);
 	void presentResult(WindowHandler& windowHandler, const uint32_t imageIndex);
 
 	const int MAX_FRAMES_IN_FLIGHT = 2;

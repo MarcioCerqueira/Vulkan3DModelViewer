@@ -4,13 +4,13 @@
 #include "Window.h"
 #include "GraphicsInstance.h"
 #include "Shader.h"
-#include "Model.h"
+#include "Scene.h"
 
 class AmbientOcclusionApplication
 {
 
 public:
-	AmbientOcclusionApplication(const int windowWidth, const int windowHeight);
+	AmbientOcclusionApplication(const WindowSize& windowSize, Scene& scene);
 	void run();
 
 private:
@@ -19,5 +19,4 @@ private:
 	const std::string applicationName{ "Ambient Occlusion Application" };
 	Window window;
 	GraphicsInstance graphicsInstance;
-	Model model;
 };

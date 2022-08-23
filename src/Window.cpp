@@ -1,10 +1,12 @@
 #include "Window.h"
 
-Window::Window(const int width, const int height, const std::string& title) : width(width), height(height), title(title), lastX(width/2.0f), lastY(height/2.0f)
+Window::Window(const WindowSize& windowSize, const std::string& title, CameraHandler& cameraHandler) : width(windowSize.width), height(windowSize.height), title(title), cameraHandler(cameraHandler)
 {
 	glfwInit();
 	setGlfwWindowHints();
 	createGlfwWindow();
+	setCallbacks();
+	initializeMouseInfo();
 }
 
 Window::~Window()
@@ -22,11 +24,23 @@ void Window::setGlfwWindowHints() const
 void Window::createGlfwWindow()
 {
 	glfwWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
-	glfwSetWindowUserPointer(glfwWindow, this);
-	glfwSetCursorPosCallback(glfwWindow, mouseCallback);
 }
 
-GLFWwindow* Window::getGLFWWindow() const noexcept
+void Window::setCallbacks()
+{
+	glfwSetWindowUserPointer(glfwWindow, this);
+	glfwSetCursorPosCallback(glfwWindow, mouseCallback);
+	glfwSetScrollCallback(glfwWindow, scrollCallback);
+}
+
+void Window::initializeMouseInfo()
+{
+	mouseInfo.firstInteraction = true;
+	mouseInfo.lastX = static_cast<float>(width) / 2.0f;
+	mouseInfo.lastY = static_cast<float>(height) / 2.0f;
+}
+
+GLFWwindow* Window::getGLFWWindow() const
 {
 	return glfwWindow;
 }
@@ -43,30 +57,39 @@ void Window::waitEvents() const
 	glfwWaitEvents();
 }
 
-void Window::open(std::function<void(WindowHandler&, const Camera&)> drawFrame)
+void Window::open(std::function<void(WindowHandler&, CameraHandler&)> drawFrame)
 {
 	while(!glfwWindowShouldClose(glfwWindow)) 
 	{
 		glfwPollEvents();
 		updateFrameTime();
 		processKeyboard();
-		drawFrame(*this, camera);
-		
+		drawFrame(*this, cameraHandler);	
 	}
 }
 
 void Window::processKeyboard()
 {
 	if (glfwGetKey(glfwWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
 		glfwSetWindowShouldClose(glfwWindow, true);
+	}
 	if (glfwGetKey(glfwWindow, GLFW_KEY_W) == GLFW_PRESS)
-		camera.processKeyboard(FORWARD, deltaTime);
+	{
+		cameraHandler.processKeyboard(CameraMovement::FORWARD, deltaTime);
+	}
 	if (glfwGetKey(glfwWindow, GLFW_KEY_S) == GLFW_PRESS)
-		camera.processKeyboard(BACKWARD, deltaTime);
+	{
+		cameraHandler.processKeyboard(CameraMovement::BACKWARD, deltaTime);
+	}
 	if (glfwGetKey(glfwWindow, GLFW_KEY_A) == GLFW_PRESS)
-		camera.processKeyboard(LEFT, deltaTime);
+	{
+		cameraHandler.processKeyboard(CameraMovement::LEFT, deltaTime);
+	}
 	if (glfwGetKey(glfwWindow, GLFW_KEY_D) == GLFW_PRESS)
-		camera.processKeyboard(RIGHT, deltaTime);
+	{
+		cameraHandler.processKeyboard(CameraMovement::RIGHT, deltaTime);
+	}
 }
 
 void Window::updateFrameTime()
@@ -82,23 +105,34 @@ void Window::mouseCallback(GLFWwindow* window, double xposIn, double yposIn)
 	app->mouseCallback(xposIn, yposIn);
 }
 
+void Window::scrollCallback(GLFWwindow* window, double xposIn, double yposIn)
+{
+	auto app = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+	app->scrollCallback(xposIn, yposIn);
+}
+
 void Window::mouseCallback(double xposIn, double yposIn)
 {
-    float xpos = static_cast<float>(xposIn);
-    float ypos = static_cast<float>(yposIn);
-
-    if (firstMouse)
+	float xpos{ static_cast<float>(xposIn) };
+	float ypos{ static_cast<float>(yposIn) };
+    if (mouseInfo.firstInteraction)
     {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
+		updateMouseInfo(xpos, ypos);
     }
+	float xoffset{ xpos - mouseInfo.lastX };
+	float yoffset{ mouseInfo.lastY - ypos };
+	cameraHandler.processMouseMovement(xoffset, yoffset, true);
+	updateMouseInfo(xpos, ypos);
+}
 
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+void Window::updateMouseInfo(float lastX, float lastY)
+{
+	mouseInfo.firstInteraction = false;
+	mouseInfo.lastX = lastX;
+	mouseInfo.lastY = lastY;
+}
 
-    lastX = xpos;
-    lastY = ypos;
-
-    camera.processMouseMovement(xoffset, yoffset);
+void Window::scrollCallback(double xoffset, double yoffset)
+{
+	cameraHandler.processMouseScroll(yoffset);
 }

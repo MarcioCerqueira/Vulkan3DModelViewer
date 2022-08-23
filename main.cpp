@@ -13,6 +13,7 @@
 #include "AmbientOcclusionApplication.h"
 #include "ArgumentParser.h"
 #include "JSONConfigurationFileParser.h"
+#include "Scene.h"
 
 int main(const int argc, const char *argv[]) 
 {
@@ -21,7 +22,9 @@ int main(const int argc, const char *argv[])
         ArgumentParser argumentParser{argc, argv};
         JSONConfigurationFileParser JSONConfigurationFileParser{argumentParser.getConfigurationFile().c_str()};
         ConfigurationFileModel configurationFileModel{JSONConfigurationFileParser.getConfigurationFileModel()};
-        AmbientOcclusionApplication app{configurationFileModel.window.width, configurationFileModel.window.height};
+        Scene scene;
+        WindowSize windowSize{ configurationFileModel.window.width, configurationFileModel.window.height };
+        AmbientOcclusionApplication app{windowSize, scene};
         app.run();
     } catch (const vk::SystemError &error) 
     {

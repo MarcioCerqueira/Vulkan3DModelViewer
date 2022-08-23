@@ -1,10 +1,10 @@
 #include "AmbientOcclusionApplication.h"
 
-AmbientOcclusionApplication::AmbientOcclusionApplication(const int windowWidth, const int windowHeight) : window(windowWidth, windowHeight, applicationName), graphicsInstance(applicationName)
+AmbientOcclusionApplication::AmbientOcclusionApplication(const WindowSize& windowSize, Scene& scene) : window(windowSize, applicationName, scene.getCamera()), graphicsInstance(applicationName)
 {
 	graphicsInstance.createWindowSurface(window.getGLFWWindow());
 	graphicsInstance.selectPhysicalDevice();
-	graphicsInstance.createLogicalDevice(window.getFramebufferSize(), model);
+	graphicsInstance.createLogicalDevice(window.getFramebufferSize(), scene.getModel());
 	graphicsInstance.createGraphicsPipeline(loadShaders(graphicsInstance.getVulkanLogicalDevice()));
 }
 
@@ -19,7 +19,7 @@ const std::vector<std::shared_ptr<Shader>> AmbientOcclusionApplication::loadShad
 
 void AmbientOcclusionApplication::run()
 {
-	std::function<void(WindowHandler& windowHandler, const Camera& camera)> drawFrame = std::bind(&GraphicsInstance::drawFrame, &graphicsInstance, std::placeholders::_1, std::placeholders::_2);
+	std::function<void(WindowHandler& windowHandler, CameraHandler& cameraHandler)> drawFrame = std::bind(&GraphicsInstance::drawFrame, &graphicsInstance, std::placeholders::_1, std::placeholders::_2);
 	window.open(drawFrame);
 	graphicsInstance.waitIdle();
 }
