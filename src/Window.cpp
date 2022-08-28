@@ -3,7 +3,7 @@
 Window::Window(const WindowSize& windowSize, const std::string& title, CameraHandler& cameraHandler) : width(windowSize.width), height(windowSize.height), title(title), cameraHandler(cameraHandler)
 {
 	glfwInit();
-	setGlfwWindowHints();
+	setGlfwWindowHint();
 	createGlfwWindow();
 	setCallbacks();
 	initializeMouseInfo();
@@ -15,10 +15,9 @@ Window::~Window()
 	glfwTerminate();
 }
 
-void Window::setGlfwWindowHints() const
+void Window::setGlfwWindowHint() const
 {
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 }
 
 void Window::createGlfwWindow()
@@ -31,6 +30,7 @@ void Window::setCallbacks()
 	glfwSetWindowUserPointer(glfwWindow, this);
 	glfwSetCursorPosCallback(glfwWindow, mouseCallback);
 	glfwSetScrollCallback(glfwWindow, scrollCallback);
+	glfwSetFramebufferSizeCallback(glfwWindow, framebufferResizeCallback);
 }
 
 void Window::initializeMouseInfo()
@@ -57,14 +57,18 @@ void Window::waitEvents() const
 	glfwWaitEvents();
 }
 
-void Window::open(std::function<void(WindowHandler&, CameraHandler&)> drawFrame)
+void Window::open(std::function<void(WindowHandler&, CameraHandler&, bool)> drawFrame)
 {
 	while(!glfwWindowShouldClose(glfwWindow)) 
 	{
 		glfwPollEvents();
 		updateFrameTime();
 		processKeyboard();
-		drawFrame(*this, cameraHandler);	
+		drawFrame(*this, cameraHandler, framebufferResized);
+		if (framebufferResized)
+		{
+			setFramebufferResized(false);
+		}
 	}
 }
 
@@ -111,6 +115,12 @@ void Window::scrollCallback(GLFWwindow* window, double xposIn, double yposIn)
 	app->scrollCallback(xposIn, yposIn);
 }
 
+void Window::framebufferResizeCallback(GLFWwindow* window, int width, int height)
+{
+	auto app = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+	app->setFramebufferResized(true);
+}
+
 void Window::mouseCallback(double xposIn, double yposIn)
 {
 	float xpos{ static_cast<float>(xposIn) };
@@ -134,5 +144,10 @@ void Window::updateMouseInfo(float lastX, float lastY)
 
 void Window::scrollCallback(double xoffset, double yoffset)
 {
-	cameraHandler.processMouseScroll(yoffset);
+	cameraHandler.processMouseScroll(static_cast<float>(yoffset));
+}
+
+void Window::setFramebufferResized(bool framebufferResized)
+{
+	this->framebufferResized = framebufferResized;
 }

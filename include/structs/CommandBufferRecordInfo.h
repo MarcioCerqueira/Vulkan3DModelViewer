@@ -14,6 +14,7 @@ struct CommandBufferRecordInfo
 	unsigned int frameIndex;
 	size_t indexCount;
 	vk::IndexType indexType;
+	vk::Extent2D swapChainExtent;
 	uint32_t firstDescriptorSet = 0;
 	uint32_t descriptorSetCount = 1;
 	uint32_t descriptorDynamicOffsetCount = 0;

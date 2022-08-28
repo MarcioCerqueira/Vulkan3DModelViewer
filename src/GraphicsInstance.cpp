@@ -72,9 +72,9 @@ void GraphicsInstance::createGraphicsPipeline(const std::vector<std::shared_ptr<
 	logicalDevice->createGraphicsPipeline(shaders, physicalDevice);
 }
 
-void GraphicsInstance::drawFrame(WindowHandler& windowHandler, CameraHandler& cameraHandler)
+void GraphicsInstance::drawFrame(WindowHandler& windowHandler, CameraHandler& cameraHandler, bool framebufferResized)
 {
-	logicalDevice->drawFrame(windowHandler, cameraHandler);
+	logicalDevice->drawFrame(windowHandler, cameraHandler, framebufferResized);
 }
 
 void GraphicsInstance::waitIdle()

@@ -211,6 +211,8 @@ void SwapChain::waitValidFramebufferSize(WindowHandler& windowHandler)
         framebufferSize = windowHandler.getFramebufferSize();
         windowHandler.waitEvents();
     }
+    extent.width = framebufferSize.width;
+    extent.height = framebufferSize.height;
 }
 
 const vk::Extent2D SwapChain::getExtent() const

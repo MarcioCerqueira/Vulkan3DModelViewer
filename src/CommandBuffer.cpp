@@ -60,15 +60,43 @@ void CommandBuffer::record(const CommandBufferRecordInfo& commandBufferRecordInf
 	ExceptionChecker::throwExceptionIfIndexIsOutOfBounds(commandBufferRecordInfo.frameIndex, vulkanCommandBuffers.size(), "Error in CommandBuffer! Index is out of bounds");
 	vk::Buffer vulkanVertexBuffers[] = { commandBufferRecordInfo.vulkanVertexBuffer };
 	vk::DeviceSize offsets[] = { commandBufferRecordInfo.offset };
+	std::array<vk::ClearValue, 2> clearValues{};
+	clearValues[0].color = vk::ClearColorValue(std::array<float, 4>{ 0.0f, 0.0f, 0.0f, 1.0f });
+	clearValues[1].depthStencil = vk::ClearDepthStencilValue(1.0f, 0);
+	vk::RenderPassBeginInfo localRenderPassBeginInfo{ commandBufferRecordInfo.renderPassBeginInfo };
+	localRenderPassBeginInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+	localRenderPassBeginInfo.pClearValues = clearValues.data();
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].begin(vk::CommandBufferBeginInfo{});
-	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].beginRenderPass(commandBufferRecordInfo.renderPassBeginInfo, vk::SubpassContents::eInline);
-	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, commandBufferRecordInfo.graphicsPipeline);
+	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].beginRenderPass(localRenderPassBeginInfo, vk::SubpassContents::eInline);
+	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, commandBufferRecordInfo.graphicsPipeline); 
+	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].setViewport(0, buildViewport(commandBufferRecordInfo.swapChainExtent));
+	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].setScissor(0, buildScissor(commandBufferRecordInfo.swapChainExtent));
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].bindVertexBuffers(commandBufferRecordInfo.firstBinding, commandBufferRecordInfo.bindingCount, vulkanVertexBuffers, offsets);
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].bindIndexBuffer(commandBufferRecordInfo.vulkanIndexBuffer, commandBufferRecordInfo.offset, commandBufferRecordInfo.indexType);
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].bindDescriptorSets(vk::PipelineBindPoint::eGraphics, commandBufferRecordInfo.vulkanPipelineLayout, commandBufferRecordInfo.firstDescriptorSet, commandBufferRecordInfo.descriptorSetCount, &commandBufferRecordInfo.vulkanDescriptorSet, commandBufferRecordInfo.descriptorDynamicOffsetCount, commandBufferRecordInfo.descriptorDynamicOffset);
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].drawIndexed(static_cast<uint32_t>(commandBufferRecordInfo.indexCount), commandBufferRecordInfo.instanceCount, commandBufferRecordInfo.firstIndex, commandBufferRecordInfo.vertexOffset, commandBufferRecordInfo.firstInstance);
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].endRenderPass();
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].end();
+}
+
+const vk::Viewport CommandBuffer::buildViewport(const vk::Extent2D& swapChainExtent) const
+{
+	return vk::Viewport{
+		.x = 0.0f,
+		.y = 0.0f,
+		.width = static_cast<float>(swapChainExtent.width),
+		.height = static_cast<float>(swapChainExtent.height),
+		.minDepth = 0.0f,
+		.maxDepth = 1.0f
+	};
+}
+
+const vk::Rect2D CommandBuffer::buildScissor(const vk::Extent2D& swapChainExtent) const
+{
+	return vk::Rect2D{
+		.offset = {0, 0},
+		.extent = swapChainExtent
+	};
 }
 
 void CommandBuffer::blitImage(const CommandBufferBlitImageInfo& commandBuferBlitImageInfo)

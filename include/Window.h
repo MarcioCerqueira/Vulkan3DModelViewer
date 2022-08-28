@@ -17,15 +17,17 @@ public:
 	GLFWwindow* getGLFWWindow() const;
 	WindowSize getFramebufferSize() const override;
 	void waitEvents() const override;
-	void open(std::function<void(WindowHandler&, CameraHandler&)> drawFrame);
+	void open(std::function<void(WindowHandler&, CameraHandler&, bool)> drawFrame);
 	
 	static void mouseCallback(GLFWwindow* window, double xposIn, double yposIn);
 	static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 	void mouseCallback(double xposIn, double yposIn);
 	void scrollCallback(double xoffset, double yoffset);
+	void setFramebufferResized(bool framebufferResized);
 
 private:
-	void setGlfwWindowHints() const;
+	void setGlfwWindowHint() const;
 	void createGlfwWindow();
 	void setCallbacks();
 	void initializeMouseInfo();
@@ -41,4 +43,5 @@ private:
 	float lastFrameTime = 0.0f;
 	float deltaTime = 0.0f;
 	MouseInfo mouseInfo;
+	bool framebufferResized = false;
 };

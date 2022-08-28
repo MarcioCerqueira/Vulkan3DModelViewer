@@ -6,14 +6,13 @@ GraphicsPipeline::GraphicsPipeline(const GraphicsPipelineCreateInfo& graphicsPip
 	const std::array<vk::VertexInputAttributeDescription, 3> vertexAttributeDescriptions{ Vertex::getAttributeDescriptions() };
 	const vk::PipelineVertexInputStateCreateInfo vertexInputState{ buildPipelineVertexInputStateCreateInfo(vertexBindingDescription, vertexAttributeDescriptions) };
 	const vk::PipelineInputAssemblyStateCreateInfo inputAssemblyState{ buildPipelineInputAssemblyStateCreateInfo() };
-	const vk::Viewport viewport{ buildViewport(graphicsPipelineCreateInfo.swapChainExtent) };
-	const vk::Rect2D scissor{ buildScissor(graphicsPipelineCreateInfo.swapChainExtent) };
-	const vk::PipelineViewportStateCreateInfo viewportState{ buildPipelineViewportStateCreateInfo(viewport, scissor) };
+	const vk::PipelineViewportStateCreateInfo viewportState{ buildPipelineViewportStateCreateInfo() };
 	const vk::PipelineRasterizationStateCreateInfo rasterizationState{ buildPipelineRasterizationStateCreateInfo() };
 	const vk::PipelineMultisampleStateCreateInfo multisampleState{ buildPipelineMultisampleStateCreateInfo(graphicsPipelineCreateInfo.sampleCount) };
 	const vk::PipelineColorBlendAttachmentState colorBlendAttachmentState{ buildPipelineColorBlendAttachmentState() };
 	const vk::PipelineColorBlendStateCreateInfo  colorBlendState{ buildPipelineColorBlendStateCreateInfo(colorBlendAttachmentState) };
-	const vk::PipelineDynamicStateCreateInfo  dynamicState{ buildPipelineDynamicStateCreateInfo() };
+	const std::vector<vk::DynamicState> dynamicStates = { vk::DynamicState::eViewport, vk::DynamicState::eScissor };
+	const vk::PipelineDynamicStateCreateInfo  dynamicState{ buildPipelineDynamicStateCreateInfo(dynamicStates) };
 	const vk::PipelineDepthStencilStateCreateInfo depthStencilState{ buildPipelineDepthStencilStateCreateInfo() };
 	const vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{ buildPipelineLayoutCreateInfo(graphicsPipelineCreateInfo.vulkanDescriptorSetLayout) };
 	pipelineLayout = vulkanLogicalDevice.createPipelineLayout(pipelineLayoutCreateInfo);
@@ -27,6 +26,7 @@ GraphicsPipeline::GraphicsPipeline(const GraphicsPipelineCreateInfo& graphicsPip
 		.pMultisampleState = &multisampleState,
 		.pDepthStencilState = &depthStencilState,
 		.pColorBlendState = &colorBlendState,
+		.pDynamicState = &dynamicState,
 		.layout = pipelineLayout,
 		.renderPass = graphicsPipelineCreateInfo.vulkanRenderPass,
 		.subpass = 0,
@@ -62,33 +62,11 @@ const vk::PipelineInputAssemblyStateCreateInfo GraphicsPipeline::buildPipelineIn
 	};
 }
 
-const vk::Viewport GraphicsPipeline::buildViewport(const vk::Extent2D& swapChainExtent) const
-{
-	return vk::Viewport{
-		.x = 0.0f,
-		.y = 0.0f,
-		.width = static_cast<float>(swapChainExtent.width),
-		.height = static_cast<float>(swapChainExtent.height),
-		.minDepth = 0.0f,
-		.maxDepth = 1.0f
-	};
-}
-
-const vk::Rect2D GraphicsPipeline::buildScissor(const vk::Extent2D& swapChainExtent) const
-{
-	return vk::Rect2D{
-		.offset = {0, 0},
-		.extent = swapChainExtent
-	};
-}
-
-const vk::PipelineViewportStateCreateInfo GraphicsPipeline::buildPipelineViewportStateCreateInfo(const vk::Viewport& viewport, const vk::Rect2D& scissor) const
+const vk::PipelineViewportStateCreateInfo GraphicsPipeline::buildPipelineViewportStateCreateInfo() const
 {
 	return vk::PipelineViewportStateCreateInfo{
 		.viewportCount = 1,
-		.pViewports = &viewport,
 		.scissorCount = 1,
-		.pScissors = &scissor
 	};
 }
 
@@ -147,9 +125,8 @@ const vk::PipelineColorBlendStateCreateInfo GraphicsPipeline::buildPipelineColor
 	};
 }
 
-const vk::PipelineDynamicStateCreateInfo GraphicsPipeline::buildPipelineDynamicStateCreateInfo() const
+const vk::PipelineDynamicStateCreateInfo GraphicsPipeline::buildPipelineDynamicStateCreateInfo(const std::vector<vk::DynamicState>& dynamicStates) const
 {
-	const std::vector<vk::DynamicState> dynamicStates = { vk::DynamicState::eViewport, vk::DynamicState::eLineWidth };
 	return vk::PipelineDynamicStateCreateInfo{
 		.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()),
 		.pDynamicStates = dynamicStates.data()

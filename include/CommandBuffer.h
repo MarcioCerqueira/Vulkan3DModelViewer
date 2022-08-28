@@ -29,6 +29,8 @@ public:
 
 private:
 	const vk::CommandBufferAllocateInfo buildCommandBufferAllocateInfo() const;
+	const vk::Viewport buildViewport(const vk::Extent2D& swapChainExtent) const;
+	const vk::Rect2D buildScissor(const vk::Extent2D& swapChainExtent) const;
 
 	std::vector<vk::CommandBuffer> vulkanCommandBuffers;
 	GraphicsQueue graphicsQueue;

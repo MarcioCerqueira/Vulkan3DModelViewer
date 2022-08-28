@@ -19,7 +19,7 @@ const std::vector<std::shared_ptr<Shader>> AmbientOcclusionApplication::loadShad
 
 void AmbientOcclusionApplication::run()
 {
-	std::function<void(WindowHandler& windowHandler, CameraHandler& cameraHandler)> drawFrame = std::bind(&GraphicsInstance::drawFrame, &graphicsInstance, std::placeholders::_1, std::placeholders::_2);
+	std::function<void(WindowHandler& windowHandler, CameraHandler& cameraHandler, bool framebufferResized)> drawFrame = std::bind(&GraphicsInstance::drawFrame, &graphicsInstance, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 	window.open(drawFrame);
 	graphicsInstance.waitIdle();
 }

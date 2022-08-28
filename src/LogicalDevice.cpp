@@ -226,7 +226,6 @@ void LogicalDevice::createGraphicsPipeline(const std::vector<std::shared_ptr<Sha
 {
 	GraphicsPipelineCreateInfo graphicsPipelineCreateInfo;
 	graphicsPipelineCreateInfo.vulkanLogicalDevice = vulkanLogicalDevice;
-	graphicsPipelineCreateInfo.swapChainExtent = swapChain->getExtent();
 	for (const auto& shader : shaders)
 	{
 		graphicsPipelineCreateInfo.shaderStages.push_back(shader->buildPipelineShaderStageCreateInfo());
@@ -237,7 +236,7 @@ void LogicalDevice::createGraphicsPipeline(const std::vector<std::shared_ptr<Sha
 	graphicsPipeline = std::make_unique<GraphicsPipeline>(graphicsPipelineCreateInfo);
 }
 
-void LogicalDevice::drawFrame(WindowHandler& windowHandler, CameraHandler& cameraHandler)
+void LogicalDevice::drawFrame(WindowHandler& windowHandler, CameraHandler& cameraHandler, bool framebufferResized)
 {
 	const uint32_t fenceCount{ 1 };
 	waitForFences(fenceCount);
@@ -248,7 +247,7 @@ void LogicalDevice::drawFrame(WindowHandler& windowHandler, CameraHandler& camer
 	descriptorSet->write(uniformBuffers[currentFrame], vulkanTextureImage, currentFrame);
 	commandBuffers->record(createCommandBufferRecordInfo(imageIndex));
 	commandBuffers->submit(synchronizationObjects[currentFrame], currentFrame);
-	presentResult(windowHandler, imageIndex);
+	presentResult(windowHandler, imageIndex, framebufferResized);
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
@@ -293,18 +292,16 @@ const CommandBufferRecordInfo LogicalDevice::createCommandBufferRecordInfo(const
 		.vulkanDescriptorSet = descriptorSet->getVulkanDescriptorSet(currentFrame),
 		.frameIndex = currentFrame,
 		.indexCount = indexBuffer->getIndexCount(),
-		.indexType = vk::IndexType::eUint32
+		.indexType = vk::IndexType::eUint32,
+		.swapChainExtent = swapChain->getExtent()
 	};
 }
 
 void LogicalDevice::updateMVP(CameraHandler& cameraHandler)
 {
 	const vk::Extent2D swapChainExtent{ swapChain->getExtent() };
-	static std::chrono::steady_clock::time_point startTime{ std::chrono::high_resolution_clock::now() };
-	const std::chrono::steady_clock::time_point currentTime{ std::chrono::high_resolution_clock::now() };
-	const float time{ std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count() };
 	ModelViewProjectionTransformation MVP{
-		.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+		.model = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
 		.view = cameraHandler.getViewMatrix(),
 		.projection = glm::perspective(glm::radians(cameraHandler.getZoom()), swapChainExtent.width / static_cast<float>(swapChainExtent.height), 0.1f, 10.0f)
 	};
@@ -312,7 +309,7 @@ void LogicalDevice::updateMVP(CameraHandler& cameraHandler)
 	uniformBuffers[currentFrame]->copyFromCPUToDeviceMemory(&MVP);
 }
 
-void LogicalDevice::presentResult(WindowHandler& windowHandler, const uint32_t imageIndex)
+void LogicalDevice::presentResult(WindowHandler& windowHandler, const uint32_t imageIndex, bool framebufferResized)
 {
 	vk::Result result;
 	try
@@ -320,6 +317,10 @@ void LogicalDevice::presentResult(WindowHandler& windowHandler, const uint32_t i
 		result = presentQueue->presentResult(synchronizationObjects[currentFrame]->renderFinished, swapChain->getVulkanSwapChain(), imageIndex);
 	}
 	catch (vk::OutOfDateKHRError error)
+	{
+		result = vk::Result::eErrorOutOfDateKHR;
+	}
+	if (framebufferResized)
 	{
 		result = vk::Result::eErrorOutOfDateKHR;
 	}
