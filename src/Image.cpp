@@ -1,5 +1,12 @@
 #include "Image.h"
 
+const std::unordered_map<vk::ImageLayout, vk::PipelineStageFlags> pipelineStage = {
+	{vk::ImageLayout::eUndefined, vk::PipelineStageFlagBits::eTopOfPipe},
+	{vk::ImageLayout::eTransferDstOptimal, vk::PipelineStageFlagBits::eTransfer},
+	{vk::ImageLayout::eTransferSrcOptimal, vk::PipelineStageFlagBits::eTransfer},
+	{vk::ImageLayout::eShaderReadOnlyOptimal, vk::PipelineStageFlagBits::eFragmentShader}
+};
+
 Image::Image(const ImageInfo& imageInfo) : vulkanLogicalDevice(imageInfo.vulkanLogicalDevice), width(imageInfo.width), height(imageInfo.height), mipLevels(imageInfo.mipLevels), format(imageInfo.format), sampler(vulkanLogicalDevice, imageInfo.physicalDeviceProperties.getVulkanPhysicalDevice().getProperties(), mipLevels)
 {
 	imageLayout = vk::ImageLayout::eUndefined;
@@ -91,29 +98,12 @@ const vk::ImageSubresourceRange Image::buildImageSubresourceRange(const uint32_t
 	};
 }
 
-const vk::PipelineStageFlags Image::determinePipelineStage(const vk::ImageLayout& layout) const
-{
-	switch (layout)
-	{
-	case vk::ImageLayout::eUndefined:
-		return vk::PipelineStageFlagBits::eTopOfPipe;
-	case vk::ImageLayout::eTransferDstOptimal:
-		return vk::PipelineStageFlagBits::eTransfer;
-	case vk::ImageLayout::eTransferSrcOptimal:
-		return vk::PipelineStageFlagBits::eTransfer;
-	case vk::ImageLayout::eShaderReadOnlyOptimal:
-		return vk::PipelineStageFlagBits::eFragmentShader;
-	default:
-		throw std::invalid_argument("Unsupported layout transition!");
-	}
-}
-
 const CommandBufferPipelineBarrierInfo Image::buildCommandBufferPipelineBarrierInfo(const ImageMemoryBarrierInfo& imageMemoryBarrierInfo, const vk::ImageMemoryBarrier& imageMemoryBarrier) const
 {
 	return CommandBufferPipelineBarrierInfo{
 		.frameIndex = 0,
-		.srcStage = determinePipelineStage(imageMemoryBarrierInfo.oldLayout),
-		.dstStage = determinePipelineStage(imageMemoryBarrierInfo.newLayout),
+		.srcStage = pipelineStage.at(imageMemoryBarrierInfo.oldLayout),
+		.dstStage = pipelineStage.at(imageMemoryBarrierInfo.newLayout),
 		.imageMemoryBarrier = imageMemoryBarrier
 	};
 }
@@ -187,10 +177,10 @@ const CommandBufferBlitImageInfo Image::buildCommandBufferBlitImageInfo(const vk
 const ImageMemoryBarrierInfo Image::prepareMipLevelForBlit(std::shared_ptr<CommandBuffer>& commandBuffers, const int level)
 {
 	const ImageMemoryBarrierInfo imageMemoryBarrierInfo{
-			.srcAccessMask = vk::AccessFlagBits::eTransferWrite,
-			.dstAccessMask = vk::AccessFlagBits::eTransferRead,
-			.oldLayout = vk::ImageLayout::eTransferDstOptimal,
-			.newLayout = vk::ImageLayout::eTransferSrcOptimal
+		.srcAccessMask = vk::AccessFlagBits::eTransferWrite,
+		.dstAccessMask = vk::AccessFlagBits::eTransferRead,
+		.oldLayout = vk::ImageLayout::eTransferDstOptimal,
+		.newLayout = vk::ImageLayout::eTransferSrcOptimal
 	};
 	const vk::ImageMemoryBarrier imageMemoryBarrier{ buildImageMemoryBarrier(imageMemoryBarrierInfo, level, 1) };
 	const CommandBufferPipelineBarrierInfo commandBufferPipelineBarrierInfo{ buildCommandBufferPipelineBarrierInfo(imageMemoryBarrierInfo, imageMemoryBarrier) };
@@ -201,10 +191,10 @@ const ImageMemoryBarrierInfo Image::prepareMipLevelForBlit(std::shared_ptr<Comma
 void Image::transferMipLevelToShaderLayout(std::shared_ptr<CommandBuffer>& commandBuffers, const int level)
 {
 	const ImageMemoryBarrierInfo imageMemoryBarrierInfo{
-			.srcAccessMask = vk::AccessFlagBits::eTransferRead,
-			.dstAccessMask = vk::AccessFlagBits::eShaderRead,
-			.oldLayout = vk::ImageLayout::eTransferSrcOptimal,
-			.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal
+		.srcAccessMask = vk::AccessFlagBits::eTransferRead,
+		.dstAccessMask = vk::AccessFlagBits::eShaderRead,
+		.oldLayout = vk::ImageLayout::eTransferSrcOptimal,
+		.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal
 	};
 	const vk::ImageMemoryBarrier imageMemoryBarrier{ buildImageMemoryBarrier(imageMemoryBarrierInfo, level, 1) };
 	const CommandBufferPipelineBarrierInfo commandBufferPipelineBarrierInfo{ buildCommandBufferPipelineBarrierInfo(imageMemoryBarrierInfo, imageMemoryBarrier) };

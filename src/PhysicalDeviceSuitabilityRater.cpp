@@ -13,23 +13,7 @@ const int PhysicalDeviceSuitabilityRater::rate(const PhysicalDeviceSuitabilityRa
 
 const int PhysicalDeviceSuitabilityRater::rateByPhysicalDeviceType(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
 {
-	int score{ 0 };
-	switch (physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice.getProperties().deviceType)
-	{
-	case vk::PhysicalDeviceType::eDiscreteGpu:
-		score = 1000;
-		break;
-	case vk::PhysicalDeviceType::eIntegratedGpu:
-		score = 500;
-		break;
-	case vk::PhysicalDeviceType::eCpu:
-		score = 100;
-		break;
-	default:
-		score = 0;
-		break;
-	}
-	return score;
+	return physicalDeviceTypeRater.at(physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice.getProperties().deviceType);
 }
 
 const int PhysicalDeviceSuitabilityRater::rateByQueueFamilyProperties(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
@@ -62,6 +46,5 @@ const int PhysicalDeviceSuitabilityRater::rateBySwapChainProperties(const Physic
 
 const int PhysicalDeviceSuitabilityRater::rateByDeviceSupportedFeatures(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
 {
-	const vk::PhysicalDeviceFeatures physicalDeviceFeatures{ physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice.getFeatures() };
-	return static_cast<int>(physicalDeviceFeatures.samplerAnisotropy);
+	return static_cast<int>(physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice.getFeatures().samplerAnisotropy);
 }

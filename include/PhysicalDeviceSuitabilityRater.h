@@ -22,4 +22,9 @@ private:
 	const int rateByDeviceExtensionSupport(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const;
 	const int rateBySwapChainProperties(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const;
 	const int rateByDeviceSupportedFeatures(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const;
+	const std::unordered_map<vk::PhysicalDeviceType, int> physicalDeviceTypeRater = {
+		{vk::PhysicalDeviceType::eDiscreteGpu, 1000},
+		{vk::PhysicalDeviceType::eIntegratedGpu, 500},
+		{vk::PhysicalDeviceType::eCpu, 100}
+	};
 };

@@ -30,7 +30,6 @@ private:
 	const vk::MemoryAllocateInfo buildMemoryAllocateInfo(const vk::MemoryRequirements& memoryRequirements, const uint32_t memoryTypeIndex) const;
 	vk::ImageMemoryBarrier buildImageMemoryBarrier(const ImageMemoryBarrierInfo& imageMemoryBarrierInfo, const uint32_t baseMipLevel, const uint32_t mipLevels) const;
 	const vk::ImageSubresourceRange buildImageSubresourceRange(const uint32_t baseMipLevel, const uint32_t mipLevels) const;
-	const vk::PipelineStageFlags determinePipelineStage(const vk::ImageLayout& layout) const;
 	const CommandBufferPipelineBarrierInfo buildCommandBufferPipelineBarrierInfo(const ImageMemoryBarrierInfo& imageMemoryBarrierInfo, const vk::ImageMemoryBarrier& imageMemoryBarrier) const;
 	void checkLinearBlittingSupport(const PhysicalDeviceProperties& physicalDeviceProperties) const;
 	const vk::ImageBlit buildImageBlit(const uint32_t level, const int32_t mipWidth, const int32_t mipHeight) const;
