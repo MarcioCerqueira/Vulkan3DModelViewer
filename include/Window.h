@@ -6,7 +6,6 @@
 
 #include "WindowHandler.h"
 #include "CameraHandler.h"
-#include "structs/MouseInfo.h"
 
 class Window : public WindowHandler
 {
@@ -19,21 +18,24 @@ public:
 	void waitEvents() const override;
 	void open(std::function<void(WindowHandler&, CameraHandler&, bool)> drawFrame);
 	
-	static void mouseCallback(GLFWwindow* window, double xposIn, double yposIn);
+	static void cursorPosCallback(GLFWwindow* window, double xposIn, double yposIn);
+	static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 	static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
-	void mouseCallback(double xposIn, double yposIn);
+	void cursorPosCallback(double xposIn, double yposIn);
+	MouseButton determineMouseButton() const;
+	void mouseButtonCallback(double xPosIn, double yPosIn);
 	void scrollCallback(double xoffset, double yoffset);
 	void setFramebufferResized(bool framebufferResized);
+	void updateWindowSizeInfoForCamera(int width, int height);
 
 private:
 	void setGlfwWindowHint() const;
 	void createGlfwWindow();
 	void setCallbacks();
-	void initializeMouseInfo();
+	void initializeCameraHandler();
 	void processKeyboard();
 	void updateFrameTime();
-	void updateMouseInfo(float lastX, float lastY);
 
 	const int width;
 	const int height;
@@ -42,6 +44,5 @@ private:
 	CameraHandler& cameraHandler;
 	float lastFrameTime = 0.0f;
 	float deltaTime = 0.0f;
-	MouseInfo mouseInfo;
 	bool framebufferResized = false;
 };

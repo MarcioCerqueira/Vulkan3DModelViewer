@@ -6,7 +6,7 @@ Window::Window(const WindowSize& windowSize, const std::string& title, CameraHan
 	setGlfwWindowHint();
 	createGlfwWindow();
 	setCallbacks();
-	initializeMouseInfo();
+	initializeCameraHandler();
 }
 
 Window::~Window()
@@ -28,16 +28,16 @@ void Window::createGlfwWindow()
 void Window::setCallbacks()
 {
 	glfwSetWindowUserPointer(glfwWindow, this);
-	glfwSetCursorPosCallback(glfwWindow, mouseCallback);
+	glfwSetCursorPosCallback(glfwWindow, cursorPosCallback);
+	glfwSetMouseButtonCallback(glfwWindow, mouseButtonCallback);
 	glfwSetScrollCallback(glfwWindow, scrollCallback);
 	glfwSetFramebufferSizeCallback(glfwWindow, framebufferResizeCallback);
 }
 
-void Window::initializeMouseInfo()
+void Window::initializeCameraHandler()
 {
-	mouseInfo.firstInteraction = true;
-	mouseInfo.lastX = static_cast<float>(width) / 2.0f;
-	mouseInfo.lastY = static_cast<float>(height) / 2.0f;
+	cameraHandler.setWindowSize(glm::ivec2(width, height));
+	cameraHandler.setLookat(glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 GLFWwindow* Window::getGLFWWindow() const
@@ -80,19 +80,19 @@ void Window::processKeyboard()
 	}
 	if (glfwGetKey(glfwWindow, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		cameraHandler.processKeyboard(CameraMovement::FORWARD, deltaTime);
+		cameraHandler.processKeyboard(CameraMovement::Forward, deltaTime);
 	}
 	if (glfwGetKey(glfwWindow, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		cameraHandler.processKeyboard(CameraMovement::BACKWARD, deltaTime);
+		cameraHandler.processKeyboard(CameraMovement::Backward, deltaTime);
 	}
 	if (glfwGetKey(glfwWindow, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		cameraHandler.processKeyboard(CameraMovement::LEFT, deltaTime);
+		cameraHandler.processKeyboard(CameraMovement::Left, deltaTime);
 	}
 	if (glfwGetKey(glfwWindow, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		cameraHandler.processKeyboard(CameraMovement::RIGHT, deltaTime);
+		cameraHandler.processKeyboard(CameraMovement::Right, deltaTime);
 	}
 }
 
@@ -103,10 +103,18 @@ void Window::updateFrameTime()
 	lastFrameTime = currentFrameTime;
 }
 
-void Window::mouseCallback(GLFWwindow* window, double xposIn, double yposIn)
+void Window::cursorPosCallback(GLFWwindow* window, double xposIn, double yposIn)
 {
 	auto app = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	app->mouseCallback(xposIn, yposIn);
+	app->cursorPosCallback(xposIn, yposIn);
+}
+
+void Window::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+	auto app = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+	app->mouseButtonCallback(xpos, ypos);
 }
 
 void Window::scrollCallback(GLFWwindow* window, double xposIn, double yposIn)
@@ -118,36 +126,65 @@ void Window::scrollCallback(GLFWwindow* window, double xposIn, double yposIn)
 void Window::framebufferResizeCallback(GLFWwindow* window, int width, int height)
 {
 	auto app = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+	app->updateWindowSizeInfoForCamera(width, height);
 	app->setFramebufferResized(true);
 }
 
-void Window::mouseCallback(double xposIn, double yposIn)
+void Window::cursorPosCallback(double xposIn, double yposIn)
 {
-	float xpos{ static_cast<float>(xposIn) };
-	float ypos{ static_cast<float>(yposIn) };
-    if (mouseInfo.firstInteraction)
-    {
-		updateMouseInfo(xpos, ypos);
-    }
-	float xoffset{ xpos - mouseInfo.lastX };
-	float yoffset{ mouseInfo.lastY - ypos };
-	cameraHandler.processMouseMovement(xoffset, yoffset, true);
-	updateMouseInfo(xpos, ypos);
+	const MouseButton mouseButton{ determineMouseButton() };
+	if (mouseButton != MouseButton::None)
+	{
+		MouseModifierFlags modifiers;
+		if (glfwGetKey(glfwWindow, GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
+		{
+			modifiers |= MouseModifierFlagBits::Alt;
+		}
+		if (glfwGetKey(glfwWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+		{
+			modifiers |= MouseModifierFlagBits::Ctrl;
+		}
+		if (glfwGetKey(glfwWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		{
+			modifiers |= MouseModifierFlagBits::Shift;
+		}
+		cameraHandler.processMouseMovement(glm::ivec2(static_cast<int>(xposIn), static_cast<int>(yposIn)), mouseButton, modifiers);
+	}
 }
 
-void Window::updateMouseInfo(float lastX, float lastY)
+MouseButton Window::determineMouseButton() const
 {
-	mouseInfo.firstInteraction = false;
-	mouseInfo.lastX = lastX;
-	mouseInfo.lastY = lastY;
+	if (glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	{
+		return MouseButton::Left;
+	}
+	if (glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)
+	{
+		return MouseButton::Middle;
+	}
+	if (glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+	{
+		return MouseButton::Right;
+	}
+	return MouseButton::None;
+}
+
+void Window::mouseButtonCallback(double xPosIn, double yPosIn)
+{
+	cameraHandler.setMousePosition(glm::ivec2(static_cast<int>(xPosIn), static_cast<int>(yPosIn)));
 }
 
 void Window::scrollCallback(double xoffset, double yoffset)
 {
-	cameraHandler.processMouseScroll(static_cast<float>(yoffset));
+	cameraHandler.processMouseScroll(static_cast<int>(yoffset));
 }
 
 void Window::setFramebufferResized(bool framebufferResized)
 {
 	this->framebufferResized = framebufferResized;
+}
+
+void Window::updateWindowSizeInfoForCamera(int width, int height)
+{
+	cameraHandler.setWindowSize(glm::ivec2(width, height));
 }
