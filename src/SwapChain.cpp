@@ -72,7 +72,7 @@ void SwapChain::chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities,
     }
 }
 
-const uint32_t SwapChain::estimateImageCount(const vk::SurfaceCapabilitiesKHR& capabilities)
+uint32_t SwapChain::estimateImageCount(const vk::SurfaceCapabilitiesKHR& capabilities)
 {
     uint32_t imageCount{ capabilities.minImageCount + 1 };
     if (capabilities.maxImageCount > 0 && imageCount > capabilities.maxImageCount) 
@@ -82,7 +82,7 @@ const uint32_t SwapChain::estimateImageCount(const vk::SurfaceCapabilitiesKHR& c
     return imageCount;
 }
 
-const bool SwapChain::isValid(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface)
+bool SwapChain::isValid(const vk::PhysicalDevice& vulkanPhysicalDevice, const vk::SurfaceKHR& vulkanWindowSurface)
 {
     const std::vector<vk::SurfaceFormatKHR> availableFormats{ vulkanPhysicalDevice.getSurfaceFormatsKHR(vulkanWindowSurface) };
     const std::vector<vk::PresentModeKHR> availablePresentModes{ vulkanPhysicalDevice.getSurfacePresentModesKHR(vulkanWindowSurface) };
@@ -137,7 +137,7 @@ void SwapChain::buildDepthImage()
     depthImage->createImageView(vk::ImageAspectFlagBits::eDepth);
 }
 
-const ImageInfo SwapChain::buildDepthImageInfo() const
+ImageInfo SwapChain::buildDepthImageInfo() const
 {
     return ImageInfo{
         .vulkanLogicalDevice = swapChainCreateInfo.vulkanLogicalDevice,
@@ -158,7 +158,7 @@ void SwapChain::buildColorImage()
     colorImage->createImageView(vk::ImageAspectFlagBits::eColor);
 }
 
-const ImageInfo SwapChain::buildColorImageInfo() const
+ImageInfo SwapChain::buildColorImageInfo() const
 {
     return ImageInfo{
         .vulkanLogicalDevice = swapChainCreateInfo.vulkanLogicalDevice,
@@ -215,22 +215,22 @@ void SwapChain::waitValidFramebufferSize(WindowHandler& windowHandler)
     extent.height = framebufferSize.height;
 }
 
-const vk::Extent2D SwapChain::getExtent() const
+const vk::Extent2D& SwapChain::getExtent() const
 {
     return extent;
 }
 
-const vk::Framebuffer SwapChain::getVulkanFramebuffer(const int framebufferIndex) const
+const vk::Framebuffer& SwapChain::getVulkanFramebuffer(const int framebufferIndex) const
 {
     return framebuffers[framebufferIndex]->getVulkanFramebuffer();
 }
 
-const vk::SurfaceFormatKHR SwapChain::getSurfaceFormat() const
+const vk::SurfaceFormatKHR& SwapChain::getSurfaceFormat() const
 {
     return surfaceFormat;
 }
 
-const vk::SwapchainKHR SwapChain::getVulkanSwapChain() const
+const vk::SwapchainKHR& SwapChain::getVulkanSwapChain() const
 {
     return vulkanSwapChain;
 }

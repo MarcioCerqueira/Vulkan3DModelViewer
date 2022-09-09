@@ -14,7 +14,7 @@ public:
 	void run();
 
 private:
-	const std::vector<std::shared_ptr<Shader>> loadShaders(const vk::Device& vulkanLogicalDevice) const;
+	std::vector<std::shared_ptr<Shader>> loadShaders(const vk::Device& vulkanLogicalDevice) const;
 
 	const std::string applicationName{ "Ambient Occlusion Application" };
 	Window window;

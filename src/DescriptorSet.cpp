@@ -8,7 +8,7 @@ DescriptorSet::DescriptorSet(const vk::Device& vulkanLogicalDevice, const int ma
 	vulkanDescriptorSets = vulkanLogicalDevice.allocateDescriptorSets(descriptorSetAllocateInfo);
 }
 
-const vk::DescriptorSetAllocateInfo DescriptorSet::createDescriptorSetAllocateInfo(const vk::DescriptorPool& vulkanDescriptorPool, const int maxFramesInFlight, std::vector<vk::DescriptorSetLayout>& descriptorSetLayouts) const
+vk::DescriptorSetAllocateInfo DescriptorSet::createDescriptorSetAllocateInfo(const vk::DescriptorPool& vulkanDescriptorPool, const int maxFramesInFlight, std::vector<vk::DescriptorSetLayout>& descriptorSetLayouts) const
 {
 	return vk::DescriptorSetAllocateInfo{
 		.descriptorPool = vulkanDescriptorPool,
@@ -29,7 +29,7 @@ void DescriptorSet::write(const std::shared_ptr<UniformBuffer>& uniformBuffer, c
 	vulkanLogicalDevice.updateDescriptorSets(static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, nullptr);
 }
 
-const vk::DescriptorBufferInfo DescriptorSet::createBufferInfo(const vk::Buffer& vulkanUniformBuffer, const size_t uniformBufferObjectSize) const
+vk::DescriptorBufferInfo DescriptorSet::createBufferInfo(const vk::Buffer& vulkanUniformBuffer, const size_t uniformBufferObjectSize) const
 {
 	return vk::DescriptorBufferInfo{
 		.buffer = vulkanUniformBuffer,
@@ -38,7 +38,7 @@ const vk::DescriptorBufferInfo DescriptorSet::createBufferInfo(const vk::Buffer&
 	};
 }
 
-const vk::WriteDescriptorSet DescriptorSet::createWriteDescriptorSet(const vk::DescriptorBufferInfo& descriptorBufferInfo, int frameIndex) const
+vk::WriteDescriptorSet DescriptorSet::createWriteDescriptorSet(const vk::DescriptorBufferInfo& descriptorBufferInfo, int frameIndex) const
 {
 	return vk::WriteDescriptorSet{
 		.dstSet = vulkanDescriptorSets[frameIndex],
@@ -50,7 +50,7 @@ const vk::WriteDescriptorSet DescriptorSet::createWriteDescriptorSet(const vk::D
 	};
 }
 
-const vk::DescriptorImageInfo DescriptorSet::createImageInfo(const std::shared_ptr<Image>& image) const
+vk::DescriptorImageInfo DescriptorSet::createImageInfo(const std::shared_ptr<Image>& image) const
 {
 	return vk::DescriptorImageInfo{
 		.sampler = image->getVulkanSampler(),
@@ -59,7 +59,7 @@ const vk::DescriptorImageInfo DescriptorSet::createImageInfo(const std::shared_p
 	};
 }
 
-const vk::WriteDescriptorSet DescriptorSet::createWriteDescriptorSet(const vk::DescriptorImageInfo& descriptorImageInfo, int frameIndex) const
+vk::WriteDescriptorSet DescriptorSet::createWriteDescriptorSet(const vk::DescriptorImageInfo& descriptorImageInfo, int frameIndex) const
 {
 	return vk::WriteDescriptorSet{
 		.dstSet = vulkanDescriptorSets[frameIndex],
@@ -71,13 +71,13 @@ const vk::WriteDescriptorSet DescriptorSet::createWriteDescriptorSet(const vk::D
 	};
 }
 
-const vk::DescriptorSet DescriptorSet::getVulkanDescriptorSet(int frameIndex) const
+const vk::DescriptorSet& DescriptorSet::getVulkanDescriptorSet(int frameIndex) const
 {
 	ExceptionChecker::throwExceptionIfIndexIsOutOfBounds(frameIndex, vulkanDescriptorSets.size(), "Error in DescriptorSet! Index is out of bounds");
 	return vulkanDescriptorSets[frameIndex];
 }
 
-const vk::DescriptorSetLayout DescriptorSet::getVulkanDescriptorSetLayout() const
+const vk::DescriptorSetLayout& DescriptorSet::getVulkanDescriptorSetLayout() const
 {
 	return layout.getVulkanDescriptorSetLayout();
 }

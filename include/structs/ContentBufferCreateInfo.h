@@ -8,7 +8,7 @@
 template<typename T>
 struct ContentBufferCreateInfo
 {
-	vk::Device vulkanLogicalDevice;
+	const vk::Device& vulkanLogicalDevice;
 	std::vector<T> content;
 	const PhysicalDeviceProperties& physicalDeviceProperties;
 	std::shared_ptr<CommandBuffer> commandBuffers;

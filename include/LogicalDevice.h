@@ -37,14 +37,14 @@ public:
 	void drawFrame(WindowHandler& windowHandler, CameraHandler& cameraHandler, bool framebufferResized);
 	void waitIdle();
 
-	const vk::Device getVulkanLogicalDevice() const;
+	const vk::Device& getVulkanLogicalDevice() const;
 
 private:
-	const std::set<uint32_t> createUniqueQueueFamilies(const QueueFamilyIndices& queueFamilyIndices) const;
-	const std::vector<vk::DeviceQueueCreateInfo> buildDeviceQueueCreateInfos(const std::set<uint32_t>& uniqueQueueFamilies) const;
-	const vk::DeviceQueueCreateInfo buildDeviceQueueCreateInfo(uint32_t queueFamilyIndex) const;
-	const vk::DeviceCreateInfo buildVulkanLogicalDeviceCreateInfo(const std::vector<vk::DeviceQueueCreateInfo>& deviceQueueCreateInfos, const LogicalDeviceCreateInfo& logicalDeviceCreateInfo) const;
-	const vk::Format getDepthImageFormat(const PhysicalDeviceProperties& physicalDeviceProperties) const;
+	std::set<uint32_t> createUniqueQueueFamilies(const QueueFamilyIndices& queueFamilyIndices) const;
+	std::vector<vk::DeviceQueueCreateInfo> buildDeviceQueueCreateInfos(const std::set<uint32_t>& uniqueQueueFamilies) const;
+	vk::DeviceQueueCreateInfo buildDeviceQueueCreateInfo(uint32_t queueFamilyIndex) const;
+	vk::DeviceCreateInfo buildVulkanLogicalDeviceCreateInfo(const std::vector<vk::DeviceQueueCreateInfo>& deviceQueueCreateInfos, const LogicalDeviceCreateInfo& logicalDeviceCreateInfo) const;
+	vk::Format getDepthImageFormat(const PhysicalDeviceProperties& physicalDeviceProperties) const;
 	void createSwapChain(const LogicalDeviceCreateInfo& logicalDeviceCreateInfo, const vk::Format& depthImageFormat);
 	void createRenderPass(const vk::Format& depthImageFormat, const PhysicalDeviceProperties& physicalDeviceProperties);
 	void createPresentQueue(const QueueFamilyIndices& queueFamilyIndices);
@@ -52,18 +52,18 @@ private:
 	void createSynchronizationObjects();
 	void createVertexBuffer(const std::vector<Vertex>& vertices, const PhysicalDeviceProperties& physicalDeviceProperties);
 	template<typename T>
-	const ContentBufferCreateInfo<T> buildContentBufferCreateInfo(const std::vector<T>& content, const PhysicalDeviceProperties& physicalDeviceProperties) const;
+	ContentBufferCreateInfo<T> buildContentBufferCreateInfo(const std::vector<T>& content, const PhysicalDeviceProperties& physicalDeviceProperties) const;
 	void createIndexBuffer(const std::vector<uint32_t>& indices, const PhysicalDeviceProperties& physicalDeviceProperties);
 	void createUniformBuffers(const PhysicalDeviceProperties& physicalDeviceProperties);
 	void createTextureBuffer(const TextureImage& textureImage, const PhysicalDeviceProperties& physicalDeviceProperties);
 	void createTextureImage(const TextureImage& textureImage, const PhysicalDeviceProperties& physicalDeviceProperties);
-	const ImageInfo createImageInfo(const TextureImage& textureImage, const PhysicalDeviceProperties& physicalDeviceProperties) const;
+	ImageInfo createImageInfo(const TextureImage& textureImage, const PhysicalDeviceProperties& physicalDeviceProperties) const;
 	void createFramebuffers();
 	void createDescriptorSet();
 	void waitForFences(const uint32_t fenceCount);
-	const uint32_t acquireNextImageFromSwapChain(WindowHandler& windowHandler);
+	uint32_t acquireNextImageFromSwapChain(WindowHandler& windowHandler);
 	void resetFences(const uint32_t fenceCount);
-	const CommandBufferRecordInfo createCommandBufferRecordInfo(const uint32_t imageIndex) const;
+	CommandBufferRecordInfo createCommandBufferRecordInfo(const uint32_t imageIndex) const;
 	void updateMVP(CameraHandler& cameraHandler);
 	void presentResult(WindowHandler& windowHandler, const uint32_t imageIndex, bool framebufferResized);
 

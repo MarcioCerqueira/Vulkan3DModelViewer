@@ -23,7 +23,7 @@ void JSONConfigurationFileParser::convertJSONDocumentToConfigurationFileModel() 
 	configurationFileModel.window.height = JSONDocument["window"].GetObject()["height"].GetInt();
 }
 
-const ConfigurationFileModel JSONConfigurationFileParser::getConfigurationFileModel() const
+const ConfigurationFileModel& JSONConfigurationFileParser::getConfigurationFileModel() const
 {
 	return configurationFileModel;
 }

@@ -19,23 +19,23 @@ public:
 	void transitionLayout(const ImageMemoryBarrierInfo& imageMemoryBarrierInfo, std::shared_ptr<CommandBuffer>& commandBuffers);
 	void createImageView(const vk::ImageAspectFlags& aspectMask);
 	void generateMipmaps(std::shared_ptr<CommandBuffer>& commandBuffers, const PhysicalDeviceProperties& physicalDeviceProperties);
-	const vk::Image getVulkanImage() const;
-	const vk::ImageView getVulkanImageView() const;
-	const vk::Sampler getVulkanSampler() const;
-	const vk::ImageLayout getImageLayout() const;
-	const vk::BufferImageCopy buildBufferImageCopy() const;
+	const vk::Image& getVulkanImage() const;
+	const vk::ImageView& getVulkanImageView() const;
+	const vk::Sampler& getVulkanSampler() const;
+	const vk::ImageLayout& getImageLayout() const;
+	vk::BufferImageCopy buildBufferImageCopy() const;
 
 private:
-	const vk::ImageCreateInfo buildImageCreateInfo(const vk::ImageUsageFlags& imageUsageFlags, const vk::SampleCountFlagBits& sampleCountFlagBits) const;
-	const vk::MemoryAllocateInfo buildMemoryAllocateInfo(const vk::MemoryRequirements& memoryRequirements, const uint32_t memoryTypeIndex) const;
+	vk::ImageCreateInfo buildImageCreateInfo(const vk::ImageUsageFlags& imageUsageFlags, const vk::SampleCountFlagBits& sampleCountFlagBits) const;
+	vk::MemoryAllocateInfo buildMemoryAllocateInfo(const vk::MemoryRequirements& memoryRequirements, const uint32_t memoryTypeIndex) const;
 	vk::ImageMemoryBarrier buildImageMemoryBarrier(const ImageMemoryBarrierInfo& imageMemoryBarrierInfo, const uint32_t baseMipLevel, const uint32_t mipLevels) const;
-	const vk::ImageSubresourceRange buildImageSubresourceRange(const uint32_t baseMipLevel, const uint32_t mipLevels) const;
-	const CommandBufferPipelineBarrierInfo buildCommandBufferPipelineBarrierInfo(const ImageMemoryBarrierInfo& imageMemoryBarrierInfo, const vk::ImageMemoryBarrier& imageMemoryBarrier) const;
+	vk::ImageSubresourceRange buildImageSubresourceRange(const uint32_t baseMipLevel, const uint32_t mipLevels) const;
+	CommandBufferPipelineBarrierInfo buildCommandBufferPipelineBarrierInfo(const ImageMemoryBarrierInfo& imageMemoryBarrierInfo, const vk::ImageMemoryBarrier& imageMemoryBarrier) const;
 	void checkLinearBlittingSupport(const PhysicalDeviceProperties& physicalDeviceProperties) const;
-	const vk::ImageBlit buildImageBlit(const uint32_t level, const int32_t mipWidth, const int32_t mipHeight) const;
-	const vk::ImageSubresourceLayers buildImageSubresourceLayers(const uint32_t mipLevel) const;
-	const CommandBufferBlitImageInfo buildCommandBufferBlitImageInfo(const vk::ImageLayout& srcLayout, const vk::ImageLayout& dstLayout, const vk::ImageBlit& imageBlit) const;
-	const ImageMemoryBarrierInfo prepareMipLevelForBlit(std::shared_ptr<CommandBuffer>& commandBuffers, const int level);
+	vk::ImageBlit buildImageBlit(const uint32_t level, const int32_t mipWidth, const int32_t mipHeight) const;
+	vk::ImageSubresourceLayers buildImageSubresourceLayers(const uint32_t mipLevel) const;
+	CommandBufferBlitImageInfo buildCommandBufferBlitImageInfo(const vk::ImageLayout& srcLayout, const vk::ImageLayout& dstLayout, const vk::ImageBlit& imageBlit) const;
+	ImageMemoryBarrierInfo prepareMipLevelForBlit(std::shared_ptr<CommandBuffer>& commandBuffers, const int level);
 	void transferMipLevelToShaderLayout(std::shared_ptr<CommandBuffer>& commandBuffers, const int level);
 	void transferLastMipLevelToShaderLayout(std::shared_ptr<CommandBuffer>& commandBuffers);
 

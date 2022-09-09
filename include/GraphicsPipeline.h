@@ -12,20 +12,20 @@ public:
 	GraphicsPipeline(const GraphicsPipelineCreateInfo& graphicsPipelineCreateInfo);
 	~GraphicsPipeline();
 
-	const vk::Pipeline getVulkanPipeline() const;
-	const vk::PipelineLayout getVulkanPipelineLayout() const;
+	const vk::Pipeline& getVulkanPipeline() const;
+	const vk::PipelineLayout& getVulkanPipelineLayout() const;
 
 private:
-	const vk::PipelineVertexInputStateCreateInfo buildPipelineVertexInputStateCreateInfo(const vk::VertexInputBindingDescription& vertexBindingDescription, const std::array<vk::VertexInputAttributeDescription, 3>&  vertexAttributeDescriptions) const;
-	const vk::PipelineInputAssemblyStateCreateInfo buildPipelineInputAssemblyStateCreateInfo() const;
-	const vk::PipelineViewportStateCreateInfo buildPipelineViewportStateCreateInfo() const;
-	const vk::PipelineRasterizationStateCreateInfo buildPipelineRasterizationStateCreateInfo() const;
-	const vk::PipelineMultisampleStateCreateInfo buildPipelineMultisampleStateCreateInfo(const vk::SampleCountFlagBits& sampleCount) const;
-	const vk::PipelineColorBlendAttachmentState buildPipelineColorBlendAttachmentState() const;
-	const vk::PipelineColorBlendStateCreateInfo buildPipelineColorBlendStateCreateInfo(const vk::PipelineColorBlendAttachmentState& colorBlendAttachmentState) const;
-	const vk::PipelineDynamicStateCreateInfo buildPipelineDynamicStateCreateInfo(const std::vector<vk::DynamicState>& dynamicStates) const;
-	const vk::PipelineDepthStencilStateCreateInfo buildPipelineDepthStencilStateCreateInfo() const;
-	const vk::PipelineLayoutCreateInfo buildPipelineLayoutCreateInfo(const vk::DescriptorSetLayout& vulkanDescriptorSetLayout) const;
+	vk::PipelineVertexInputStateCreateInfo buildPipelineVertexInputStateCreateInfo(const vk::VertexInputBindingDescription& vertexBindingDescription, const std::array<vk::VertexInputAttributeDescription, 3>&  vertexAttributeDescriptions) const;
+	vk::PipelineInputAssemblyStateCreateInfo buildPipelineInputAssemblyStateCreateInfo() const;
+	vk::PipelineViewportStateCreateInfo buildPipelineViewportStateCreateInfo() const;
+	vk::PipelineRasterizationStateCreateInfo buildPipelineRasterizationStateCreateInfo() const;
+	vk::PipelineMultisampleStateCreateInfo buildPipelineMultisampleStateCreateInfo(const vk::SampleCountFlagBits& sampleCount) const;
+	vk::PipelineColorBlendAttachmentState buildPipelineColorBlendAttachmentState() const;
+	vk::PipelineColorBlendStateCreateInfo buildPipelineColorBlendStateCreateInfo(const vk::PipelineColorBlendAttachmentState& colorBlendAttachmentState) const;
+	vk::PipelineDynamicStateCreateInfo buildPipelineDynamicStateCreateInfo(const std::vector<vk::DynamicState>& dynamicStates) const;
+	vk::PipelineDepthStencilStateCreateInfo buildPipelineDepthStencilStateCreateInfo() const;
+	vk::PipelineLayoutCreateInfo buildPipelineLayoutCreateInfo(const vk::DescriptorSetLayout& vulkanDescriptorSetLayout) const;
 	
 	const vk::Device vulkanLogicalDevice;
 	vk::PipelineLayout pipelineLayout;

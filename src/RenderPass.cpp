@@ -24,7 +24,7 @@ RenderPass::~RenderPass()
 	vulkanLogicalDevice.destroyRenderPass(vulkanRenderPass);
 }
 
-const vk::RenderPassCreateInfo RenderPass::createRenderPassCreateInfo(const std::vector<vk::AttachmentDescription>& attachmentDescriptions, const vk::SubpassDescription& subpassDescription, const vk::SubpassDependency& subpassDependency) const
+vk::RenderPassCreateInfo RenderPass::createRenderPassCreateInfo(const std::vector<vk::AttachmentDescription>& attachmentDescriptions, const vk::SubpassDescription& subpassDescription, const vk::SubpassDependency& subpassDependency) const
 {
 	return vk::RenderPassCreateInfo{
 		.attachmentCount = static_cast<uint32_t>(attachmentDescriptions.size()),
@@ -36,7 +36,7 @@ const vk::RenderPassCreateInfo RenderPass::createRenderPassCreateInfo(const std:
 	};
 }
 
-const vk::AttachmentDescription RenderPass::createMSAAColorAttachmentDescription(const RenderPassInfo& renderPassInfo) const
+vk::AttachmentDescription RenderPass::createMSAAColorAttachmentDescription(const RenderPassInfo& renderPassInfo) const
 {
 	return vk::AttachmentDescription{
 		.format = renderPassInfo.colorImageFormat,
@@ -50,7 +50,7 @@ const vk::AttachmentDescription RenderPass::createMSAAColorAttachmentDescription
 	};
 }
 
-const vk::AttachmentDescription RenderPass::createResolveColorAttachmentDescription(const RenderPassInfo& renderPassInfo) const
+vk::AttachmentDescription RenderPass::createResolveColorAttachmentDescription(const RenderPassInfo& renderPassInfo) const
 {
 	return vk::AttachmentDescription{
 		.format = renderPassInfo.colorImageFormat,
@@ -64,7 +64,7 @@ const vk::AttachmentDescription RenderPass::createResolveColorAttachmentDescript
 	};
 }
 
-const vk::AttachmentDescription RenderPass::createDepthAttachmentDescription(const RenderPassInfo& renderPassInfo) const
+vk::AttachmentDescription RenderPass::createDepthAttachmentDescription(const RenderPassInfo& renderPassInfo) const
 {
 	return vk::AttachmentDescription{
 		.format = renderPassInfo.depthImageFormat,
@@ -78,7 +78,7 @@ const vk::AttachmentDescription RenderPass::createDepthAttachmentDescription(con
 	};
 }
 
-const vk::SubpassDescription RenderPass::createSubpassDescription(const vk::AttachmentReference& colorAttachmentReference, const vk::AttachmentReference& depthAttachmentReference, const vk::AttachmentReference& resolveColorAttachmentReference) const
+vk::SubpassDescription RenderPass::createSubpassDescription(const vk::AttachmentReference& colorAttachmentReference, const vk::AttachmentReference& depthAttachmentReference, const vk::AttachmentReference& resolveColorAttachmentReference) const
 {
 	return vk::SubpassDescription{
 		.pipelineBindPoint = vk::PipelineBindPoint::eGraphics,
@@ -89,7 +89,7 @@ const vk::SubpassDescription RenderPass::createSubpassDescription(const vk::Atta
 	};
 }
 
-const vk::AttachmentReference RenderPass::createColorAttachmentReference(const uint32_t attachmentIndex) const
+vk::AttachmentReference RenderPass::createColorAttachmentReference(const uint32_t attachmentIndex) const
 {
 	return vk::AttachmentReference{
 		.attachment = attachmentIndex,
@@ -97,7 +97,7 @@ const vk::AttachmentReference RenderPass::createColorAttachmentReference(const u
 	};
 }
 
-const vk::AttachmentReference RenderPass::createDepthAttachmentReference(const uint32_t attachmentIndex) const
+vk::AttachmentReference RenderPass::createDepthAttachmentReference(const uint32_t attachmentIndex) const
 {
 	return vk::AttachmentReference{
 		.attachment = attachmentIndex,
@@ -105,7 +105,7 @@ const vk::AttachmentReference RenderPass::createDepthAttachmentReference(const u
 	};
 }
 
-const vk::SubpassDependency RenderPass::createSubpassDependency() const
+vk::SubpassDependency RenderPass::createSubpassDependency() const
 {
 	return vk::SubpassDependency{
 		.srcSubpass = VK_SUBPASS_EXTERNAL,
@@ -116,7 +116,7 @@ const vk::SubpassDependency RenderPass::createSubpassDependency() const
 	};
 }
 
-const vk::RenderPassBeginInfo RenderPass::createRenderPassBeginInfo(const vk::Framebuffer& vulkanFramebuffer, const vk::Extent2D& swapChainExtent) const
+vk::RenderPassBeginInfo RenderPass::createRenderPassBeginInfo(const vk::Framebuffer& vulkanFramebuffer, const vk::Extent2D& swapChainExtent) const
 {
 	std::array<vk::ClearValue, 2> clearValues{};
 	clearValues[0].color = vk::ClearColorValue(std::array<float, 4>{ 0.0f, 0.0f, 0.0f, 1.0f });
@@ -134,7 +134,7 @@ const vk::RenderPassBeginInfo RenderPass::createRenderPassBeginInfo(const vk::Fr
 	};
 }
 
-const vk::RenderPass RenderPass::getVulkanRenderPass() const
+const vk::RenderPass& RenderPass::getVulkanRenderPass() const
 {
 	return vulkanRenderPass;
 }

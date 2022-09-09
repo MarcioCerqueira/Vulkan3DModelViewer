@@ -25,12 +25,12 @@ public:
 	void drawFrame(WindowHandler& windowHandler, CameraHandler& cameraHandler, bool framebufferResized);
 	void waitIdle();
 
-	const vk::Device getVulkanLogicalDevice() const;
+	const vk::Device& getVulkanLogicalDevice() const;
 
 private:
 	void createVulkanInstance(const std::string& applicationName);
-	const vk::ApplicationInfo createApplicationInfo(const std::string& applicationName) const;
-	const vk::InstanceCreateInfo createVulkanInstanceInfo(const vk::ApplicationInfo& applicationInfo) const;
+	vk::ApplicationInfo createApplicationInfo(const std::string& applicationName) const;
+	vk::InstanceCreateInfo createVulkanInstanceInfo(const vk::ApplicationInfo& applicationInfo) const;
 
 	const ValidationLayer validationLayer; 
 	vk::Instance vulkanInstance;

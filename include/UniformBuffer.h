@@ -8,8 +8,8 @@ class UniformBuffer
 public:
 	UniformBuffer(const vk::Device& vulkanLogicalDevice, const PhysicalDeviceProperties& physicalDeviceProperties, const vk::DeviceSize& contentSize);
 	void copyFromCPUToDeviceMemory(const ModelViewProjectionTransformation* data);
-	const vk::Buffer getVulkanBuffer() const;
-	const size_t getSize() const;
+	const vk::Buffer& getVulkanBuffer() const;
+	size_t getSize() const;
 
 private:
 	void createUniformData(const PhysicalDeviceProperties& physicalDeviceProperties, const vk::DeviceSize& contentSize);

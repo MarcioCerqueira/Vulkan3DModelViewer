@@ -10,10 +10,10 @@ public:
 	CommandPool(const vk::Device& vulkanLogicalDevice, const std::optional<uint32_t> graphicsFamilyIndex);
 	~CommandPool();
 
-	const vk::CommandPool getVulkanCommandPool() const;
+	const vk::CommandPool& getVulkanCommandPool() const;
 
 private:
-	const vk::CommandPoolCreateInfo buildCommandPoolCreateInfo(const std::optional<uint32_t> graphicsFamilyIndex) const;
+	vk::CommandPoolCreateInfo buildCommandPoolCreateInfo(const std::optional<uint32_t> graphicsFamilyIndex) const;
 
 	vk::CommandPool vulkanCommandPool;
 	const vk::Device vulkanLogicalDevice;

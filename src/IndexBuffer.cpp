@@ -20,12 +20,12 @@ void IndexBuffer::createIndexData(const std::vector<uint32_t>& indices, const Ph
 	buffer.bindBufferMemory();
 }
 
-const size_t IndexBuffer::getIndexCount() const
+size_t IndexBuffer::getIndexCount() const
 {
 	return indexCount;
 }
 
-const vk::Buffer IndexBuffer::getVulkanBuffer() const
+const vk::Buffer& IndexBuffer::getVulkanBuffer() const
 {
 	return buffer.getVulkanBuffer();
 }

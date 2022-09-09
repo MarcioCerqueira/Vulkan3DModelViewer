@@ -6,15 +6,15 @@
 struct CommandBufferRecordInfo
 {
 	vk::RenderPassBeginInfo renderPassBeginInfo;
-	vk::Pipeline graphicsPipeline;
-	vk::PipelineLayout vulkanPipelineLayout;
-	vk::Buffer vulkanVertexBuffer;
-	vk::Buffer vulkanIndexBuffer;
-	vk::DescriptorSet vulkanDescriptorSet;
+	const vk::Pipeline& graphicsPipeline;
+	const vk::PipelineLayout& vulkanPipelineLayout;
+	const vk::Buffer& vulkanVertexBuffer;
+	const vk::Buffer& vulkanIndexBuffer;
+	const vk::DescriptorSet& vulkanDescriptorSet;
 	unsigned int frameIndex;
 	size_t indexCount;
 	vk::IndexType indexType;
-	vk::Extent2D swapChainExtent;
+	const vk::Extent2D& swapChainExtent;
 	uint32_t firstDescriptorSet = 0;
 	uint32_t descriptorSetCount = 1;
 	uint32_t descriptorDynamicOffsetCount = 0;

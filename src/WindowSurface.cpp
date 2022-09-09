@@ -15,7 +15,7 @@ WindowSurface::~WindowSurface()
 	vulkanInstance.destroySurfaceKHR(vulkanWindowSurface);
 }
 
-const vk::SurfaceKHR WindowSurface::getVulkanWindowSurface() const
+const vk::SurfaceKHR& WindowSurface::getVulkanWindowSurface() const
 {
 	return vulkanWindowSurface;
 }

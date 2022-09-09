@@ -18,14 +18,14 @@ class PhysicalDevice : public PhysicalDeviceProperties
 public:
 	void pick(const std::vector<vk::PhysicalDevice>& vulkanPhysicalDevices, const vk::SurfaceKHR& vulkanWindowSurface);
 	std::unique_ptr<LogicalDevice> createLogicalDevice(const LogicalDevicePartialCreateInfo& logicalDevicePartialCreateInfo);
-	const uint32_t findMemoryType(uint32_t memoryTypeFilter, vk::MemoryPropertyFlags memoryPropertyFlags) const override;
-	const vk::Format findSupportedFormat(const std::vector<vk::Format>& candidates, const vk::ImageTiling& tiling, const vk::FormatFeatureFlags& features) const override;
-	const vk::SampleCountFlagBits getMaxUsableSampleCount() const override;
-	const vk::PhysicalDevice getVulkanPhysicalDevice() const override;
+	uint32_t findMemoryType(uint32_t memoryTypeFilter, vk::MemoryPropertyFlags memoryPropertyFlags) const override;
+	vk::Format findSupportedFormat(const std::vector<vk::Format>& candidates, const vk::ImageTiling& tiling, const vk::FormatFeatureFlags& features) const override;
+	vk::SampleCountFlagBits getMaxUsableSampleCount() const override;
+	const vk::PhysicalDevice& getVulkanPhysicalDevice() const override;
 
 private:
 	void checkVulkanSupport(const std::vector<vk::PhysicalDevice>& vulkanPhysicalDevices) const;
-	const std::multimap<int, vk::PhysicalDevice> rateMostSuitablePhysicalDevices(const std::vector<vk::PhysicalDevice>& vulkanPhysicalDevices, const vk::SurfaceKHR& vulkanWindowSurface) const;
+	std::multimap<int, vk::PhysicalDevice> rateMostSuitablePhysicalDevices(const std::vector<vk::PhysicalDevice>& vulkanPhysicalDevices, const vk::SurfaceKHR& vulkanWindowSurface) const;
 	vk::PhysicalDevice selectMostSuitablePhysicalDevice(const std::multimap<int, vk::PhysicalDevice>& mostSuitablePhysicalDevices) const;
 
 	const std::vector<const char*> vulkanDeviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };

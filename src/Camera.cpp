@@ -392,12 +392,12 @@ void Camera::trackball(glm::ivec2 const& position)
 	upVector = glm::vec3(up2.x, up2.y, up2.z);
 }
 
-const glm::mat4 Camera::getViewMatrix() const
+const glm::mat4& Camera::getViewMatrix() const
 {
 	return matrix;
 }
 
-const float Camera::getZoom() const
+float Camera::getZoom() const
 {
 	return zoom;
 }

@@ -11,7 +11,7 @@ Sampler::~Sampler()
 	vulkanLogicalDevice.destroySampler(vulkanSampler);
 }
 
-const vk::SamplerCreateInfo Sampler::buildSamplerCreateInfo(const vk::PhysicalDeviceProperties& physicalDeviceProperties, const uint32_t mipLevels) const
+vk::SamplerCreateInfo Sampler::buildSamplerCreateInfo(const vk::PhysicalDeviceProperties& physicalDeviceProperties, const uint32_t mipLevels) const
 {
 	return vk::SamplerCreateInfo{
 		.magFilter = vk::Filter::eLinear,
@@ -32,7 +32,7 @@ const vk::SamplerCreateInfo Sampler::buildSamplerCreateInfo(const vk::PhysicalDe
 	};
 }
 
-const vk::Sampler Sampler::getVulkanSampler() const
+const vk::Sampler& Sampler::getVulkanSampler() const
 {
 	return vulkanSampler;
 }

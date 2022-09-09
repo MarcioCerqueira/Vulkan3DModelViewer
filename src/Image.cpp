@@ -27,7 +27,7 @@ Image::~Image()
 	vulkanLogicalDevice.freeMemory(vulkanImageMemory);
 }
 
-const vk::ImageCreateInfo Image::buildImageCreateInfo(const vk::ImageUsageFlags& imageUsageFlags, const vk::SampleCountFlagBits& sampleCountFlagBits) const
+vk::ImageCreateInfo Image::buildImageCreateInfo(const vk::ImageUsageFlags& imageUsageFlags, const vk::SampleCountFlagBits& sampleCountFlagBits) const
 {
 	return vk::ImageCreateInfo{
 		.imageType = vk::ImageType::e2D,
@@ -43,7 +43,7 @@ const vk::ImageCreateInfo Image::buildImageCreateInfo(const vk::ImageUsageFlags&
 	};
 }
 
-const vk::MemoryAllocateInfo Image::buildMemoryAllocateInfo(const vk::MemoryRequirements& memoryRequirements, const uint32_t memoryTypeIndex) const
+vk::MemoryAllocateInfo Image::buildMemoryAllocateInfo(const vk::MemoryRequirements& memoryRequirements, const uint32_t memoryTypeIndex) const
 {
 	return vk::MemoryAllocateInfo{
 		.allocationSize = memoryRequirements.size,
@@ -87,7 +87,7 @@ vk::ImageMemoryBarrier Image::buildImageMemoryBarrier(const ImageMemoryBarrierIn
 	};
 }
 
-const vk::ImageSubresourceRange Image::buildImageSubresourceRange(const uint32_t baseMipLevel, const uint32_t mipLevels) const
+vk::ImageSubresourceRange Image::buildImageSubresourceRange(const uint32_t baseMipLevel, const uint32_t mipLevels) const
 {
 	return vk::ImageSubresourceRange{
 		.aspectMask = vk::ImageAspectFlagBits::eColor,
@@ -98,7 +98,7 @@ const vk::ImageSubresourceRange Image::buildImageSubresourceRange(const uint32_t
 	};
 }
 
-const CommandBufferPipelineBarrierInfo Image::buildCommandBufferPipelineBarrierInfo(const ImageMemoryBarrierInfo& imageMemoryBarrierInfo, const vk::ImageMemoryBarrier& imageMemoryBarrier) const
+CommandBufferPipelineBarrierInfo Image::buildCommandBufferPipelineBarrierInfo(const ImageMemoryBarrierInfo& imageMemoryBarrierInfo, const vk::ImageMemoryBarrier& imageMemoryBarrier) const
 {
 	return CommandBufferPipelineBarrierInfo{
 		.frameIndex = 0,
@@ -138,7 +138,7 @@ void Image::checkLinearBlittingSupport(const PhysicalDeviceProperties& physicalD
 	}
 }
 
-const vk::ImageBlit Image::buildImageBlit(const uint32_t level, const int32_t mipWidth, const int32_t mipHeight) const
+vk::ImageBlit Image::buildImageBlit(const uint32_t level, const int32_t mipWidth, const int32_t mipHeight) const
 {
 	std::array<vk::Offset3D, 2> srcOffsets, dstOffsets;
 	srcOffsets[0] = vk::Offset3D{ 0, 0, 0 };
@@ -153,7 +153,7 @@ const vk::ImageBlit Image::buildImageBlit(const uint32_t level, const int32_t mi
 	};
 }
 
-const vk::ImageSubresourceLayers Image::buildImageSubresourceLayers(const uint32_t mipLevel) const
+vk::ImageSubresourceLayers Image::buildImageSubresourceLayers(const uint32_t mipLevel) const
 {
 	return vk::ImageSubresourceLayers{
 		.aspectMask = vk::ImageAspectFlagBits::eColor,
@@ -163,7 +163,7 @@ const vk::ImageSubresourceLayers Image::buildImageSubresourceLayers(const uint32
 	};
 }
 
-const CommandBufferBlitImageInfo Image::buildCommandBufferBlitImageInfo(const vk::ImageLayout& srcLayout, const vk::ImageLayout& dstLayout, const vk::ImageBlit& imageBlit) const
+CommandBufferBlitImageInfo Image::buildCommandBufferBlitImageInfo(const vk::ImageLayout& srcLayout, const vk::ImageLayout& dstLayout, const vk::ImageBlit& imageBlit) const
 {
 	return CommandBufferBlitImageInfo{
 		.frameIndex = 0,
@@ -174,7 +174,7 @@ const CommandBufferBlitImageInfo Image::buildCommandBufferBlitImageInfo(const vk
 	};
 }
 
-const ImageMemoryBarrierInfo Image::prepareMipLevelForBlit(std::shared_ptr<CommandBuffer>& commandBuffers, const int level)
+ImageMemoryBarrierInfo Image::prepareMipLevelForBlit(std::shared_ptr<CommandBuffer>& commandBuffers, const int level)
 {
 	const ImageMemoryBarrierInfo imageMemoryBarrierInfo{
 		.srcAccessMask = vk::AccessFlagBits::eTransferWrite,
@@ -214,27 +214,27 @@ void Image::transferLastMipLevelToShaderLayout(std::shared_ptr<CommandBuffer>& c
 	commandBuffers->pipelineBarrier(commandBufferPipelineBarrierInfo);
 }
 
-const vk::Image Image::getVulkanImage() const
+const vk::Image& Image::getVulkanImage() const
 {
 	return vulkanImage;
 }
 
-const vk::ImageView Image::getVulkanImageView() const
+const vk::ImageView& Image::getVulkanImageView() const
 {
 	return imageView->getVulkanImageView();
 }
 
-const vk::Sampler Image::getVulkanSampler() const
+const vk::Sampler& Image::getVulkanSampler() const
 {
 	return sampler.getVulkanSampler();
 }
 
-const vk::ImageLayout Image::getImageLayout() const
+const vk::ImageLayout& Image::getImageLayout() const
 {
 	return imageLayout;
 }
 
-const vk::BufferImageCopy Image::buildBufferImageCopy() const
+vk::BufferImageCopy Image::buildBufferImageCopy() const
 {
 	return vk::BufferImageCopy{
 		.bufferOffset = 0,

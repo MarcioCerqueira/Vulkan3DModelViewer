@@ -5,8 +5,8 @@
 struct CommandBufferBlitImageInfo
 {
 	int frameIndex;
-	vk::Image image;
-	vk::ImageLayout srcLayout;
-	vk::ImageLayout dstLayout;
+	const vk::Image& image;
+	const vk::ImageLayout& srcLayout;
+	const vk::ImageLayout& dstLayout;
 	vk::ImageBlit blit;
 };

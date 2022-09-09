@@ -11,7 +11,7 @@ ImageView::~ImageView()
     vulkanLogicalDevice.destroyImageView(vulkanImageView);
 }
 
-const vk::ImageViewCreateInfo ImageView::buildImageViewCreateInfo(const ImageViewInfo& imageViewInfo) const
+vk::ImageViewCreateInfo ImageView::buildImageViewCreateInfo(const ImageViewInfo& imageViewInfo) const
 {
     return vk::ImageViewCreateInfo{
         .image = imageViewInfo.image,
@@ -22,7 +22,7 @@ const vk::ImageViewCreateInfo ImageView::buildImageViewCreateInfo(const ImageVie
     };
 }
 
-const vk::ImageSubresourceRange ImageView::createImageSubresourceRange(const ImageViewInfo& imageViewInfo) const
+vk::ImageSubresourceRange ImageView::createImageSubresourceRange(const ImageViewInfo& imageViewInfo) const
 {
     return vk::ImageSubresourceRange{
         .aspectMask = imageViewInfo.aspectMask,
@@ -33,7 +33,7 @@ const vk::ImageSubresourceRange ImageView::createImageSubresourceRange(const Ima
     };
 }
 
-const vk::ImageView ImageView::getVulkanImageView() const
+const vk::ImageView& ImageView::getVulkanImageView() const
 {
     return vulkanImageView;
 }

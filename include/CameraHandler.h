@@ -40,8 +40,8 @@ using MouseModifierFlags = vk::Flags<MouseModifierFlagBits>;
 class CameraHandler
 {
 public:
-	virtual const glm::mat4 getViewMatrix() const = 0;
-    virtual const float getZoom() const = 0;
+	virtual const glm::mat4& getViewMatrix() const = 0;
+    virtual float getZoom() const = 0;
     virtual void processKeyboard(CameraMovement direction, float deltaTime) = 0;
     virtual Action processMouseMovement(const glm::ivec2& position, MouseButton mouseButton, MouseModifierFlags& modifiers) = 0;
     virtual void setMousePosition(const glm::ivec2& position) = 0;

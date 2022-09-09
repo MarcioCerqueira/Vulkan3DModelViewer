@@ -4,8 +4,8 @@
 
 struct ImageViewInfo
 {
-	vk::Device vulkanLogicalDevice;
-	vk::Image image;
+	const vk::Device& vulkanLogicalDevice;
+	const vk::Image& image;
 	vk::Format format;
 	vk::ImageAspectFlags aspectMask;
 	uint32_t mipLevels;

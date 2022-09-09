@@ -10,10 +10,10 @@ public:
 	Framebuffer(const vk::Device& vulkanLogicalDevice, const vk::RenderPass& vulkanRenderPass, const std::vector<vk::ImageView>& attachments, const vk::Extent2D& swapChainExtent);
 	~Framebuffer();
 
-	const vk::Framebuffer getVulkanFramebuffer() const;
+	const vk::Framebuffer& getVulkanFramebuffer() const;
 
 private:
-	const vk::FramebufferCreateInfo buildFramebufferCreateInfo(const vk::RenderPass& vulkanRenderPass, const std::vector<vk::ImageView>& attachments, const vk::Extent2D& swapChainExtent) const;
+	vk::FramebufferCreateInfo buildFramebufferCreateInfo(const vk::RenderPass& vulkanRenderPass, const std::vector<vk::ImageView>& attachments, const vk::Extent2D& swapChainExtent) const;
 
 	const vk::Device vulkanLogicalDevice;
 	vk::Framebuffer vulkanFramebuffer;

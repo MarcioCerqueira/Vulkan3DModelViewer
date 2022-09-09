@@ -15,7 +15,7 @@ DescriptorPool::~DescriptorPool()
 	vulkanLogicalDevice.destroyDescriptorPool(vulkanDescriptorPool);
 }
 
-const vk::DescriptorPoolSize DescriptorPool::buildDescriptorPoolSize(const vk::DescriptorType& descriptorType, const int maxFramesInFlight) const
+vk::DescriptorPoolSize DescriptorPool::buildDescriptorPoolSize(const vk::DescriptorType& descriptorType, const int maxFramesInFlight) const
 {
 	return vk::DescriptorPoolSize{
 		.type = descriptorType,
@@ -23,7 +23,7 @@ const vk::DescriptorPoolSize DescriptorPool::buildDescriptorPoolSize(const vk::D
 	};
 }
 
-const vk::DescriptorPoolCreateInfo DescriptorPool::buildDescriptorPoolCreateInfo(const std::vector<vk::DescriptorPoolSize>& descriptorPoolSizes, const int maxFramesInFlight) const
+vk::DescriptorPoolCreateInfo DescriptorPool::buildDescriptorPoolCreateInfo(const std::vector<vk::DescriptorPoolSize>& descriptorPoolSizes, const int maxFramesInFlight) const
 {
 	return vk::DescriptorPoolCreateInfo{
 		.maxSets = static_cast<uint32_t>(maxFramesInFlight),
@@ -32,7 +32,7 @@ const vk::DescriptorPoolCreateInfo DescriptorPool::buildDescriptorPoolCreateInfo
 	};
 }
 
-const vk::DescriptorPool DescriptorPool::getVulkanDescriptorPool() const
+const vk::DescriptorPool& DescriptorPool::getVulkanDescriptorPool() const
 {
 	return vulkanDescriptorPool;
 }

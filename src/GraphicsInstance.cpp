@@ -19,7 +19,7 @@ void GraphicsInstance::createVulkanInstance(const std::string& applicationName)
 	vulkanInstance = vk::createInstance(createInfo);
 }
 
-const vk::ApplicationInfo GraphicsInstance::createApplicationInfo(const std::string& applicationName) const
+vk::ApplicationInfo GraphicsInstance::createApplicationInfo(const std::string& applicationName) const
 {
 	return vk::ApplicationInfo{
 		.pApplicationName = applicationName.c_str(),
@@ -30,7 +30,7 @@ const vk::ApplicationInfo GraphicsInstance::createApplicationInfo(const std::str
 	};
 }
 
-const vk::InstanceCreateInfo GraphicsInstance::createVulkanInstanceInfo(const vk::ApplicationInfo& applicationInfo) const
+vk::InstanceCreateInfo GraphicsInstance::createVulkanInstanceInfo(const vk::ApplicationInfo& applicationInfo) const
 {
 	uint32_t glfwExtensionCount{ 0 };
 	const char** glfwExtensions{ glfwGetRequiredInstanceExtensions(&glfwExtensionCount) };
@@ -82,7 +82,7 @@ void GraphicsInstance::waitIdle()
 	logicalDevice->waitIdle();
 }
 
-const vk::Device GraphicsInstance::getVulkanLogicalDevice() const
+const vk::Device& GraphicsInstance::getVulkanLogicalDevice() const
 {
 	return logicalDevice->getVulkanLogicalDevice();
 }

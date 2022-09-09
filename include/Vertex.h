@@ -9,8 +9,8 @@
 class Vertex
 {
 public:
-	static const vk::VertexInputBindingDescription getBindingDescription();
-	static const std::array<vk::VertexInputAttributeDescription, 3> getAttributeDescriptions();
+	static vk::VertexInputBindingDescription getBindingDescription();
+	static std::array<vk::VertexInputAttributeDescription, 3> getAttributeDescriptions();
 	bool operator==(const Vertex& other) const 
 	{
 		return position == other.position && color == other.color && texCoord == other.texCoord;
@@ -20,9 +20,9 @@ public:
 	glm::vec2 texCoord;
 
 private:
-	static const vk::VertexInputAttributeDescription getPositionAttributeDescription();
-	static const vk::VertexInputAttributeDescription getColorAttributeDescription();
-	static const vk::VertexInputAttributeDescription getTexCoordAttributeDescription();
+	static vk::VertexInputAttributeDescription getPositionAttributeDescription();
+	static vk::VertexInputAttributeDescription getColorAttributeDescription();
+	static vk::VertexInputAttributeDescription getTexCoordAttributeDescription();
 };
 
 namespace std {

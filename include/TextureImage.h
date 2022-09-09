@@ -11,10 +11,10 @@ public:
 	explicit TextureImage(const std::string& filename);
 
 	const stbi_uc* getPixels() const;
-	const int getSize() const;
-	const int getWidth() const;
-	const int getHeight() const;
-	const int getMipLevels() const;
+	int getSize() const;
+	int getWidth() const;
+	int getHeight() const;
+	int getMipLevels() const;
 
 private:
 	stbi_uc* pixels;

@@ -14,7 +14,7 @@ DescriptorSetLayout::~DescriptorSetLayout()
 	vulkanLogicalDevice.destroyDescriptorSetLayout(vulkanDescriptorSetLayout);
 }
 
-const vk::DescriptorSetLayoutBinding DescriptorSetLayout::createUniformBufferDescriptorSetLayoutBinding() const
+vk::DescriptorSetLayoutBinding DescriptorSetLayout::createUniformBufferDescriptorSetLayoutBinding() const
 {
 	return vk::DescriptorSetLayoutBinding{
 		.binding = 0,
@@ -24,7 +24,7 @@ const vk::DescriptorSetLayoutBinding DescriptorSetLayout::createUniformBufferDes
 	};
 }
 
-const vk::DescriptorSetLayoutBinding DescriptorSetLayout::createSamplerDescriptorSetLayoutBinding() const
+vk::DescriptorSetLayoutBinding DescriptorSetLayout::createSamplerDescriptorSetLayoutBinding() const
 {
 	return vk::DescriptorSetLayoutBinding{
 		.binding = 1,
@@ -34,7 +34,7 @@ const vk::DescriptorSetLayoutBinding DescriptorSetLayout::createSamplerDescripto
 	};
 }
 
-const vk::DescriptorSetLayoutCreateInfo DescriptorSetLayout::buildDescriptorSetLayoutCreateInfo(const std::vector<vk::DescriptorSetLayoutBinding>& descriptorSetLayoutBindings) const
+vk::DescriptorSetLayoutCreateInfo DescriptorSetLayout::buildDescriptorSetLayoutCreateInfo(const std::vector<vk::DescriptorSetLayoutBinding>& descriptorSetLayoutBindings) const
 {
 	return vk::DescriptorSetLayoutCreateInfo{
 		.bindingCount = static_cast<uint32_t>(descriptorSetLayoutBindings.size()),
@@ -42,7 +42,7 @@ const vk::DescriptorSetLayoutCreateInfo DescriptorSetLayout::buildDescriptorSetL
 	};
 }
 
-const vk::DescriptorSetLayout DescriptorSetLayout::getVulkanDescriptorSetLayout() const
+const vk::DescriptorSetLayout& DescriptorSetLayout::getVulkanDescriptorSetLayout() const
 {
 	return vulkanDescriptorSetLayout;
 }

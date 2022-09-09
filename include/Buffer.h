@@ -17,12 +17,12 @@ public:
 	void bindBufferMemory();
 	void copyFromCPUToDeviceMemory(const void* data);
 
-	const vk::BufferCreateInfo getBufferCreateInfo() const;
-	const vk::Buffer getVulkanBuffer() const;
+	const vk::BufferCreateInfo& getBufferCreateInfo() const;
+	const vk::Buffer& getVulkanBuffer() const;
 	
 private:
-	const vk::BufferCreateInfo buildBufferCreateInfo(const vk::DeviceSize& contentSize, const vk::BufferUsageFlags& bufferUsage) const;
-	const vk::MemoryAllocateInfo buildMemoryAllocateInfo(const vk::MemoryRequirements& memoryRequirements, const uint32_t memoryTypeIndex) const;
+	vk::BufferCreateInfo buildBufferCreateInfo(const vk::DeviceSize& contentSize, const vk::BufferUsageFlags& bufferUsage) const;
+	vk::MemoryAllocateInfo buildMemoryAllocateInfo(const vk::MemoryRequirements& memoryRequirements, const uint32_t memoryTypeIndex) const;
 
 	vk::BufferCreateInfo vulkanBufferCreateInfo;
 	const vk::Device vulkanLogicalDevice;

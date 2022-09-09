@@ -16,7 +16,7 @@ void PhysicalDevice::checkVulkanSupport(const std::vector<vk::PhysicalDevice>& v
 	}
 }
 
-const std::multimap<int, vk::PhysicalDevice> PhysicalDevice::rateMostSuitablePhysicalDevices(const std::vector<vk::PhysicalDevice>& vulkanPhysicalDevices, const vk::SurfaceKHR& vulkanWindowSurface) const
+std::multimap<int, vk::PhysicalDevice> PhysicalDevice::rateMostSuitablePhysicalDevices(const std::vector<vk::PhysicalDevice>& vulkanPhysicalDevices, const vk::SurfaceKHR& vulkanWindowSurface) const
 {
 	std::multimap<int, vk::PhysicalDevice> mostSuitablePhysicalDevices;
 	for (const auto& vulkanPhysicalDevice : vulkanPhysicalDevices)
@@ -59,7 +59,7 @@ std::unique_ptr<LogicalDevice> PhysicalDevice::createLogicalDevice(const Logical
 	return std::make_unique<LogicalDevice>(logicalDeviceCreateInfo);
 }
 
-const uint32_t PhysicalDevice::findMemoryType(uint32_t memoryTypeFilter, vk::MemoryPropertyFlags memoryPropertyFlags) const
+uint32_t PhysicalDevice::findMemoryType(uint32_t memoryTypeFilter, vk::MemoryPropertyFlags memoryPropertyFlags) const
 {
 	const vk::PhysicalDeviceMemoryProperties physicalDeviceMemoryProperties{ vulkanPhysicalDevice.getMemoryProperties() };
 	for (uint32_t i = 0; i < physicalDeviceMemoryProperties.memoryTypeCount; i++)
@@ -75,7 +75,7 @@ const uint32_t PhysicalDevice::findMemoryType(uint32_t memoryTypeFilter, vk::Mem
 	throw std::runtime_error("Failed to find suitable memory type!");
 }
 
-const vk::Format PhysicalDevice::findSupportedFormat(const std::vector<vk::Format>& candidates, const vk::ImageTiling& tiling, const vk::FormatFeatureFlags& features) const
+vk::Format PhysicalDevice::findSupportedFormat(const std::vector<vk::Format>& candidates, const vk::ImageTiling& tiling, const vk::FormatFeatureFlags& features) const
 {
 	for (const auto& format : candidates)
 	{
@@ -92,7 +92,7 @@ const vk::Format PhysicalDevice::findSupportedFormat(const std::vector<vk::Forma
 	throw std::runtime_error("Failed to find supported features!");
 }
 
-const vk::SampleCountFlagBits PhysicalDevice::getMaxUsableSampleCount() const
+vk::SampleCountFlagBits PhysicalDevice::getMaxUsableSampleCount() const
 {
 	const vk::PhysicalDeviceProperties vulkanPhysicalDeviceProperties{ vulkanPhysicalDevice.getProperties() };
 	const vk::SampleCountFlags sampleCounts{ vulkanPhysicalDeviceProperties.limits.framebufferColorSampleCounts & vulkanPhysicalDeviceProperties.limits.framebufferDepthSampleCounts };
@@ -126,7 +126,7 @@ const vk::SampleCountFlagBits PhysicalDevice::getMaxUsableSampleCount() const
 	}
 }
 
-const vk::PhysicalDevice PhysicalDevice::getVulkanPhysicalDevice() const
+const vk::PhysicalDevice& PhysicalDevice::getVulkanPhysicalDevice() const
 {
 	return vulkanPhysicalDevice;
 }

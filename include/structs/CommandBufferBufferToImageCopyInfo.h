@@ -6,7 +6,7 @@
 struct CommandBufferBufferToImageCopyInfo
 {
 	int frameIndex;
-	vk::Buffer srcBuffer;
-	vk::Image dstImage; 
+	const vk::Buffer& srcBuffer;
+	const vk::Image& dstImage; 
 	vk::BufferImageCopy bufferImageCopy;
 };

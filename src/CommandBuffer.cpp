@@ -7,7 +7,7 @@ CommandBuffer::CommandBuffer(const vk::Device& vulkanLogicalDevice, const std::o
 	vulkanCommandBuffers = vulkanLogicalDevice.allocateCommandBuffers(commandBufferAllocateInfo);
 }
 
-const vk::CommandBufferAllocateInfo CommandBuffer::buildCommandBufferAllocateInfo() const
+vk::CommandBufferAllocateInfo CommandBuffer::buildCommandBufferAllocateInfo() const
 {
 	return vk::CommandBufferAllocateInfo{
 		.commandPool = commandPool.getVulkanCommandPool(),
@@ -79,7 +79,7 @@ void CommandBuffer::record(const CommandBufferRecordInfo& commandBufferRecordInf
 	vulkanCommandBuffers[commandBufferRecordInfo.frameIndex].end();
 }
 
-const vk::Viewport CommandBuffer::buildViewport(const vk::Extent2D& swapChainExtent) const
+vk::Viewport CommandBuffer::buildViewport(const vk::Extent2D& swapChainExtent) const
 {
 	return vk::Viewport{
 		.x = 0.0f,
@@ -91,7 +91,7 @@ const vk::Viewport CommandBuffer::buildViewport(const vk::Extent2D& swapChainExt
 	};
 }
 
-const vk::Rect2D CommandBuffer::buildScissor(const vk::Extent2D& swapChainExtent) const
+vk::Rect2D CommandBuffer::buildScissor(const vk::Extent2D& swapChainExtent) const
 {
 	return vk::Rect2D{
 		.offset = {0, 0},
@@ -119,7 +119,7 @@ void CommandBuffer::submit(std::shared_ptr<SynchronizationObjects>& synchronizat
 	graphicsQueue.submit(synchronizationObjects, vulkanCommandBuffers[frameIndex]);
 }
 
-const vk::CommandBuffer CommandBuffer::getVulkanCommandBuffer(const int frameIndex) const
+const vk::CommandBuffer& CommandBuffer::getVulkanCommandBuffer(const int frameIndex) const
 {
 	ExceptionChecker::throwExceptionIfIndexIsOutOfBounds(frameIndex, vulkanCommandBuffers.size(), "Error in CommandBuffer! Index is out of bounds");
 	return vulkanCommandBuffers[frameIndex];

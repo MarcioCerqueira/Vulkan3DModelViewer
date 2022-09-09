@@ -20,12 +20,12 @@ void UniformBuffer::copyFromCPUToDeviceMemory(const ModelViewProjectionTransform
 	size = sizeof(ModelViewProjectionTransformation);
 }
 
-const vk::Buffer UniformBuffer::getVulkanBuffer() const
+const vk::Buffer& UniformBuffer::getVulkanBuffer() const
 {
 	return buffer.getVulkanBuffer();
 }
 
-const size_t UniformBuffer::getSize() const
+size_t UniformBuffer::getSize() const
 {
 	return size;
 }

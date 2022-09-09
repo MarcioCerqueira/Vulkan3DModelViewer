@@ -6,7 +6,7 @@
 struct CommandBufferBufferToBufferCopyInfo
 {
 	int frameIndex;
-	vk::Buffer srcBuffer;
-	vk::Buffer dstBuffer;
+	const vk::Buffer& srcBuffer;
+	const vk::Buffer& dstBuffer;
 	vk::DeviceSize bufferSize;
 };

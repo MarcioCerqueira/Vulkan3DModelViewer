@@ -10,7 +10,7 @@ public:
 	WindowSurface(const vk::Instance& vulkanInstance, GLFWwindow* glfwWindow);
 	~WindowSurface();
 
-	const vk::SurfaceKHR getVulkanWindowSurface() const;
+	const vk::SurfaceKHR& getVulkanWindowSurface() const;
 
 private:
 	const vk::Instance vulkanInstance;

@@ -6,7 +6,7 @@
 
 struct ImageInfo
 {
-	vk::Device vulkanLogicalDevice;
+	const vk::Device& vulkanLogicalDevice;
 	const PhysicalDeviceProperties& physicalDeviceProperties;
 	int width;
 	int height;

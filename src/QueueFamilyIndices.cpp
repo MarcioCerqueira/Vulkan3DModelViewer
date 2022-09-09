@@ -34,12 +34,12 @@ void QueueFamilyIndices::computeValidPresentFamilyIndex(const vk::PhysicalDevice
 	}
 }
 
-const std::optional<uint32_t> QueueFamilyIndices::getGraphicsFamilyIndex() const
+const std::optional<uint32_t>& QueueFamilyIndices::getGraphicsFamilyIndex() const
 {
 	return graphicsFamilyIndex;
 }
 
-const std::optional<uint32_t> QueueFamilyIndices::getPresentFamilyIndex() const
+const std::optional<uint32_t>& QueueFamilyIndices::getPresentFamilyIndex() const
 {
 	return presentFamilyIndex;
 }

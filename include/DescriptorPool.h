@@ -9,11 +9,11 @@ public:
 	DescriptorPool(const vk::Device& vulkanLogicalDevice, const int maxFramesInFlight);
 	~DescriptorPool();
 
-	const vk::DescriptorPool getVulkanDescriptorPool() const;
+	const vk::DescriptorPool& getVulkanDescriptorPool() const;
 
 private:
-	const vk::DescriptorPoolSize buildDescriptorPoolSize(const vk::DescriptorType& descriptorType, const int maxFramesInFlight) const;
-	const vk::DescriptorPoolCreateInfo buildDescriptorPoolCreateInfo(const std::vector<vk::DescriptorPoolSize>& descriptorPoolSizes, const int maxFramesInFlight) const;
+	vk::DescriptorPoolSize buildDescriptorPoolSize(const vk::DescriptorType& descriptorType, const int maxFramesInFlight) const;
+	vk::DescriptorPoolCreateInfo buildDescriptorPoolCreateInfo(const std::vector<vk::DescriptorPoolSize>& descriptorPoolSizes, const int maxFramesInFlight) const;
 
 	const vk::Device vulkanLogicalDevice;
 	vk::DescriptorPool vulkanDescriptorPool;

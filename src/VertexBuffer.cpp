@@ -20,12 +20,12 @@ void VertexBuffer::createVertexData(const std::vector<Vertex>& vertices, const P
 	buffer.bindBufferMemory();
 }
 
-const size_t VertexBuffer::getVertexCount() const
+size_t VertexBuffer::getVertexCount() const
 {
 	return vertexCount;
 }
 
-const vk::Buffer VertexBuffer::getVulkanBuffer() const
+const vk::Buffer& VertexBuffer::getVulkanBuffer() const
 {
 	return buffer.getVulkanBuffer();
 }

@@ -16,7 +16,7 @@ void Buffer::createVulkanBuffer(const vk::DeviceSize& contentSize, const vk::Buf
 	vulkanBuffer = vulkanLogicalDevice.createBuffer(vulkanBufferCreateInfo);
 }
 
-const vk::BufferCreateInfo Buffer::buildBufferCreateInfo(const vk::DeviceSize& contentSize, const vk::BufferUsageFlags& bufferUsage) const
+vk::BufferCreateInfo Buffer::buildBufferCreateInfo(const vk::DeviceSize& contentSize, const vk::BufferUsageFlags& bufferUsage) const
 {
 	return vk::BufferCreateInfo{
 		.size = contentSize,
@@ -33,7 +33,7 @@ void Buffer::createVulkanBufferMemory(const PhysicalDeviceProperties& physicalDe
 	vulkanBufferMemory = vulkanLogicalDevice.allocateMemory(memoryAllocateInfo);
 }
 
-const vk::MemoryAllocateInfo Buffer::buildMemoryAllocateInfo(const vk::MemoryRequirements& memoryRequirements, const uint32_t memoryTypeIndex) const
+vk::MemoryAllocateInfo Buffer::buildMemoryAllocateInfo(const vk::MemoryRequirements& memoryRequirements, const uint32_t memoryTypeIndex) const
 {
 	return vk::MemoryAllocateInfo{
 		.allocationSize = memoryRequirements.size,
@@ -55,12 +55,12 @@ void Buffer::copyFromCPUToDeviceMemory(const void* data)
 	vulkanLogicalDevice.unmapMemory(vulkanBufferMemory);
 }
 
-const vk::BufferCreateInfo Buffer::getBufferCreateInfo() const
+const vk::BufferCreateInfo& Buffer::getBufferCreateInfo() const
 {
 	return vulkanBufferCreateInfo;
 }
 
-const vk::Buffer Buffer::getVulkanBuffer() const
+const vk::Buffer& Buffer::getVulkanBuffer() const
 {
 	return vulkanBuffer;
 }

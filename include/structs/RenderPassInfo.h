@@ -4,7 +4,7 @@
 
 struct RenderPassInfo
 {
-	vk::Device vulkanLogicalDevice;
+	const vk::Device& vulkanLogicalDevice;
 	vk::Format colorImageFormat;
 	vk::Format depthImageFormat;
 	vk::SampleCountFlagBits sampleCount;

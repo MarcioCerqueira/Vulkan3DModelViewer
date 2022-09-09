@@ -44,7 +44,7 @@ LogicalDevice::~LogicalDevice()
 	vulkanLogicalDevice.destroy();
 }
 
-const std::set<uint32_t> LogicalDevice::createUniqueQueueFamilies(const QueueFamilyIndices& queueFamilyIndices) const
+std::set<uint32_t> LogicalDevice::createUniqueQueueFamilies(const QueueFamilyIndices& queueFamilyIndices) const
 {
 	std::set<uint32_t> uniqueQueueFamilies = {
 		queueFamilyIndices.getGraphicsFamilyIndex().value(),
@@ -53,7 +53,7 @@ const std::set<uint32_t> LogicalDevice::createUniqueQueueFamilies(const QueueFam
 	return uniqueQueueFamilies;
 }
 
-const std::vector<vk::DeviceQueueCreateInfo> LogicalDevice::buildDeviceQueueCreateInfos(const std::set<uint32_t>& uniqueQueueFamilies) const
+std::vector<vk::DeviceQueueCreateInfo> LogicalDevice::buildDeviceQueueCreateInfos(const std::set<uint32_t>& uniqueQueueFamilies) const
 {
 	std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
 	for (uint32_t queueFamilyIndex : uniqueQueueFamilies)
@@ -63,7 +63,7 @@ const std::vector<vk::DeviceQueueCreateInfo> LogicalDevice::buildDeviceQueueCrea
 	return queueCreateInfos;
 }
 
-const vk::DeviceQueueCreateInfo LogicalDevice::buildDeviceQueueCreateInfo(uint32_t queueFamilyIndex) const
+vk::DeviceQueueCreateInfo LogicalDevice::buildDeviceQueueCreateInfo(uint32_t queueFamilyIndex) const
 {
 	const float queuePriority{ 1.0f };
 	return vk::DeviceQueueCreateInfo{
@@ -73,7 +73,7 @@ const vk::DeviceQueueCreateInfo LogicalDevice::buildDeviceQueueCreateInfo(uint32
 	};
 }
 
-const vk::DeviceCreateInfo LogicalDevice::buildVulkanLogicalDeviceCreateInfo(const std::vector<vk::DeviceQueueCreateInfo>& deviceQueueCreateInfos, const LogicalDeviceCreateInfo& logicalDeviceCreateInfo) const
+vk::DeviceCreateInfo LogicalDevice::buildVulkanLogicalDeviceCreateInfo(const std::vector<vk::DeviceQueueCreateInfo>& deviceQueueCreateInfos, const LogicalDeviceCreateInfo& logicalDeviceCreateInfo) const
 {
 	return vk::DeviceCreateInfo{
 		.queueCreateInfoCount = static_cast<uint32_t>(deviceQueueCreateInfos.size()),
@@ -86,7 +86,7 @@ const vk::DeviceCreateInfo LogicalDevice::buildVulkanLogicalDeviceCreateInfo(con
 	};
 }
 
-const vk::Format LogicalDevice::getDepthImageFormat(const PhysicalDeviceProperties& physicalDeviceProperties) const
+vk::Format LogicalDevice::getDepthImageFormat(const PhysicalDeviceProperties& physicalDeviceProperties) const
 {
 	const std::vector<vk::Format> depthImageCandidateFormats = { vk::Format::eD32Sfloat, vk::Format::eD32SfloatS8Uint, vk::Format::eD24UnormS8Uint };
 	const vk::ImageTiling depthImageTiling{ vk::ImageTiling::eOptimal };
@@ -144,7 +144,7 @@ void LogicalDevice::createVertexBuffer(const std::vector<Vertex>& vertices, cons
 }
 
 template<typename T>
-const ContentBufferCreateInfo<T> LogicalDevice::buildContentBufferCreateInfo(const std::vector<T>& content, const PhysicalDeviceProperties& physicalDeviceProperties) const
+ContentBufferCreateInfo<T> LogicalDevice::buildContentBufferCreateInfo(const std::vector<T>& content, const PhysicalDeviceProperties& physicalDeviceProperties) const
 {
 	return ContentBufferCreateInfo<T>{
 		.vulkanLogicalDevice = vulkanLogicalDevice,
@@ -193,7 +193,7 @@ void LogicalDevice::createTextureImage(const TextureImage& textureImage, const P
 	vulkanTextureImage->createImageView(vk::ImageAspectFlagBits::eColor);
 }
 
-const ImageInfo LogicalDevice::createImageInfo(const TextureImage& textureImage, const PhysicalDeviceProperties& physicalDeviceProperties) const
+ImageInfo LogicalDevice::createImageInfo(const TextureImage& textureImage, const PhysicalDeviceProperties& physicalDeviceProperties) const
 {
 	return ImageInfo{
 		.vulkanLogicalDevice = vulkanLogicalDevice,
@@ -217,7 +217,7 @@ void LogicalDevice::createDescriptorSet()
 	descriptorSet = std::make_unique<DescriptorSet>(vulkanLogicalDevice, MAX_FRAMES_IN_FLIGHT);
 }
 
-const vk::Device LogicalDevice::getVulkanLogicalDevice() const
+const vk::Device& LogicalDevice::getVulkanLogicalDevice() const
 {
 	return vulkanLogicalDevice;
 }
@@ -258,7 +258,7 @@ void LogicalDevice::waitForFences(const uint32_t fenceCount)
 	ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(result, "Failed to wait for fences!");
 }
 
-const uint32_t LogicalDevice::acquireNextImageFromSwapChain(WindowHandler& windowHandler)
+uint32_t LogicalDevice::acquireNextImageFromSwapChain(WindowHandler& windowHandler)
 {
 	uint32_t imageIndex;
 	vk::Result result;
@@ -281,7 +281,7 @@ void LogicalDevice::resetFences(const uint32_t fenceCount)
 	ExceptionChecker::throwExceptionIfVulkanResultIsNotSuccess(result, "Failed to reset fences!");
 }
 
-const CommandBufferRecordInfo LogicalDevice::createCommandBufferRecordInfo(const uint32_t imageIndex) const
+CommandBufferRecordInfo LogicalDevice::createCommandBufferRecordInfo(const uint32_t imageIndex) const
 {
 	return CommandBufferRecordInfo{
 		.renderPassBeginInfo = renderPass->createRenderPassBeginInfo(swapChain->getVulkanFramebuffer(imageIndex), swapChain->getExtent()),

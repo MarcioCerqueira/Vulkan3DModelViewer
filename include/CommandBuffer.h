@@ -25,12 +25,12 @@ public:
 	void reset(const int frameIndex);
 	void submit(std::shared_ptr<SynchronizationObjects>& synchronizationObjects, const int frameIndex);
 	
-	const vk::CommandBuffer getVulkanCommandBuffer(const int frameIndex) const;
+	const vk::CommandBuffer& getVulkanCommandBuffer(const int frameIndex) const;
 
 private:
-	const vk::CommandBufferAllocateInfo buildCommandBufferAllocateInfo() const;
-	const vk::Viewport buildViewport(const vk::Extent2D& swapChainExtent) const;
-	const vk::Rect2D buildScissor(const vk::Extent2D& swapChainExtent) const;
+	vk::CommandBufferAllocateInfo buildCommandBufferAllocateInfo() const;
+	vk::Viewport buildViewport(const vk::Extent2D& swapChainExtent) const;
+	vk::Rect2D buildScissor(const vk::Extent2D& swapChainExtent) const;
 
 	std::vector<vk::CommandBuffer> vulkanCommandBuffers;
 	GraphicsQueue graphicsQueue;

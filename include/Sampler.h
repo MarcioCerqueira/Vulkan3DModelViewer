@@ -9,10 +9,10 @@ public:
 	Sampler(const vk::Device& vulkanLogicalDevice, const vk::PhysicalDeviceProperties& physicalDeviceProperties, const uint32_t mipLevels);
 	~Sampler();
 
-	const vk::Sampler getVulkanSampler() const;
+	const vk::Sampler& getVulkanSampler() const;
 
 private:
-	const vk::SamplerCreateInfo buildSamplerCreateInfo(const vk::PhysicalDeviceProperties& physicalDeviceProperties, const uint32_t mipLevels) const;
+	vk::SamplerCreateInfo buildSamplerCreateInfo(const vk::PhysicalDeviceProperties& physicalDeviceProperties, const uint32_t mipLevels) const;
 
 	const vk::Device vulkanLogicalDevice;
 	vk::Sampler vulkanSampler;

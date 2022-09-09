@@ -6,7 +6,7 @@ ArgumentParser::ArgumentParser(const int argc, const char* argv[])
 	loadConfigurationFile(argv[1]);
 }
 
-const std::string ArgumentParser::getConfigurationFile() const
+const std::string& ArgumentParser::getConfigurationFile() const
 {
 	return configurationFile;
 }
@@ -21,13 +21,13 @@ void ArgumentParser::validateNumberOfArguments(const int argc) const
 
 void ArgumentParser::loadConfigurationFile(const char* configurationFilePath)
 {
-	std::ifstream file{ openFile(configurationFilePath) };
+	const std::ifstream file{ openFile(configurationFilePath) };
 	std::stringstream buffer;
 	buffer << file.rdbuf();
 	configurationFile = buffer.str();
 }
 
-const std::ifstream ArgumentParser::openFile(const char* filePath) const
+std::ifstream ArgumentParser::openFile(const char* filePath) const
 {
 	std::ifstream file(filePath);
 	ExceptionChecker::throwExceptionIfFileCouldNotBeOpened(file, filePath);

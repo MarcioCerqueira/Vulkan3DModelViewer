@@ -11,7 +11,7 @@ CommandPool::~CommandPool()
 	vulkanLogicalDevice.destroyCommandPool(vulkanCommandPool);
 }
 
-const vk::CommandPoolCreateInfo CommandPool::buildCommandPoolCreateInfo(const std::optional<uint32_t> graphicsFamilyIndex) const
+vk::CommandPoolCreateInfo CommandPool::buildCommandPoolCreateInfo(const std::optional<uint32_t> graphicsFamilyIndex) const
 {
 	return vk::CommandPoolCreateInfo{
 		.flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
@@ -19,7 +19,7 @@ const vk::CommandPoolCreateInfo CommandPool::buildCommandPoolCreateInfo(const st
 	};
 }
 
-const vk::CommandPool CommandPool::getVulkanCommandPool() const
+const vk::CommandPool& CommandPool::getVulkanCommandPool() const
 {
 	return vulkanCommandPool;
 }

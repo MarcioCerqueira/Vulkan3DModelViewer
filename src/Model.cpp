@@ -35,7 +35,7 @@ void Model::buildMesh(const tinyobj::attrib_t& attrib, const std::vector <tinyob
 	}
 }
 
-const glm::vec3 Model::buildPosition(const tinyobj::attrib_t& attrib, const tinyobj::index_t& index) const
+glm::vec3 Model::buildPosition(const tinyobj::attrib_t& attrib, const tinyobj::index_t& index) const
 {
 	return glm::vec3{
 		attrib.vertices[3 * static_cast<uint32_t>(index.vertex_index) + 0],
@@ -44,7 +44,7 @@ const glm::vec3 Model::buildPosition(const tinyobj::attrib_t& attrib, const tiny
 	};
 }
 
-const glm::vec2 Model::buildTexCoord(const tinyobj::attrib_t& attrib, const tinyobj::index_t& index) const
+glm::vec2 Model::buildTexCoord(const tinyobj::attrib_t& attrib, const tinyobj::index_t& index) const
 {
 	return glm::vec2{
 		attrib.texcoords[2 * static_cast<uint32_t>(index.texcoord_index) + 0],
@@ -52,17 +52,17 @@ const glm::vec2 Model::buildTexCoord(const tinyobj::attrib_t& attrib, const tiny
 	};
 }
 
-const std::vector<Vertex> Model::getVertices() const
+const std::vector<Vertex>& Model::getVertices() const
 {
 	return vertices;
 }
 
-const std::vector<uint32_t> Model::getIndices() const
+const std::vector<uint32_t>& Model::getIndices() const
 {
 	return indices;
 }
 
-const TextureImage Model::getTextureImage() const
+const TextureImage& Model::getTextureImage() const
 {
 	return textureImage;
 }

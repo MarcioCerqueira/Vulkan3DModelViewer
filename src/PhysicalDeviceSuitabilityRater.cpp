@@ -1,6 +1,6 @@
 #include "PhysicalDeviceSuitabilityRater.h"
 
-const int PhysicalDeviceSuitabilityRater::rate(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
+int PhysicalDeviceSuitabilityRater::rate(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
 {
 	int score{ 0 };
 	score += rateByPhysicalDeviceType(physicalDeviceSuitabilityRaterInfo);
@@ -11,12 +11,12 @@ const int PhysicalDeviceSuitabilityRater::rate(const PhysicalDeviceSuitabilityRa
 	return score;
 }
 
-const int PhysicalDeviceSuitabilityRater::rateByPhysicalDeviceType(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
+int PhysicalDeviceSuitabilityRater::rateByPhysicalDeviceType(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
 {
 	return physicalDeviceTypeRater.at(physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice.getProperties().deviceType);
 }
 
-const int PhysicalDeviceSuitabilityRater::rateByQueueFamilyProperties(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
+int PhysicalDeviceSuitabilityRater::rateByQueueFamilyProperties(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
 {
 	int score{ 0 };
 	const QueueFamilyIndices queueFamilyIndices{ 
@@ -28,7 +28,7 @@ const int PhysicalDeviceSuitabilityRater::rateByQueueFamilyProperties(const Phys
 	return score;
 }
 
-const int PhysicalDeviceSuitabilityRater::rateByDeviceExtensionSupport(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
+int PhysicalDeviceSuitabilityRater::rateByDeviceExtensionSupport(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
 {
 	const std::vector<vk::ExtensionProperties> availableExtensions = physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice.enumerateDeviceExtensionProperties();
 	std::set<std::string> requiredExtensions(physicalDeviceSuitabilityRaterInfo.vulkanDeviceExtensions.begin(), physicalDeviceSuitabilityRaterInfo.vulkanDeviceExtensions.end());
@@ -39,12 +39,12 @@ const int PhysicalDeviceSuitabilityRater::rateByDeviceExtensionSupport(const Phy
 	return static_cast<int>(requiredExtensions.empty());
 }
 
-const int PhysicalDeviceSuitabilityRater::rateBySwapChainProperties(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
+int PhysicalDeviceSuitabilityRater::rateBySwapChainProperties(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
 {
 	return SwapChain::isValid(physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice, physicalDeviceSuitabilityRaterInfo.vulkanWindowSurface);
 }
 
-const int PhysicalDeviceSuitabilityRater::rateByDeviceSupportedFeatures(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
+int PhysicalDeviceSuitabilityRater::rateByDeviceSupportedFeatures(const PhysicalDeviceSuitabilityRaterInfo& physicalDeviceSuitabilityRaterInfo) const
 {
 	return static_cast<int>(physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice.getFeatures().samplerAnisotropy);
 }

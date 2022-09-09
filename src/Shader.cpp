@@ -12,7 +12,7 @@ Shader::~Shader()
 	vulkanLogicalDevice.destroyShaderModule(vulkanShaderModule);
 }
 
-const std::vector<char> Shader::readFile(const std::string& filename) const
+std::vector<char> Shader::readFile(const std::string& filename) const
 {
 	std::ifstream file(filename, std::ios::ate | std::ios::binary);
 	ExceptionChecker::throwExceptionIfFileCouldNotBeOpened(file, filename.c_str());
@@ -34,7 +34,7 @@ void Shader::createShaderModule(const std::vector<char>& shaderCode, const vk::D
 	vulkanShaderModule = vulkanLogicalDevice.createShaderModule(shaderModuleCreateInfo);
 }
 
-const vk::PipelineShaderStageCreateInfo Shader::buildPipelineShaderStageCreateInfo() const
+vk::PipelineShaderStageCreateInfo Shader::buildPipelineShaderStageCreateInfo() const
 {
 	return vk::PipelineShaderStageCreateInfo{
 		.stage = stage,

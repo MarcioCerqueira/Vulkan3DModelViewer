@@ -44,7 +44,7 @@ GraphicsPipeline::~GraphicsPipeline()
 	vulkanLogicalDevice.destroyPipelineLayout(pipelineLayout);
 }
 
-const vk::PipelineVertexInputStateCreateInfo GraphicsPipeline::buildPipelineVertexInputStateCreateInfo(const vk::VertexInputBindingDescription& vertexBindingDescription, const std::array<vk::VertexInputAttributeDescription, 3>& vertexAttributeDescriptions) const
+vk::PipelineVertexInputStateCreateInfo GraphicsPipeline::buildPipelineVertexInputStateCreateInfo(const vk::VertexInputBindingDescription& vertexBindingDescription, const std::array<vk::VertexInputAttributeDescription, 3>& vertexAttributeDescriptions) const
 {	
 	return vk::PipelineVertexInputStateCreateInfo{
 		.vertexBindingDescriptionCount = 1,
@@ -54,7 +54,7 @@ const vk::PipelineVertexInputStateCreateInfo GraphicsPipeline::buildPipelineVert
 	};
 }
 
-const vk::PipelineInputAssemblyStateCreateInfo GraphicsPipeline::buildPipelineInputAssemblyStateCreateInfo() const
+vk::PipelineInputAssemblyStateCreateInfo GraphicsPipeline::buildPipelineInputAssemblyStateCreateInfo() const
 {
 	return vk::PipelineInputAssemblyStateCreateInfo{
 		.topology = vk::PrimitiveTopology::eTriangleList,
@@ -62,7 +62,7 @@ const vk::PipelineInputAssemblyStateCreateInfo GraphicsPipeline::buildPipelineIn
 	};
 }
 
-const vk::PipelineViewportStateCreateInfo GraphicsPipeline::buildPipelineViewportStateCreateInfo() const
+vk::PipelineViewportStateCreateInfo GraphicsPipeline::buildPipelineViewportStateCreateInfo() const
 {
 	return vk::PipelineViewportStateCreateInfo{
 		.viewportCount = 1,
@@ -70,7 +70,7 @@ const vk::PipelineViewportStateCreateInfo GraphicsPipeline::buildPipelineViewpor
 	};
 }
 
-const vk::PipelineRasterizationStateCreateInfo GraphicsPipeline::buildPipelineRasterizationStateCreateInfo() const
+vk::PipelineRasterizationStateCreateInfo GraphicsPipeline::buildPipelineRasterizationStateCreateInfo() const
 {
 	return vk::PipelineRasterizationStateCreateInfo{
 		.depthClampEnable = vk::Bool32(0),
@@ -86,7 +86,7 @@ const vk::PipelineRasterizationStateCreateInfo GraphicsPipeline::buildPipelineRa
 	};
 }
 
-const vk::PipelineMultisampleStateCreateInfo GraphicsPipeline::buildPipelineMultisampleStateCreateInfo(const vk::SampleCountFlagBits& sampleCount) const
+vk::PipelineMultisampleStateCreateInfo GraphicsPipeline::buildPipelineMultisampleStateCreateInfo(const vk::SampleCountFlagBits& sampleCount) const
 {
 	return vk::PipelineMultisampleStateCreateInfo{
 		.rasterizationSamples = sampleCount,
@@ -98,7 +98,7 @@ const vk::PipelineMultisampleStateCreateInfo GraphicsPipeline::buildPipelineMult
 	};
 }
 
-const vk::PipelineColorBlendAttachmentState GraphicsPipeline::buildPipelineColorBlendAttachmentState() const
+vk::PipelineColorBlendAttachmentState GraphicsPipeline::buildPipelineColorBlendAttachmentState() const
 {
 	return vk::PipelineColorBlendAttachmentState{
 		.blendEnable = vk::Bool32(0),
@@ -113,7 +113,7 @@ const vk::PipelineColorBlendAttachmentState GraphicsPipeline::buildPipelineColor
 	};
 }
 
-const vk::PipelineColorBlendStateCreateInfo GraphicsPipeline::buildPipelineColorBlendStateCreateInfo(const vk::PipelineColorBlendAttachmentState& colorBlendAttachmentState) const
+vk::PipelineColorBlendStateCreateInfo GraphicsPipeline::buildPipelineColorBlendStateCreateInfo(const vk::PipelineColorBlendAttachmentState& colorBlendAttachmentState) const
 {
 	const std::array<float, 4> blendConstants = { 0.0f, 0.0f, 0.0f, 0.0f };
 	return vk::PipelineColorBlendStateCreateInfo{
@@ -125,7 +125,7 @@ const vk::PipelineColorBlendStateCreateInfo GraphicsPipeline::buildPipelineColor
 	};
 }
 
-const vk::PipelineDynamicStateCreateInfo GraphicsPipeline::buildPipelineDynamicStateCreateInfo(const std::vector<vk::DynamicState>& dynamicStates) const
+vk::PipelineDynamicStateCreateInfo GraphicsPipeline::buildPipelineDynamicStateCreateInfo(const std::vector<vk::DynamicState>& dynamicStates) const
 {
 	return vk::PipelineDynamicStateCreateInfo{
 		.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()),
@@ -133,7 +133,7 @@ const vk::PipelineDynamicStateCreateInfo GraphicsPipeline::buildPipelineDynamicS
 	};
 }
 
-const vk::PipelineDepthStencilStateCreateInfo GraphicsPipeline::buildPipelineDepthStencilStateCreateInfo() const
+vk::PipelineDepthStencilStateCreateInfo GraphicsPipeline::buildPipelineDepthStencilStateCreateInfo() const
 {
 	return vk::PipelineDepthStencilStateCreateInfo{
 		.depthTestEnable = vk::Bool32(1),
@@ -145,7 +145,7 @@ const vk::PipelineDepthStencilStateCreateInfo GraphicsPipeline::buildPipelineDep
 	};
 }
 
-const vk::PipelineLayoutCreateInfo GraphicsPipeline::buildPipelineLayoutCreateInfo(const vk::DescriptorSetLayout& vulkanDescriptorSetLayout) const
+vk::PipelineLayoutCreateInfo GraphicsPipeline::buildPipelineLayoutCreateInfo(const vk::DescriptorSetLayout& vulkanDescriptorSetLayout) const
 {
 	return vk::PipelineLayoutCreateInfo{
 		.setLayoutCount = 1,
@@ -155,12 +155,12 @@ const vk::PipelineLayoutCreateInfo GraphicsPipeline::buildPipelineLayoutCreateIn
 	};
 }
 
-const vk::Pipeline GraphicsPipeline::getVulkanPipeline() const
+const vk::Pipeline& GraphicsPipeline::getVulkanPipeline() const
 {
 	return pipeline;
 }
 
-const vk::PipelineLayout GraphicsPipeline::getVulkanPipelineLayout() const
+const vk::PipelineLayout& GraphicsPipeline::getVulkanPipelineLayout() const
 {
 	return pipelineLayout;
 }

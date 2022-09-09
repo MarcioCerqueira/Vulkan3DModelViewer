@@ -1,6 +1,6 @@
 #include "Vertex.h"
 
-const vk::VertexInputBindingDescription Vertex::getBindingDescription()
+vk::VertexInputBindingDescription Vertex::getBindingDescription()
 {
 	return vk::VertexInputBindingDescription{
 		.binding = 0,
@@ -9,7 +9,7 @@ const vk::VertexInputBindingDescription Vertex::getBindingDescription()
 	};
 }
 
-const std::array<vk::VertexInputAttributeDescription, 3> Vertex::getAttributeDescriptions()
+std::array<vk::VertexInputAttributeDescription, 3> Vertex::getAttributeDescriptions()
 {
 	std::array<vk::VertexInputAttributeDescription, 3> attributeDescriptions{};
 	attributeDescriptions[0] = getPositionAttributeDescription();
@@ -18,7 +18,7 @@ const std::array<vk::VertexInputAttributeDescription, 3> Vertex::getAttributeDes
 	return attributeDescriptions;
 }
 
-const vk::VertexInputAttributeDescription Vertex::getPositionAttributeDescription()
+vk::VertexInputAttributeDescription Vertex::getPositionAttributeDescription()
 {
 	return vk::VertexInputAttributeDescription{
 		.location = 0,
@@ -28,7 +28,7 @@ const vk::VertexInputAttributeDescription Vertex::getPositionAttributeDescriptio
 	};
 }
 
-const vk::VertexInputAttributeDescription Vertex::getColorAttributeDescription()
+vk::VertexInputAttributeDescription Vertex::getColorAttributeDescription()
 {
 	return vk::VertexInputAttributeDescription{
 		.location = 1,
@@ -38,7 +38,7 @@ const vk::VertexInputAttributeDescription Vertex::getColorAttributeDescription()
 	};
 }
 
-const vk::VertexInputAttributeDescription Vertex::getTexCoordAttributeDescription()
+vk::VertexInputAttributeDescription Vertex::getTexCoordAttributeDescription()
 {
 	return vk::VertexInputAttributeDescription{
 		.location = 2,

@@ -66,8 +66,8 @@ public:
 	float getSpeed() const;
 	const glm::vec3& getUpVector() const;
 	const glm::u32vec2& getWindowSize() const;
-	const glm::mat4 getViewMatrix() const override;
-	const float getZoom() const override;
+	const glm::mat4& getViewMatrix() const override;
+	float getZoom() const override;
 	void processKeyboard(CameraMovement direction, float deltaTime) override;
 	Action processMouseMovement(const glm::ivec2& position, MouseButton mouseButton, MouseModifierFlags& modifiers) override;
 	void processMouseScroll(int value) override;
