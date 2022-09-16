@@ -12,10 +12,10 @@ The provided source codes were tested in Windows 10 using the following librarie
 - glm 0.9.9.8;
 - rapidjson;
 
-To run the application, you need to pass the `config.json` file path as an argument to it (_e.g._ `main.exe config.json`). Also, we suggest you to move the `shaders` folder to the same folder where the executable is located.
+To run the application, you need to pass the `config.json` file path as an argument to it (_e.g._ `main.exe config.json`). Also, we suggest you move the `shaders` folder to the same folder where the executable is located.
 
 If you want to recompile the shaders, please update the `compileShaders.bat` file (Windows) or create a new one following this [tutorial](https://vulkan-tutorial.com/Drawing_a_triangle/Graphics_pipeline_basics/Shader_modules#page_Compiling-the-shaders).
- 
+
 ## Compilation/Building for Windows 
 
 To compile the source code and build the application for Windows, you may need to:
@@ -39,3 +39,16 @@ Then, you can create a new, empty Visual Studio project, add the source codes, a
 where:
 - `<AMBIENT_OCCLUSION_PATH>` is the path where the repository is stored;
 - `<VULKAN_SDK_PATH>` is the path where the Vulkan SDK is installed;
+
+## Scene Configuration
+
+By default, this project comes with the [Viking Room](https://sketchfab.com/3d-models/viking-room-a49f1b8e4f5c4ecf9e1fe7d81915ad38) model by [nigeloh](https://sketchfab.com/nigelgoh) updated by the [Vulkan tutorial](https://vulkan-tutorial.com/Loading_models). 
+If you want to load your own models in the application, please keep in mind that the current version of the application only supports the loading of a single .obj file (ideally stored in the `models` folder) associated with a single texture (ideally stored in the `textures` folder). 
+Then, update the `config.json` to point to the filenames of the model and texture files to be loaded.
+
+This application was successfully tested using the following models:
+- [Dabrovic Sponza](https://casual-effects.com/g3d/data10/research/model/dabrovic_sponza/sponza.zip);
+- [Erato](https://casual-effects.com/g3d/data10/research/model/erato/erato.zip);
+- [Gallery](https://casual-effects.com/g3d/data10/research/model/gallery/gallery.zip);
+- [Viking Room](https://vulkan-tutorial.com/Loading_models);
+- [Vokselia Spawn](https://casual-effects.com/g3d/data10/research/model/vokselia_spawn/vokselia_spawn.zip);

@@ -11,7 +11,7 @@
 class Model
 {
 public:
-	Model();
+	Model(const std::string& modelFilename, const std::string& textureFilename);
 	const std::vector<Vertex>& getVertices() const;
 	const std::vector<uint32_t>& getIndices() const;
 	const TextureImage& getTextureImage() const;
@@ -23,7 +23,5 @@ private:
 
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
-	const std::string modelFilename{ "models/viking_room.obj" };
-	const std::string textureFilename{ "textures/viking_room.png" };
 	const TextureImage textureImage;
 };

@@ -1,6 +1,6 @@
 #include "Model.h"
 
-Model::Model() : textureImage(textureFilename)
+Model::Model(const std::string& modelFilename, const std::string& textureFilename) : textureImage(textureFilename)
 {
 	tinyobj::attrib_t attrib;
 	std::vector < tinyobj::shape_t> shapes;

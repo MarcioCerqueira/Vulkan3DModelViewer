@@ -22,7 +22,7 @@ int main(const int argc, const char *argv[])
         ArgumentParser argumentParser{argc, argv};
         JSONConfigurationFileParser JSONConfigurationFileParser{argumentParser.getConfigurationFile().c_str()};
         ConfigurationFileModel configurationFileModel{JSONConfigurationFileParser.getConfigurationFileModel()};
-        Scene scene;
+        Scene scene{ configurationFileModel.scene.modelFilename, configurationFileModel.scene.textureFilename };
         WindowSize windowSize{ configurationFileModel.window.width, configurationFileModel.window.height };
         AmbientOcclusionApplication app{windowSize, scene};
         app.run();

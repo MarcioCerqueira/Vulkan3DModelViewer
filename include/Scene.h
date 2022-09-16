@@ -6,6 +6,7 @@
 class Scene
 {
 public:
+	Scene(const std::string& modelFilename, const std::string& textureFilename);
 	Model getModel() const;
 	Camera& getCamera();
 

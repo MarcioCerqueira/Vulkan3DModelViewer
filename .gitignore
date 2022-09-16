@@ -4,3 +4,10 @@
 *.vcxproj*
 *.vs
 /x64
+
+# Model and texture files
+
+*.obj
+*.mtl
+*.jpg
+*.png

@@ -1,5 +1,13 @@
 #pragma once
 
+#include <string>
+
+struct SceneConfigurationModel
+{
+	std::string modelFilename;
+	std::string textureFilename;
+};
+
 struct WindowConfigurationModel
 {
 	int width = 800;
@@ -9,5 +17,6 @@ struct WindowConfigurationModel
 struct ConfigurationFileModel
 {
 	WindowConfigurationModel window;
+	SceneConfigurationModel scene;
 };
 
