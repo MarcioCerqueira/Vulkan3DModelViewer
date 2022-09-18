@@ -45,7 +45,7 @@ inline float sign(float s)
 	return (s < 0.f) ? -1.f : 1.f;
 }
 
-Camera::Camera()
+Camera::Camera(const glm::vec3& cameraPosition, const glm::vec3& centerPosition, const glm::vec3& upVector) : cameraPosition(cameraPosition), centerPosition(centerPosition), upVector(upVector)
 {
 	update();
 }
@@ -167,14 +167,6 @@ void Camera::motion(const glm::ivec2& position, Action action)
 	update();
 
 	mousePosition = position;
-}
-
-void Camera::setLookat(const glm::vec3& cameraPosition, const glm::vec3& centerPosition, const glm::vec3& upVector)
-{
-	this->cameraPosition = cameraPosition;
-	this->centerPosition = centerPosition;
-	this->upVector = upVector;
-	update();
 }
 
 void Camera::setMode(Mode mode)
@@ -400,6 +392,15 @@ const glm::mat4& Camera::getViewMatrix() const
 float Camera::getZoom() const
 {
 	return zoom;
+}
+
+void Camera::printCameraData() const
+{
+	std::cout << std::endl;
+	std::cout << "=========== CAMERA DATA ===========" << std::endl;
+	std::cout << "Camera Position: " << cameraPosition.x << " " << cameraPosition.y << " " << cameraPosition.z << std::endl;
+	std::cout << "Target Position: " << centerPosition.x << " " << centerPosition.y << " " << centerPosition.z << std::endl;
+	std::cout << "Up Vector: " << upVector.x << " " << upVector.y << " " << upVector.z << std::endl;
 }
 
 void Camera::processKeyboard(CameraMovement direction, float deltaTime)

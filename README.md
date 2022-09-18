@@ -44,7 +44,7 @@ where:
 
 By default, this project comes with the [Viking Room](https://sketchfab.com/3d-models/viking-room-a49f1b8e4f5c4ecf9e1fe7d81915ad38) model by [nigeloh](https://sketchfab.com/nigelgoh) updated by the [Vulkan tutorial](https://vulkan-tutorial.com/Loading_models). 
 If you want to load your own models in the application, please keep in mind that the current version of the application only supports the loading of a single .obj file (ideally stored in the `models` folder) associated with a single texture (ideally stored in the `textures` folder). 
-Then, update the `config.json` to point to the filenames of the model and texture files to be loaded.
+Then, create a configuration file following the examples available in the `configs` folder to setup the scene to be loaded.
 
 This application was successfully tested using the following models:
 - [Dabrovic Sponza](https://casual-effects.com/g3d/data10/research/model/dabrovic_sponza/sponza.zip);
@@ -52,3 +52,5 @@ This application was successfully tested using the following models:
 - [Gallery](https://casual-effects.com/g3d/data10/research/model/gallery/gallery.zip);
 - [Viking Room](https://vulkan-tutorial.com/Loading_models);
 - [Vokselia Spawn](https://casual-effects.com/g3d/data10/research/model/vokselia_spawn/vokselia_spawn.zip);
+
+Tip: If you want to set up the camera properly, you can move the camera around the scene and press `C` to capture the camera data and later insert it in the configuration file.

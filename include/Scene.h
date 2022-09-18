@@ -2,11 +2,12 @@
 
 #include "Model.h"
 #include "Camera.h"
+#include "structs\ConfigurationFileModel.h"
 
 class Scene
 {
 public:
-	Scene(const std::string& modelFilename, const std::string& textureFilename);
+	Scene(const SceneConfigurationModel& sceneConfigurationModel);
 	Model getModel() const;
 	Camera& getCamera();
 

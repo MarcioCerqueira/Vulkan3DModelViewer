@@ -37,7 +37,6 @@ void Window::setCallbacks()
 void Window::initializeCameraHandler()
 {
 	cameraHandler.setWindowSize(glm::ivec2(width, height));
-	cameraHandler.setLookat(glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 GLFWwindow* Window::getGLFWWindow() const
@@ -93,6 +92,10 @@ void Window::processKeyboard()
 	if (glfwGetKey(glfwWindow, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		cameraHandler.processKeyboard(CameraMovement::Right, deltaTime);
+	}
+	if (glfwGetKey(glfwWindow, GLFW_KEY_C) == GLFW_PRESS)
+	{
+		cameraHandler.printCameraData();
 	}
 }
 

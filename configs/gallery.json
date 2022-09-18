@@ -1,0 +1,27 @@
+{
+	"window": {
+		"width": 800,
+		"height": 600
+	},
+	"scene": {
+		"modelFilename": "models/gallery.obj",
+		"textureFilename": "textures/gallery.jpg",
+		"camera": {
+			"position": {
+				"x": -0.501639,
+				"y": 2.62104,
+				"z": 10.815
+			},
+			"target": {
+				"x": 0.388682,
+				"y": 2.01889,
+				"z": 0.957601
+			},
+			"up": {
+				"x": 0.0583512,
+				"y": 0.996746,
+				"z": -0.0556175
+			}
+		}
+	}
+}

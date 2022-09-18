@@ -1,0 +1,27 @@
+{
+	"window": {
+		"width": 800,
+		"height": 600
+	},
+	"scene": {
+		"modelFilename": "models/viking_room.obj",
+		"textureFilename": "textures/viking_room.png",
+		"camera": {
+			"position": {
+				"x": 2.33984,
+				"y": 1.40014,
+				"z": 1.72252
+			},
+			"target": {
+				"x": -0.0605966,
+				"y": -0.0850911,
+				"z": 0.175745
+			},
+			"up": {
+				"x": -0.42337,
+				"y": -0.228691,
+				"z": 0.876617
+			}
+		}
+	}
+}

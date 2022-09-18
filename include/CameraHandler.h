@@ -47,5 +47,5 @@ public:
     virtual void setMousePosition(const glm::ivec2& position) = 0;
     virtual void processMouseScroll(int value) = 0;
     virtual void setWindowSize(const glm::ivec2& size) = 0;
-    virtual void setLookat(const glm::vec3& cameraPosition, const glm::vec3& centerPosition, const glm::vec3& upVector) = 0;
+    virtual void printCameraData() const = 0;
 };

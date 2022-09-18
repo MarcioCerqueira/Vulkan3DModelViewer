@@ -1,6 +1,6 @@
 #include "Scene.h"
 
-Scene::Scene(const std::string& modelFilename, const std::string& textureFilename) : model(modelFilename, textureFilename)
+Scene::Scene(const SceneConfigurationModel& sceneConfigurationModel) : model(sceneConfigurationModel.modelFilename, sceneConfigurationModel.textureFilename), camera(sceneConfigurationModel.camera.cameraPosition, sceneConfigurationModel.camera.targetPosition, sceneConfigurationModel.camera.upVector)
 {
 }
 

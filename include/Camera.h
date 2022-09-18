@@ -31,6 +31,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtx/rotate_vector.hpp>
+#include <iostream>
 
 #if defined( _MSC_VER )
 #  pragma warning( pop )
@@ -56,7 +57,7 @@ public:
 		Trackball
 	};
 	
-	Camera();
+	Camera(const glm::vec3& cameraPosition, const glm::vec3& centerPosition, const glm::vec3& upVector);
 
 	const glm::vec3& getCameraPosition() const;
 	const glm::vec3& getCenterPosition() const;
@@ -68,10 +69,10 @@ public:
 	const glm::u32vec2& getWindowSize() const;
 	const glm::mat4& getViewMatrix() const override;
 	float getZoom() const override;
+	void printCameraData() const override;
 	void processKeyboard(CameraMovement direction, float deltaTime) override;
 	Action processMouseMovement(const glm::ivec2& position, MouseButton mouseButton, MouseModifierFlags& modifiers) override;
 	void processMouseScroll(int value) override;
-	void setLookat(const glm::vec3& cameraPosition, const glm::vec3& centerPosition, const glm::vec3& upVector) override;
 	void setMode(Mode mode);
 	void setMousePosition(const glm::ivec2& position) override;
 	void setRoll(float roll);  // roll in radians
@@ -88,14 +89,14 @@ private:
 	void   trackball(glm::ivec2 const& position);
 	void   update();
 
-	glm::vec3 cameraPosition = glm::vec3(10, 10, 10);
-	glm::vec3 centerPosition = glm::vec3(0, 0, 0);
-	glm::vec3 upVector = glm::vec3(0, 1, 0);
+	glm::vec3 cameraPosition;
+	glm::vec3 centerPosition;
+	glm::vec3 upVector;
 	float roll = 0;  // Rotation around the Z axis in RAD
 	glm::mat4 matrix = glm::mat4(1);
 	glm::u32vec2 windowSize = glm::u32vec2(1, 1);
 	float speed = 30.0f;
-	float movementSpeed = 2.5f;
+	float movementSpeed = 10.0f;
 	float zoom = 45.0f;
 	glm::ivec2 mousePosition = glm::ivec2(0, 0);
 	Mode mode = Mode::Examine;

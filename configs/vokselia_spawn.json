@@ -1,0 +1,27 @@
+{
+	"window": {
+		"width": 800,
+		"height": 600
+	},
+	"scene": {
+		"modelFilename": "models/vokselia_spawn.obj",
+		"textureFilename": "textures/vokselia_spawn.png",
+		"camera": {
+			"position": {
+				"x": 0.922062,
+				"y": 0.427945,
+				"z": 1.56714
+			},
+			"target": {
+				"x": 0.761276,
+				"y": 0.269587,
+				"z": 1.13046
+			},
+			"up": {
+				"x": -0.103409,
+				"y": 0.946651,
+				"z": -0.305219
+			}
+		}
+	}
+}
