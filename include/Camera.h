@@ -67,8 +67,7 @@ public:
 	float getSpeed() const;
 	const glm::vec3& getUpVector() const;
 	const glm::u32vec2& getWindowSize() const;
-	const glm::mat4& getViewMatrix() const override;
-	float getZoom() const override;
+	ModelViewProjectionTransformation getMVPTransformation() const override;
 	void printCameraData() const override;
 	void processKeyboard(CameraMovement direction, float deltaTime) override;
 	Action processMouseMovement(const glm::ivec2& position, MouseButton mouseButton, MouseModifierFlags& modifiers) override;
@@ -101,4 +100,6 @@ private:
 	glm::ivec2 mousePosition = glm::ivec2(0, 0);
 	Mode mode = Mode::Examine;
 	const float trackballSize = 0.8f;
+	const float near = 1.0f;
+	const float far = 1000.0f;
 };

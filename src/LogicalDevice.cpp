@@ -300,11 +300,7 @@ CommandBufferRecordInfo LogicalDevice::createCommandBufferRecordInfo(const uint3
 void LogicalDevice::updateMVP(CameraHandler& cameraHandler)
 {
 	const vk::Extent2D swapChainExtent{ swapChain->getExtent() };
-	ModelViewProjectionTransformation MVP{
-		.model = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
-		.view = cameraHandler.getViewMatrix(),
-		.projection = glm::perspective(glm::radians(cameraHandler.getZoom()), swapChainExtent.width / static_cast<float>(swapChainExtent.height), 0.1f, 1000.0f)
-	};
+	ModelViewProjectionTransformation MVP{ cameraHandler.getMVPTransformation() };
 	MVP.projection[1][1] *= -1;
 	uniformBuffers[currentFrame]->copyFromCPUToDeviceMemory(&MVP);
 }

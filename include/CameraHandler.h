@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <vulkan/vulkan.hpp>
+#include "structs/ModelViewProjectionTransformation.h"
 
 enum class CameraMovement 
 {
@@ -40,8 +41,7 @@ using MouseModifierFlags = vk::Flags<MouseModifierFlagBits>;
 class CameraHandler
 {
 public:
-	virtual const glm::mat4& getViewMatrix() const = 0;
-    virtual float getZoom() const = 0;
+	virtual ModelViewProjectionTransformation getMVPTransformation() const = 0;
     virtual void processKeyboard(CameraMovement direction, float deltaTime) = 0;
     virtual Action processMouseMovement(const glm::ivec2& position, MouseButton mouseButton, MouseModifierFlags& modifiers) = 0;
     virtual void setMousePosition(const glm::ivec2& position) = 0;

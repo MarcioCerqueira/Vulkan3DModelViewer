@@ -61,7 +61,7 @@ void CommandBuffer::record(const CommandBufferRecordInfo& commandBufferRecordInf
 	vk::Buffer vulkanVertexBuffers[] = { commandBufferRecordInfo.vulkanVertexBuffer };
 	vk::DeviceSize offsets[] = { commandBufferRecordInfo.offset };
 	std::array<vk::ClearValue, 2> clearValues{};
-	clearValues[0].color = vk::ClearColorValue(std::array<float, 4>{ 0.0f, 0.0f, 0.0f, 1.0f });
+	clearValues[0].color = vk::ClearColorValue(std::array<float, 4>{ 0.63f, 0.82f, 0.96f, 1.0f });
 	clearValues[1].depthStencil = vk::ClearDepthStencilValue(1.0f, 0);
 	vk::RenderPassBeginInfo localRenderPassBeginInfo{ commandBufferRecordInfo.renderPassBeginInfo };
 	localRenderPassBeginInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());

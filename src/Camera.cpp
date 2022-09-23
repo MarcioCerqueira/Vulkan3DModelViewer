@@ -384,14 +384,13 @@ void Camera::trackball(glm::ivec2 const& position)
 	upVector = glm::vec3(up2.x, up2.y, up2.z);
 }
 
-const glm::mat4& Camera::getViewMatrix() const
+ModelViewProjectionTransformation Camera::getMVPTransformation() const
 {
-	return matrix;
-}
-
-float Camera::getZoom() const
-{
-	return zoom;
+	return ModelViewProjectionTransformation{
+		.model = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+		.view = matrix,
+		.projection = glm::perspective(glm::radians(zoom), windowSize[0] / static_cast<float>(windowSize[1]), 0.1f, 1000.0f)
+	};
 }
 
 void Camera::printCameraData() const
