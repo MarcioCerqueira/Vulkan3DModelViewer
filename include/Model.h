@@ -19,6 +19,7 @@ public:
 private:
 	void buildMesh(const tinyobj::attrib_t& attrib, const std::vector <tinyobj::shape_t>& shapes);
 	glm::vec3 buildPosition(const tinyobj::attrib_t& attrib, const tinyobj::index_t& index) const;
+	glm::vec3 buildNormal(const tinyobj::attrib_t& attrib, const tinyobj::index_t& index) const;
 	glm::vec2 buildTexCoord(const tinyobj::attrib_t& attrib, const tinyobj::index_t& index) const;
 
 	std::vector<Vertex> vertices;

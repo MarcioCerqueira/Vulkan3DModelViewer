@@ -22,7 +22,7 @@ void Model::buildMesh(const tinyobj::attrib_t& attrib, const std::vector <tinyob
 		{
 			const Vertex vertex{
 				.position = buildPosition(attrib, index),
-				.color = {1.0, 1.0f, 1.0f},
+				.normal = buildNormal(attrib, index),
 				.texCoord = buildTexCoord(attrib, index)
 			};
 			if (uniqueVertices.count(vertex) == 0)
@@ -41,6 +41,15 @@ glm::vec3 Model::buildPosition(const tinyobj::attrib_t& attrib, const tinyobj::i
 		attrib.vertices[3 * static_cast<uint32_t>(index.vertex_index) + 0],
 		attrib.vertices[3 * static_cast<uint32_t>(index.vertex_index) + 1],
 		attrib.vertices[3 * static_cast<uint32_t>(index.vertex_index) + 2]
+	};
+}
+
+glm::vec3 Model::buildNormal(const tinyobj::attrib_t& attrib, const tinyobj::index_t& index) const
+{
+	return glm::vec3{
+		attrib.normals[3 * static_cast<uint32_t>(index.normal_index) + 0],
+		attrib.normals[3 * static_cast<uint32_t>(index.normal_index) + 1],
+		attrib.normals[3 * static_cast<uint32_t>(index.normal_index) + 2]
 	};
 }
 
