@@ -14,10 +14,10 @@ void UniformBuffer::createUniformData(const PhysicalDeviceProperties& physicalDe
 	buffer.bindBufferMemory();
 }
 
-void UniformBuffer::copyFromCPUToDeviceMemory(const ModelViewProjectionTransformation* data)
+void UniformBuffer::copyFromCPUToDeviceMemory(const UniformBufferObject* data)
 {
 	buffer.copyFromCPUToDeviceMemory(data);
-	size = sizeof(ModelViewProjectionTransformation);
+	size = sizeof(UniformBufferObject);
 }
 
 const vk::Buffer& UniformBuffer::getVulkanBuffer() const

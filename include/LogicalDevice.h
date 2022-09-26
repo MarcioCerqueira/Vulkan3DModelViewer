@@ -12,7 +12,7 @@
 #include <chrono>
 
 #include "structs/LogicalDeviceCreateInfo.h"
-#include "structs/ModelViewProjectionTransformation.h"
+#include "structs/UniformBufferObject.h"
 #include "SwapChain.h"
 #include "RenderPass.h"
 #include "CommandBuffer.h"
@@ -64,7 +64,7 @@ private:
 	uint32_t acquireNextImageFromSwapChain(WindowHandler& windowHandler);
 	void resetFences(const uint32_t fenceCount);
 	CommandBufferRecordInfo createCommandBufferRecordInfo(const uint32_t imageIndex) const;
-	void updateMVP(CameraHandler& cameraHandler);
+	void updateUniformBuffers(CameraHandler& cameraHandler);
 	void presentResult(WindowHandler& windowHandler, const uint32_t imageIndex, bool framebufferResized);
 
 	const int MAX_FRAMES_IN_FLIGHT = 2;

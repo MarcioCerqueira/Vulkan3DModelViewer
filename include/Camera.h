@@ -59,7 +59,7 @@ public:
 	
 	Camera(const glm::vec3& cameraPosition, const glm::vec3& centerPosition, const glm::vec3& upVector);
 
-	const glm::vec3& getCameraPosition() const;
+	const glm::vec3& getCameraPosition() const override;
 	const glm::vec3& getCenterPosition() const;
 	Mode  getMode() const;
 	const glm::ivec2& getMousePosition() const;

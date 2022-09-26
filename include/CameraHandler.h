@@ -42,6 +42,7 @@ class CameraHandler
 {
 public:
 	virtual ModelViewProjectionTransformation getMVPTransformation() const = 0;
+    virtual const glm::vec3& getCameraPosition() const = 0;
     virtual void processKeyboard(CameraMovement direction, float deltaTime) = 0;
     virtual Action processMouseMovement(const glm::ivec2& position, MouseButton mouseButton, MouseModifierFlags& modifiers) = 0;
     virtual void setMousePosition(const glm::ivec2& position) = 0;

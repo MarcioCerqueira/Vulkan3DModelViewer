@@ -162,7 +162,7 @@ void LogicalDevice::createIndexBuffer(const std::vector<uint32_t>& indices, cons
 
 void LogicalDevice::createUniformBuffers(const PhysicalDeviceProperties& physicalDeviceProperties)
 {
-	const vk::DeviceSize bufferSize{ sizeof(ModelViewProjectionTransformation) };
+	const vk::DeviceSize bufferSize{ sizeof(UniformBufferObject) };
 	uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 	for (auto& uniformBuffer : uniformBuffers)
 	{
@@ -243,7 +243,7 @@ void LogicalDevice::drawFrame(WindowHandler& windowHandler, CameraHandler& camer
 	const uint32_t imageIndex{ acquireNextImageFromSwapChain(windowHandler) };
 	resetFences(fenceCount);
 	commandBuffers->reset(currentFrame);
-	updateMVP(cameraHandler);
+	updateUniformBuffers(cameraHandler);
 	descriptorSet->write(uniformBuffers[currentFrame], vulkanTextureImage, currentFrame);
 	commandBuffers->record(createCommandBufferRecordInfo(imageIndex));
 	commandBuffers->submit(synchronizationObjects[currentFrame], currentFrame);
@@ -297,12 +297,18 @@ CommandBufferRecordInfo LogicalDevice::createCommandBufferRecordInfo(const uint3
 	};
 }
 
-void LogicalDevice::updateMVP(CameraHandler& cameraHandler)
+void LogicalDevice::updateUniformBuffers(CameraHandler& cameraHandler)
 {
 	const vk::Extent2D swapChainExtent{ swapChain->getExtent() };
 	ModelViewProjectionTransformation MVP{ cameraHandler.getMVPTransformation() };
 	MVP.projection[1][1] *= -1;
-	uniformBuffers[currentFrame]->copyFromCPUToDeviceMemory(&MVP);
+	UniformBufferObject UBO{
+		.model = MVP.model,
+		.view = MVP.view,
+		.projection = MVP.projection,
+		.cameraPosition = glm::vec4(cameraHandler.getCameraPosition(), 1.0)
+	};
+	uniformBuffers[currentFrame]->copyFromCPUToDeviceMemory(&UBO);
 }
 
 void LogicalDevice::presentResult(WindowHandler& windowHandler, const uint32_t imageIndex, bool framebufferResized)

@@ -13,7 +13,7 @@ class DescriptorSet
 {
 public:
 	DescriptorSet(const vk::Device& vulkanLogicalDevice, const int maxFramesInFlight);
-	void write(const std::shared_ptr<UniformBuffer>& uniformBuffer, const std::shared_ptr<Image>& image, int frameIndex);
+	void write(const std::shared_ptr<UniformBuffer>& uniformBuffer, const std::shared_ptr<Image>& image, int index);
 	
 	const vk::DescriptorSet& getVulkanDescriptorSet(int frameIndex) const;
 	const vk::DescriptorSetLayout& getVulkanDescriptorSetLayout() const;
