@@ -3,8 +3,9 @@
 
 struct UniformBufferObject
 {
-	glm::mat4 model;
-	glm::mat4 view;
-	glm::mat4 projection;
-	glm::vec4 cameraPosition;
+	alignas(16) glm::mat4 model;
+	alignas(16) glm::mat4 view;
+	alignas(16) glm::mat4 projection;
+	alignas(16) glm::vec4 cameraPosition;
+	alignas(16) float showTexture;
 };

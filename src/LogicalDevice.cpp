@@ -243,7 +243,7 @@ void LogicalDevice::drawFrame(WindowHandler& windowHandler, CameraHandler& camer
 	const uint32_t imageIndex{ acquireNextImageFromSwapChain(windowHandler) };
 	resetFences(fenceCount);
 	commandBuffers->reset(currentFrame);
-	updateUniformBuffers(cameraHandler);
+	updateUniformBuffers(windowHandler, cameraHandler);
 	descriptorSet->write(uniformBuffers[currentFrame], vulkanTextureImage, currentFrame);
 	commandBuffers->record(createCommandBufferRecordInfo(imageIndex));
 	commandBuffers->submit(synchronizationObjects[currentFrame], currentFrame);
@@ -297,7 +297,7 @@ CommandBufferRecordInfo LogicalDevice::createCommandBufferRecordInfo(const uint3
 	};
 }
 
-void LogicalDevice::updateUniformBuffers(CameraHandler& cameraHandler)
+void LogicalDevice::updateUniformBuffers(WindowHandler& windowHandler, CameraHandler& cameraHandler)
 {
 	const vk::Extent2D swapChainExtent{ swapChain->getExtent() };
 	ModelViewProjectionTransformation MVP{ cameraHandler.getMVPTransformation() };
@@ -306,7 +306,8 @@ void LogicalDevice::updateUniformBuffers(CameraHandler& cameraHandler)
 		.model = MVP.model,
 		.view = MVP.view,
 		.projection = MVP.projection,
-		.cameraPosition = glm::vec4(cameraHandler.getCameraPosition(), 1.0)
+		.cameraPosition = glm::vec4(cameraHandler.getCameraPosition(), 1.0),
+		.showTexture = static_cast<float>(windowHandler.showTexture())
 	};
 	uniformBuffers[currentFrame]->copyFromCPUToDeviceMemory(&UBO);
 }

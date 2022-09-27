@@ -64,7 +64,7 @@ private:
 	uint32_t acquireNextImageFromSwapChain(WindowHandler& windowHandler);
 	void resetFences(const uint32_t fenceCount);
 	CommandBufferRecordInfo createCommandBufferRecordInfo(const uint32_t imageIndex) const;
-	void updateUniformBuffers(CameraHandler& cameraHandler);
+	void updateUniformBuffers(WindowHandler& windowHandler, CameraHandler& cameraHandler);
 	void presentResult(WindowHandler& windowHandler, const uint32_t imageIndex, bool framebufferResized);
 
 	const int MAX_FRAMES_IN_FLIGHT = 2;

@@ -5,6 +5,7 @@ layout(binding = 0) uniform UniformBufferObject {
     mat4 view;
     mat4 projection;
     vec4 cameraPosition;
+    float showTexture;
 } ubo;
 
 layout(location = 0) in vec3 inPosition;
@@ -15,6 +16,7 @@ layout(location = 0) out vec3 fragPosition;
 layout(location = 1) out vec3 fragNormal;
 layout(location = 2) out vec2 fragTexCoord;
 layout(location = 3) out vec4 cameraPosition;
+layout(location = 4) out float showTexture;
 
 void main() 
 {
@@ -23,4 +25,5 @@ void main()
     fragNormal = mat3(transpose(inverse(ubo.model))) * inNormal;
     fragTexCoord = inTexCoord;
     cameraPosition = ubo.cameraPosition;
+    showTexture = ubo.showTexture;
 }

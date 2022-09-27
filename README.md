@@ -53,4 +53,5 @@ This application was successfully tested using the following models:
 - [Viking Room](https://vulkan-tutorial.com/Loading_models);
 - [Vokselia Spawn](https://casual-effects.com/g3d/data10/research/model/vokselia_spawn/vokselia_spawn.zip);
 
-Tip: If you want to set up the camera properly, you can move the camera around the scene and press `C` to capture the camera data and later insert it in the configuration file.
+Tips: If you want to set up the camera properly, you can move the camera around the scene and press `C` to capture the camera data and later insert it in the configuration file.
+Also, if you want to disable the texture visualization, press 'R'. Conversely, press 'T' to enable the texture visualization.

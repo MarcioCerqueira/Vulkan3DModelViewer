@@ -6,5 +6,6 @@ class WindowHandler
 {
 public:
 	virtual WindowSize getFramebufferSize() const = 0;
-	virtual void waitEvents() const = 0;
+	virtual void waitEvents() const = 0; 
+	virtual bool showTexture() const = 0;
 };

@@ -16,6 +16,7 @@ public:
 	GLFWwindow* getGLFWWindow() const;
 	WindowSize getFramebufferSize() const override;
 	void waitEvents() const override;
+	bool showTexture() const override;
 	void open(std::function<void(WindowHandler&, CameraHandler&, bool)> drawFrame);
 	
 	static void cursorPosCallback(GLFWwindow* window, double xposIn, double yposIn);
@@ -45,4 +46,5 @@ private:
 	float lastFrameTime = 0.0f;
 	float deltaTime = 0.0f;
 	bool framebufferResized = false;
+	bool textureShouldBeVisible = true;
 };

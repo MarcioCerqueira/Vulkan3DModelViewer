@@ -56,6 +56,11 @@ void Window::waitEvents() const
 	glfwWaitEvents();
 }
 
+bool Window::showTexture() const
+{
+	return textureShouldBeVisible;
+}
+
 void Window::open(std::function<void(WindowHandler&, CameraHandler&, bool)> drawFrame)
 {
 	while(!glfwWindowShouldClose(glfwWindow)) 
@@ -96,6 +101,14 @@ void Window::processKeyboard()
 	if (glfwGetKey(glfwWindow, GLFW_KEY_C) == GLFW_PRESS)
 	{
 		cameraHandler.printCameraData();
+	}
+	if (glfwGetKey(glfwWindow, GLFW_KEY_T) == GLFW_PRESS)
+	{
+		textureShouldBeVisible = true;
+	}
+	if (glfwGetKey(glfwWindow, GLFW_KEY_R) == GLFW_PRESS)
+	{
+		textureShouldBeVisible = false;
 	}
 }
 
