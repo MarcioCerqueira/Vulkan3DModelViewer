@@ -26,7 +26,6 @@ std::vector<char> Shader::readFile(const std::string& filename) const
 
 void Shader::createShaderModule(const std::vector<char>& shaderCode, const vk::Device& vulkanLogicalDevice)
 {
-
 	vk::ShaderModuleCreateInfo shaderModuleCreateInfo{
 		.codeSize = shaderCode.size(),
 		.pCode = reinterpret_cast<const uint32_t*>(shaderCode.data())

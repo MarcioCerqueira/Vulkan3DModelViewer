@@ -16,10 +16,8 @@ Model::Model(const std::string& modelFilename, const std::string& textureFilenam
 void Model::buildMesh(const tinyobj::attrib_t& attrib, const std::vector <tinyobj::shape_t>& shapes)
 {
 	std::unordered_map<Vertex, uint32_t> uniqueVertices;
-	for (const auto& shape : shapes)
-	{
-		for (const auto& index : shape.mesh.indices)
-		{
+	std::ranges::for_each(shapes, [this, attrib, &uniqueVertices](const auto& shape) {
+		std::ranges::for_each(shape.mesh.indices, [this, attrib, &uniqueVertices](const auto& index) {
 			const Vertex vertex{
 				.position = buildPosition(attrib, index),
 				.normal = buildNormal(attrib, index),
@@ -31,8 +29,8 @@ void Model::buildMesh(const tinyobj::attrib_t& attrib, const std::vector <tinyob
 				vertices.push_back(vertex);
 			}
 			indices.push_back(uniqueVertices[vertex]);
-		}
-	}
+		});
+	});
 }
 
 glm::vec3 Model::buildPosition(const tinyobj::attrib_t& attrib, const tinyobj::index_t& index) const

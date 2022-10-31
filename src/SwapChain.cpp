@@ -22,11 +22,9 @@ SwapChain::~SwapChain()
 
 void SwapChain::cleanup()
 {
-    for (int imageIndex = 0; imageIndex < imageViews.size(); imageIndex++)
-    {
-        framebuffers[imageIndex].reset();
-        imageViews[imageIndex].reset();
-    }
+    auto resetUniquePointers = []<typename T>(std::unique_ptr<T>& uniquePointer) { uniquePointer.reset(); };
+    std::ranges::for_each(framebuffers, resetUniquePointers);
+    std::ranges::for_each(imageViews, resetUniquePointers);
     depthImage.reset();
     colorImage.reset();
     swapChainCreateInfo.vulkanLogicalDevice.destroySwapchainKHR(vulkanSwapChain);
@@ -35,27 +33,23 @@ void SwapChain::cleanup()
 void SwapChain::chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats)
 {
     surfaceFormat = availableFormats[0];
-    for (const auto& availableFormat : availableFormats) 
-    {
-        if (availableFormat.format == vk::Format::eB8G8R8A8Srgb && availableFormat.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear) 
+    std::ranges::for_each(availableFormats, [this](const auto& availableFormat) {
+        if (availableFormat.format == vk::Format::eB8G8R8A8Srgb && availableFormat.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear)
         {
             surfaceFormat = availableFormat;
-            return;
         }
-    }
+    });
 }
 
 void SwapChain::chooseSwapPresentMode(const std::vector<vk::PresentModeKHR>& availablePresentModes)
 {
     presentMode = vk::PresentModeKHR::eFifo;
-    for (const auto& availablePresentMode : availablePresentModes) 
-    {
-        if (availablePresentMode == vk::PresentModeKHR::eMailbox) 
+    std::ranges::for_each(availablePresentModes, [this](const auto& availablePresentMode) {
+        if (availablePresentMode == vk::PresentModeKHR::eMailbox)
         {
             presentMode = availablePresentMode;
-            return;
         }
-    }
+    });
 }
 
 void SwapChain::chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities, const WindowSize& framebufferSize)
@@ -117,17 +111,16 @@ void SwapChain::buildVulkanSwapChain(const SwapChainCreateInfo& swapChainCreateI
 void SwapChain::buildSwapChainImageViews(const SwapChainCreateInfo& swapChainCreateInfo)
 {
     imageViews.resize(images.size());
-    for (int imageIndex = 0; imageIndex < images.size(); ++imageIndex)
-    {
+    std::ranges::for_each(imageViews, [this, index = 0, swapChainCreateInfo](auto& imageView) mutable {
         const ImageViewInfo imageViewInfo{
             .vulkanLogicalDevice = swapChainCreateInfo.vulkanLogicalDevice,
-            .image = images[imageIndex],
+            .image = images[index++],
             .format = surfaceFormat.format,
             .aspectMask = vk::ImageAspectFlagBits::eColor,
             .mipLevels = 1
         };
-        imageViews[imageIndex] = std::make_unique<ImageView>(imageViewInfo);
-    }
+        imageView = std::make_unique<ImageView>(imageViewInfo);
+    });
 }
 
 void SwapChain::buildDepthImage()
@@ -174,11 +167,11 @@ ImageInfo SwapChain::buildColorImageInfo() const
 void SwapChain::buildFramebuffers(const vk::Device& vulkanLogicalDevice, const vk::RenderPass& vulkanRenderPass)
 {
     framebuffers.resize(imageViews.size());
-    for (int framebufferIndex = 0; framebufferIndex < framebuffers.size(); framebufferIndex++)
-    {
-        const std::vector<vk::ImageView> attachments = { colorImage->getVulkanImageView(), depthImage->getVulkanImageView(), imageViews[framebufferIndex]->getVulkanImageView() };
-        framebuffers[framebufferIndex] = std::make_unique<Framebuffer>(vulkanLogicalDevice, vulkanRenderPass, attachments, extent);
-    }
+    std::ranges::for_each(framebuffers, [this, index = 0, vulkanLogicalDevice, vulkanRenderPass](auto& framebuffer) mutable {
+        const std::vector<vk::ImageView> attachments = { colorImage->getVulkanImageView(), depthImage->getVulkanImageView(), imageViews[index]->getVulkanImageView() };
+        framebuffer = std::make_unique<Framebuffer>(vulkanLogicalDevice, vulkanRenderPass, attachments, extent);
+        index++;
+    });
 }
 
 vk::Result SwapChain::acquireNextImage(vk::Semaphore& imageAvailable, const vk::RenderPass& vulkanRenderPass, uint32_t& imageIndex)

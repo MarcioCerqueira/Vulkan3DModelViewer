@@ -24,16 +24,11 @@ LogicalDevice::LogicalDevice(const LogicalDeviceCreateInfo& logicalDeviceCreateI
 
 LogicalDevice::~LogicalDevice()
 {
-	for (auto& synchronizationObject : synchronizationObjects)
-	{
-		synchronizationObject.reset();
-	}
+	auto resetSharedPointers = []<typename T>(std::shared_ptr<T>& sharedPointer) { sharedPointer.reset(); };
+	std::ranges::for_each(synchronizationObjects, resetSharedPointers);
 	swapChain.reset();
 	commandBuffers.reset();
-	for (auto& uniformBuffer : uniformBuffers)
-	{
-		uniformBuffer.reset();
-	}
+	std::ranges::for_each(uniformBuffers, resetSharedPointers);
 	descriptorSet.reset();
 	vulkanTextureImage.reset();
 	graphicsPipeline.reset();
@@ -56,10 +51,9 @@ std::set<uint32_t> LogicalDevice::createUniqueQueueFamilies(const QueueFamilyInd
 std::vector<vk::DeviceQueueCreateInfo> LogicalDevice::buildDeviceQueueCreateInfos(const std::set<uint32_t>& uniqueQueueFamilies) const
 {
 	std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
-	for (uint32_t queueFamilyIndex : uniqueQueueFamilies)
-	{
+	std::ranges::for_each(uniqueQueueFamilies, [this, &queueCreateInfos](auto queueFamilyIndex) {
 		queueCreateInfos.push_back(buildDeviceQueueCreateInfo(queueFamilyIndex));
-	}
+	});
 	return queueCreateInfos;
 }
 
@@ -131,10 +125,9 @@ void LogicalDevice::createCommandBuffers(const QueueFamilyIndices& queueFamilyIn
 void LogicalDevice::createSynchronizationObjects()
 {
 	synchronizationObjects.resize(MAX_FRAMES_IN_FLIGHT);
-	for (auto& synchronizationObject : synchronizationObjects)
-	{
+	std::ranges::for_each(synchronizationObjects, [this](std::shared_ptr<SynchronizationObjects>& synchronizationObject) {
 		synchronizationObject = std::make_shared<SynchronizationObjects>(vulkanLogicalDevice);
-	}
+	});
 }
 
 void LogicalDevice::createVertexBuffer(const std::vector<Vertex>& vertices, const PhysicalDeviceProperties& physicalDeviceProperties)
@@ -162,12 +155,11 @@ void LogicalDevice::createIndexBuffer(const std::vector<uint32_t>& indices, cons
 
 void LogicalDevice::createUniformBuffers(const PhysicalDeviceProperties& physicalDeviceProperties)
 {
-	const vk::DeviceSize bufferSize{ sizeof(UniformBufferObject) };
 	uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-	for (auto& uniformBuffer : uniformBuffers)
-	{
+	std::ranges::for_each(uniformBuffers, [this, &physicalDeviceProperties](std::shared_ptr<UniformBuffer>& uniformBuffer) {
+		const vk::DeviceSize bufferSize{ sizeof(UniformBufferObject) };
 		uniformBuffer = std::make_shared<UniformBuffer>(vulkanLogicalDevice, physicalDeviceProperties, bufferSize);
-	}
+	});
 }
 
 void LogicalDevice::createTextureBuffer(const TextureImage& textureImage, const PhysicalDeviceProperties& physicalDeviceProperties)
@@ -226,10 +218,10 @@ void LogicalDevice::createGraphicsPipeline(const std::vector<std::shared_ptr<Sha
 {
 	GraphicsPipelineCreateInfo graphicsPipelineCreateInfo;
 	graphicsPipelineCreateInfo.vulkanLogicalDevice = vulkanLogicalDevice;
-	for (const auto& shader : shaders)
-	{
-		graphicsPipelineCreateInfo.shaderStages.push_back(shader->buildPipelineShaderStageCreateInfo());
-	}
+	graphicsPipelineCreateInfo.shaderStages.resize(shaders.size());
+	std::ranges::generate(graphicsPipelineCreateInfo.shaderStages, [index = 0, &shaders]() mutable {
+		return shaders[index++]->buildPipelineShaderStageCreateInfo();
+	});
 	graphicsPipelineCreateInfo.vulkanRenderPass = renderPass->getVulkanRenderPass();
 	graphicsPipelineCreateInfo.vulkanDescriptorSetLayout = descriptorSet->getVulkanDescriptorSetLayout();
 	graphicsPipelineCreateInfo.sampleCount = physicalDeviceProperties.getMaxUsableSampleCount();

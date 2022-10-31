@@ -11,23 +11,13 @@ ValidationLayer::ValidationLayer()
 bool ValidationLayer::isAvailable() const
 {
 	const std::vector<vk::LayerProperties> availableLayers{ vk::enumerateInstanceLayerProperties() };
-	for (const char* layerName : layerNames)
-	{
-		bool layerFound = false;
-		for (const auto& layerProperties : availableLayers)
-		{
-			if (strcmp(layerName, layerProperties.layerName) == 0)
-			{
-				layerFound = true;
-				break;
-			}
-		}
-		if (!layerFound)
-		{
-			return false;
-		}
-	}
-	return true;
+	auto validationLayerIsNotAvailable = std::ranges::find_if(layerNames, [availableLayers](const char* layerName) {
+		auto layerFound = std::ranges::find_if(availableLayers, [layerName](const auto& layerProperties) {
+			return strcmp(layerName, layerProperties.layerName) == 0;
+		});
+		return layerFound == availableLayers.end();
+	});
+	return validationLayerIsNotAvailable == layerNames.end();
 }
 
 uint32_t ValidationLayer::getEnabledLayerCount() const

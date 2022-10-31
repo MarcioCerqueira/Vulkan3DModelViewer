@@ -32,10 +32,9 @@ int PhysicalDeviceSuitabilityRater::rateByDeviceExtensionSupport(const PhysicalD
 {
 	const std::vector<vk::ExtensionProperties> availableExtensions = physicalDeviceSuitabilityRaterInfo.vulkanPhysicalDevice.enumerateDeviceExtensionProperties();
 	std::set<std::string> requiredExtensions(physicalDeviceSuitabilityRaterInfo.vulkanDeviceExtensions.begin(), physicalDeviceSuitabilityRaterInfo.vulkanDeviceExtensions.end());
-	for (const auto& extension : availableExtensions)
-	{
+	std::ranges::for_each(availableExtensions, [&requiredExtensions](const auto& extension) {
 		requiredExtensions.erase(extension.extensionName);
-	}
+	});
 	return static_cast<int>(requiredExtensions.empty());
 }
 

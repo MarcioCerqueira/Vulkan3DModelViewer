@@ -32,6 +32,8 @@ private:
 	vk::ImageSubresourceRange buildImageSubresourceRange(const uint32_t baseMipLevel, const uint32_t mipLevels) const;
 	CommandBufferPipelineBarrierInfo buildCommandBufferPipelineBarrierInfo(const ImageMemoryBarrierInfo& imageMemoryBarrierInfo, const vk::ImageMemoryBarrier& imageMemoryBarrier) const;
 	void checkLinearBlittingSupport(const PhysicalDeviceProperties& physicalDeviceProperties) const;
+	std::vector<uint32_t> generateLevelsVector() const;
+	void generateEachMipmap(std::shared_ptr<CommandBuffer>& commandBuffers, const std::vector<uint32_t>& levels);
 	vk::ImageBlit buildImageBlit(const uint32_t level, const int32_t mipWidth, const int32_t mipHeight) const;
 	vk::ImageSubresourceLayers buildImageSubresourceLayers(const uint32_t mipLevel) const;
 	CommandBufferBlitImageInfo buildCommandBufferBlitImageInfo(const vk::ImageLayout& srcLayout, const vk::ImageLayout& dstLayout, const vk::ImageBlit& imageBlit) const;

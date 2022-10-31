@@ -112,18 +112,7 @@ void Image::generateMipmaps(std::shared_ptr<CommandBuffer>& commandBuffers, cons
 {
 	commandBuffers->beginOneTimeSubmit(0);
 	checkLinearBlittingSupport(physicalDeviceProperties);
-	int32_t mipWidth{ width };
-	int32_t mipHeight{ height };
-	for (uint32_t level = 1; level < mipLevels; ++level)
-	{
-		const ImageMemoryBarrierInfo imageMemoryBarrierInfo{ prepareMipLevelForBlit(commandBuffers, level - 1) };
-		const vk::ImageBlit imageBlit{ buildImageBlit(level, mipWidth, mipHeight) };
-		const CommandBufferBlitImageInfo commandBufferBlitImageInfo{ buildCommandBufferBlitImageInfo(imageMemoryBarrierInfo.newLayout, imageMemoryBarrierInfo.oldLayout, imageBlit) };
-		commandBuffers->blitImage(commandBufferBlitImageInfo);
-		transferMipLevelToShaderLayout(commandBuffers, level - 1);
-		if (mipWidth > 1) mipWidth /= 2;
-		if (mipHeight > 1) mipHeight /= 2;
-	}
+	generateEachMipmap(commandBuffers, generateLevelsVector());
 	transferLastMipLevelToShaderLayout(commandBuffers);
 	commandBuffers->endOneTimeSubmit(0);
 	imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
@@ -136,6 +125,28 @@ void Image::checkLinearBlittingSupport(const PhysicalDeviceProperties& physicalD
 	{
 		throw std::runtime_error("Texture image format does not support linear blitting!");
 	}
+}
+
+std::vector<uint32_t> Image::generateLevelsVector() const
+{
+	std::vector<uint32_t> levels(mipLevels - 1);
+	std::ranges::generate(levels, [level = 1]() mutable { return level++; });
+	return levels;
+}
+
+void Image::generateEachMipmap(std::shared_ptr<CommandBuffer>& commandBuffers, const std::vector<uint32_t>& levels)
+{
+	int32_t mipWidth{ width };
+	int32_t mipHeight{ height };
+	std::ranges::for_each(levels, [this, &commandBuffers, &mipWidth, &mipHeight](uint32_t level) {
+		const ImageMemoryBarrierInfo imageMemoryBarrierInfo{ prepareMipLevelForBlit(commandBuffers, level - 1) };
+		const vk::ImageBlit imageBlit{ buildImageBlit(level, mipWidth, mipHeight) };
+		const CommandBufferBlitImageInfo commandBufferBlitImageInfo{ buildCommandBufferBlitImageInfo(imageMemoryBarrierInfo.newLayout, imageMemoryBarrierInfo.oldLayout, imageBlit) };
+		commandBuffers->blitImage(commandBufferBlitImageInfo);
+		transferMipLevelToShaderLayout(commandBuffers, level - 1);
+		if (mipWidth > 1) mipWidth /= 2;
+		if (mipHeight > 1) mipHeight /= 2;
+	});
 }
 
 vk::ImageBlit Image::buildImageBlit(const uint32_t level, const int32_t mipWidth, const int32_t mipHeight) const

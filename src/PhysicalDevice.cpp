@@ -19,8 +19,7 @@ void PhysicalDevice::checkVulkanSupport(const std::vector<vk::PhysicalDevice>& v
 std::multimap<int, vk::PhysicalDevice> PhysicalDevice::rateMostSuitablePhysicalDevices(const std::vector<vk::PhysicalDevice>& vulkanPhysicalDevices, const vk::SurfaceKHR& vulkanWindowSurface) const
 {
 	std::multimap<int, vk::PhysicalDevice> mostSuitablePhysicalDevices;
-	for (const auto& vulkanPhysicalDevice : vulkanPhysicalDevices)
-	{
+	std::ranges::for_each(vulkanPhysicalDevices, [this, vulkanWindowSurface, &mostSuitablePhysicalDevices](auto& vulkanPhysicalDevice) {
 		PhysicalDeviceSuitabilityRaterInfo physicalDeviceSuitabilityRaterInfo{
 			.vulkanPhysicalDevice = vulkanPhysicalDevice,
 			.vulkanWindowSurface = vulkanWindowSurface,
@@ -28,7 +27,7 @@ std::multimap<int, vk::PhysicalDevice> PhysicalDevice::rateMostSuitablePhysicalD
 		};
 		int score{ physicalDeviceSuitabilityRater.rate(physicalDeviceSuitabilityRaterInfo) };
 		mostSuitablePhysicalDevices.insert(std::make_pair(score, vulkanPhysicalDevice));
-	}
+	});
 	return mostSuitablePhysicalDevices;
 }
 
@@ -61,33 +60,31 @@ std::unique_ptr<LogicalDevice> PhysicalDevice::createLogicalDevice(const Logical
 
 uint32_t PhysicalDevice::findMemoryType(uint32_t memoryTypeFilter, vk::MemoryPropertyFlags memoryPropertyFlags) const
 {
-	const vk::PhysicalDeviceMemoryProperties physicalDeviceMemoryProperties{ vulkanPhysicalDevice.getMemoryProperties() };
-	for (uint32_t i = 0; i < physicalDeviceMemoryProperties.memoryTypeCount; i++)
+	std::vector<uint32_t> indices(vulkanPhysicalDevice.getMemoryProperties().memoryTypeCount);
+	std::ranges::generate(indices, [index = 0]() mutable { return index++; });
+	auto memoryType = std::ranges::find_if(indices, [this, memoryTypeFilter, &memoryPropertyFlags](const uint32_t index) {
+		bool firstCondition = memoryTypeFilter & (1 << index);
+		bool secondCondition = (vulkanPhysicalDevice.getMemoryProperties().memoryTypes[index].propertyFlags & memoryPropertyFlags) == memoryPropertyFlags;
+		return firstCondition && secondCondition;
+	});
+	if (memoryType != indices.end())
 	{
-		if (memoryTypeFilter & (1 << i))
-		{
-			if ((physicalDeviceMemoryProperties.memoryTypes[i].propertyFlags & memoryPropertyFlags) == memoryPropertyFlags)
-			{
-				return i;
-			}
-		}
+		return *memoryType;
 	}
 	throw std::runtime_error("Failed to find suitable memory type!");
 }
 
 vk::Format PhysicalDevice::findSupportedFormat(const std::vector<vk::Format>& candidates, const vk::ImageTiling& tiling, const vk::FormatFeatureFlags& features) const
 {
-	for (const auto& format : candidates)
-	{
+	auto supportedFormat = std::ranges::find_if(candidates, [this, &tiling, &features](const auto& format) {
 		const vk::FormatProperties formatProperties{ vulkanPhysicalDevice.getFormatProperties(format) };
-		if (tiling == vk::ImageTiling::eLinear && (formatProperties.linearTilingFeatures & features) == features)
-		{
-			return format;
-		}
-		if (tiling == vk::ImageTiling::eOptimal && (formatProperties.optimalTilingFeatures & features) == features)
-		{
-			return format;
-		}
+		bool isLinear = (tiling == vk::ImageTiling::eLinear && (formatProperties.linearTilingFeatures & features) == features);
+		bool isOptimal = (tiling == vk::ImageTiling::eOptimal && (formatProperties.optimalTilingFeatures & features) == features);
+		return isLinear || isOptimal;
+	});
+	if (supportedFormat != candidates.end())
+	{
+		return *supportedFormat;
 	}
 	throw std::runtime_error("Failed to find supported features!");
 }

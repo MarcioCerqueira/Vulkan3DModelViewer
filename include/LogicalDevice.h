@@ -10,6 +10,7 @@
 #include <iostream>
 #include <set>
 #include <chrono>
+#include <ranges>
 
 #include "structs/LogicalDeviceCreateInfo.h"
 #include "structs/UniformBufferObject.h"
