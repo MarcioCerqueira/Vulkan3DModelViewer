@@ -10,7 +10,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "AmbientOcclusionApplication.h"
+#include "Application.h"
 #include "ArgumentParser.h"
 #include "JSONConfigurationFileParser.h"
 #include "Scene.h"
@@ -24,7 +24,7 @@ int main(const int argc, const char *argv[])
         ConfigurationFileModel configurationFileModel{JSONConfigurationFileParser.getConfigurationFileModel()};
         Scene scene{ configurationFileModel.scene };
         WindowSize windowSize{ configurationFileModel.window.width, configurationFileModel.window.height };
-        AmbientOcclusionApplication app{windowSize, scene};
+        Application app{windowSize, scene};
         app.run();
     } catch (const vk::SystemError &error) 
     {

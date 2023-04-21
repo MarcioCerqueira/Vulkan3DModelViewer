@@ -1,6 +1,6 @@
-#include "AmbientOcclusionApplication.h"
+#include "Application.h"
 
-AmbientOcclusionApplication::AmbientOcclusionApplication(const WindowSize& windowSize, Scene& scene) : window(windowSize, applicationName, scene.getCamera()), graphicsInstance(applicationName)
+Application::Application(const WindowSize& windowSize, Scene& scene) : window(windowSize, applicationName, scene.getCamera()), graphicsInstance(applicationName)
 {
 	graphicsInstance.createWindowSurface(window.getGLFWWindow());
 	graphicsInstance.selectPhysicalDevice();
@@ -8,7 +8,7 @@ AmbientOcclusionApplication::AmbientOcclusionApplication(const WindowSize& windo
 	graphicsInstance.createGraphicsPipeline(loadShaders(graphicsInstance.getVulkanLogicalDevice()));
 }
 
-std::vector<std::shared_ptr<Shader>> AmbientOcclusionApplication::loadShaders(const vk::Device& vulkanLogicalDevice) const
+std::vector<std::shared_ptr<Shader>> Application::loadShaders(const vk::Device& vulkanLogicalDevice) const
 {
 	const std::vector<std::shared_ptr<Shader>> shaders = {
 		std::make_shared<Shader>("shaders/vert.spv", vulkanLogicalDevice, vk::ShaderStageFlagBits::eVertex),
@@ -17,7 +17,7 @@ std::vector<std::shared_ptr<Shader>> AmbientOcclusionApplication::loadShaders(co
 	return shaders;
 }
 
-void AmbientOcclusionApplication::run()
+void Application::run()
 {
 	std::function<void(WindowHandler& windowHandler, CameraHandler& cameraHandler, bool framebufferResized)> drawFrame = std::bind(&GraphicsInstance::drawFrame, &graphicsInstance, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 	window.open(drawFrame);
