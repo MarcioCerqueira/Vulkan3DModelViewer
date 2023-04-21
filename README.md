@@ -1,8 +1,8 @@
-# AmbientOcclusion
+# 3D Model Viewer in Vulkan
 
 ## Overview
 
-This repository contains several ambient occlusion algorithms implemented in C++ using the Vulkan library.
+This repository contains a basic 3D model viewer implemented in C++ using the Vulkan library.
 
 ## Requirements
 
@@ -32,12 +32,12 @@ To compile the source code and build the application for Windows, you may need t
    
 Then, you can create a new, empty Visual Studio project, add the source codes, and you may need to change the following properties of the project:
  - `Configuration Properties -> General -> C++ Language Standard:` to `ISO C++17 Standard (/std:c++17)`;
- - `Configuration Properties -> C/C++ -> General -> Additional Include Directories:` to `<AMBIENT_OCCLUSION_PATH>\include;%(AdditionalIncludeDirectories)`;
+ - `Configuration Properties -> C/C++ -> General -> Additional Include Directories:` to `<VULKAN_MODEL_VIEWER_PATH>\include;%(AdditionalIncludeDirectories)`;
  - `Configuration Properties -> Linker -> General ->  Additional Library Directories:` to `<VULKAN_SDK_PATH>\Lib;%(AdditionalLibraryDirectories)`;
  - `Configuration Properties -> Linker -> Input -> Additional Dependencies:` add `vulkan-1.lib`,
 
 where:
-- `<AMBIENT_OCCLUSION_PATH>` is the path where the repository is stored;
+- `<VULKAN_MODEL_VIEWER_PATH>` is the path where the repository is stored;
 - `<VULKAN_SDK_PATH>` is the path where the Vulkan SDK is installed;
 
 ## Scene Configuration
