@@ -4,6 +4,8 @@
 
 This repository contains a basic 3D model viewer implemented in C++ using the Vulkan library.
 
+<img src="https://github.com/MarcioCerqueira/Vulkan3DModelViewer/blob/main/gallery.jpeg"  width="50%" height="50%">
+
 ## Requirements
 
 The provided source codes were tested in Windows 10 using the following libraries:
